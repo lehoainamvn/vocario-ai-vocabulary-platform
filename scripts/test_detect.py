@@ -3,14 +3,15 @@ import os
 from ultralytics import YOLOWorld
 
 def main():
-    image_path = os.path.join("docs", "figures", "scene_01_study_desk.jpg")
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    image_path = os.path.join(root_dir, "docs", "figures", "scene_01_study_desk.jpg")
     print(f"🚀 Bắt đầu nhận diện từ vựng trên bức ảnh: {image_path}")
 
     # 1. Load mô hình YOLO-World
     model = YOLOWorld('yolov8s-worldv2.pt')
 
     # 2. Đọc bộ từ vựng 1000+ từ thiết yếu chuẩn Vocario
-    target_classes_path = os.path.join("backend", "services", "target_classes.txt")
+    target_classes_path = os.path.join(root_dir, "backend", "services", "target_classes.txt")
     if os.path.exists(target_classes_path):
         with open(target_classes_path, "r", encoding="utf-8") as f:
             vocab_classes = [line.strip() for line in f if line.strip()]

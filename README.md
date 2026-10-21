@@ -68,6 +68,11 @@ graph TD
 * Gắn thẻ từ vựng trực quan (Bounding Box) kèm phiên âm quốc tế IPA, định nghĩa và câu ví dụ song ngữ.
 * Một chạm thêm từ vựng vào sổ tay ôn tập SM-2 cá nhân.
 
+<p align="center">
+  <img src="docs/figures/test_output_study_desk.jpg" width="85%" alt="YOLO-World Object Detection Showcase" />
+  <br/><i>Minh họa kết quả nhận diện bóc tách từ vựng thực tế trong không gian bàn học sinh</i>
+</p>
+
 ### 🧠 2. Phòng Luyện Ôn Thẻ Nhớ SM-2 (`/flashcards`)
 * Thuật toán SuperMemo SM-2 tự động tính toán lại $EF$ (Easiness Factor) và khoảng cách ngày ôn tập tiếp theo dựa trên tự đánh giá (Grade 0 đến 5).
 * Chế độ lật thẻ 3D mượt mà, phát âm giọng bản xứ tự nhiên thông qua Web Speech API.
@@ -87,6 +92,16 @@ graph TD
 * **Quản trị học viên:** Xem tiến trình SM-2, đặt lại mật khẩu, cấp mới tài khoản an toàn.
 * **Kiểm duyệt ảnh AI Vision:** Quản lý nhật ký quét ảnh, gán nhãn thủ công hoặc quảng bá vật thể vào từ điển.
 * **Cấu hình thuật toán:** Tùy biến tham số SM-2 ($I_1, I_2, EF_{min}, EF_{init}$) và độ nhạy nhận diện AI.
+
+### 📊 6. Đánh Giá Thực Nghiệm Mô Hình AI (AI Model Benchmarks)
+* Đồ án thực hiện đo lường khoa học các chỉ số chất lượng mô hình:
+  * **Mean Average Precision (mAP@50 & mAP@50-95)** đánh giá độ chuẩn xác phát hiện vật thể.
+  * **Confusion Matrix** và **Training Loss Curves** kiểm soát hiện tượng quá khớp (Overfitting).
+
+<p align="center">
+  <img src="docs/figures/map_curve.png" width="45%" alt="mAP Curve" />
+  <img src="docs/figures/loss_curve.png" width="45%" alt="Loss Curve" />
+</p>
 
 ---
 
@@ -121,10 +136,11 @@ DoAnTotNghiep/
 │   ├── figures/              # Biểu đồ đánh giá độ chính xác mAP, Loss, Confusion Matrix
 │   └── UI_DESIGN_SYSTEM_GUIDELINES.md
 │
-├── huongdanchay.md           # Hướng dẫn chạy nhanh 3 Terminal
-├── start_ai_service.bat      # Script khởi chạy nhanh AI Service
-├── test_detect.py            # Script kiểm thử độc lập mô hình YOLO-World
+├── scripts/                  # Tiện ích khởi chạy & Script kiểm thử độc lập
+│   ├── start_ai_service.bat  # Script khởi chạy nhanh AI Vision Server
+│   └── test_detect.py        # Script kiểm thử độc lập mô hình YOLO-World
 ├── .gitignore                # Cấu hình bỏ qua tệp nháp, build cache & dữ liệu cá nhân
+├── LICENSE                   # Giấy phép MIT bản quyền năm 2026
 └── README.md                 # Tài liệu tổng quan dự án
 ```
 
@@ -167,10 +183,16 @@ mvn spring-boot:run
 ### Bước 3: Khởi Chạy AI Vision Service (Cổng 8001)
 ```powershell
 cd d:\GitHub\DoAnTotNghiep
+
+# 1. Cài đặt các thư viện Python (chỉ cần chạy lần đầu)
+pip install -r backend/requirements.txt
+
+# 2. Khởi chạy AI Vision FastAPI Server
 py -m uvicorn backend.services.ai_vision_server:app --host 127.0.0.1 --port 8001 --reload
 ```
-*(Hoặc chạy trực tiếp file `start_ai_service.bat`).*
+*(Hoặc click đúp chuột vào file tiện ích **`scripts\start_ai_service.bat`**).*
 * **Kiểm tra trạng thái:** `http://127.0.0.1:8001/health`
+* **Kiểm thử nhận diện độc lập:** `py scripts/test_detect.py`
 
 ---
 

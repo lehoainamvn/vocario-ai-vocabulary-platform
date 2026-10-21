@@ -1,0 +1,26 @@
+# =========================================================================
+# VOCARIO AI VISION & LLM SERVICE — DEPENDENCIES
+# Install: pip install -r requirements.txt
+# =========================================================================
+
+# Web Framework & API Server
+fastapi>=0.110.0
+uvicorn[standard]>=0.28.0
+pydantic>=2.6.0
+python-multipart>=0.0.9
+
+# Computer Vision & Deep Learning
+ultralytics>=8.1.0
+torch>=2.2.0
+torchvision>=0.17.0
+pillow>=10.2.0
+numpy>=1.26.0
+
+# Natural Language Processing & Phonetics
+groq>=0.5.0
+eng-to-ipa>=0.0.2
+deep-translator>=1.11.4
+
+# Database Client
+psycopg2-binary>=2.9.9
+requests>=2.31.0
