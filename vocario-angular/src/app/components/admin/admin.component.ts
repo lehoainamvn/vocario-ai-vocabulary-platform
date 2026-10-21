@@ -10,6 +10,7 @@ import { AdminStats, AdminWordItem, AdminWordPageResponse, AdminWordRequest, Adm
 import { Certificate, CertificateType } from '../../models/certificate.model';
 import { IconComponent } from '../common/icon.component';
 import { CertificateModalComponent } from '../user/certificate-modal.component';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-admin',
@@ -8827,7 +8828,7 @@ headphone,Tai nghe trùm đầu,/ˈhed.fəʊn/,A2,Noun,Put on your headphones to
   getImageUrl(url: string): string {
     if (!url) return '/study_desk.png';
     if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    if (url.startsWith('/uploads/')) return `http://localhost:8088${url}`;
+    if (url.startsWith('/uploads/')) return `${environment.serverUrl}${url}`;
     return url;
   }
 

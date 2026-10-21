@@ -5,12 +5,13 @@ import { User, LoginRequest, RegisterRequest, AuthResponse, UserWordProgress, Re
 import { LeaderboardResponse, LeaderboardEntry } from '../models/leaderboard.model';
 import { Certificate, ClaimCertificateRequest, ApproveCertificateRequest, CertificateType, CreateCertificateTypeRequest, UpdateCertificateTypeRequest } from '../models/certificate.model';
 import { ToastService } from './toast.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private readonly baseUrl = 'http://localhost:8088/api';
+  private readonly baseUrl = environment.apiUrl;
   
   // Current user state as Angular Signal
   currentUser = signal<User | null>(this.loadSavedUser());

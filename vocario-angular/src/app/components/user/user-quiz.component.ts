@@ -7,6 +7,7 @@ import { ToastService } from '../../services/toast.service';
 import { UserStudyService, ContextWord } from '../../services/user-study.service';
 import { QuizStageService, QuizStage } from '../../services/quiz-stage.service';
 import { IconComponent } from '../common/icon.component';
+import { environment } from '../../../environments/environment';
 
 interface ClickFeedback {
   x: number;
@@ -699,7 +700,7 @@ export class UserQuizComponent implements OnInit, OnDestroy {
   router = inject(Router);
   quizStageService = inject(QuizStageService);
 
-  private readonly baseUrl = 'http://localhost:8088/api';
+  private readonly baseUrl = environment.apiUrl;
 
   // Trạng thái game
   gameMode = signal<'SELECT_STAGE' | 'PLAYING' | 'VICTORY'>('SELECT_STAGE');

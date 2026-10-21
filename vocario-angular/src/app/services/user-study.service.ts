@@ -6,6 +6,7 @@ import { filter } from 'rxjs/operators';
 import { ToastService } from './toast.service';
 import { ApiService } from './api.service';
 import { TargetProgress } from '../models/vocario.models';
+import { environment } from '../../environments/environment';
 
 export interface ContextWord {
   id: string;
@@ -126,7 +127,7 @@ export interface QuizGenerationResponse {
   providedIn: 'root'
 })
 export class UserStudyService {
-  private readonly baseUrl = 'http://localhost:8088/api';
+  private readonly baseUrl = environment.apiUrl;
 
   // Điều hướng các trang chính của học viên
   activePage = signal<'home' | 'scanner' | 'collection' | 'flashcards'>('home');
@@ -333,7 +334,7 @@ export class UserStudyService {
 
       let fullImageUrl = c.imageUrl || '';
       if (fullImageUrl.startsWith('/uploads/')) {
-        fullImageUrl = `http://localhost:8088${fullImageUrl}`;
+        fullImageUrl = `${environment.serverUrl}${fullImageUrl}`;
       }
 
       return {
@@ -780,7 +781,7 @@ export class UserStudyService {
     formData.append('file', file);
     const targetLevel = this.api.currentUser()?.targetLevel || 'A2';
     return this.http.post<any>(
-      `http://localhost:8001/detect?conf=${confidence}&theme=${encodeURIComponent(theme)}&target_level=${encodeURIComponent(targetLevel)}`,
+      `${environment.aiServiceUrl}/detect?conf=${confidence}&theme=${encodeURIComponent(theme)}&target_level=${encodeURIComponent(targetLevel)}`,
       formData
     );
   }
@@ -806,7 +807,7 @@ export class UserStudyService {
    */
   regenerateDialogueWithAi(words: ContextWord[], theme: string = 'general'): Observable<any> {
     const targetLevel = this.api.currentUser()?.targetLevel || 'A2';
-    return this.http.post<any>('http://localhost:8001/regenerate-dialogue', { words, theme, target_level: targetLevel });
+    return this.http.post<any>(`${environment.aiServiceUrl}/regenerate-dialogue`, { words, theme, target_level: targetLevel });
   }
 
   /**
@@ -835,7 +836,7 @@ export class UserStudyService {
   ) {
     let finalUrl = savedCapture.imageUrl || localPreviewUrl || '';
     if (finalUrl.startsWith('/uploads/')) {
-      finalUrl = `http://localhost:8088${finalUrl}`;
+      finalUrl = `${environment.serverUrl}${finalUrl}`;
     }
 
     const finalDialogue = (aiDialogue && aiDialogue.length > 0)

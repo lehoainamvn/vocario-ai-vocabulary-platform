@@ -19,13 +19,14 @@ import {
 } from '../models/vocario.models';
 import { ToastService } from './toast.service';
 import { ApiService } from './api.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClassroomService {
-  private readonly springBaseUrl = 'http://localhost:8088/api/classrooms';
-  private readonly visionBaseUrl = 'http://127.0.0.1:8001';
+  private readonly springBaseUrl = `${environment.apiUrl}/classrooms`;
+  private readonly visionBaseUrl = environment.aiServiceUrl;
 
   // Signals for reactive UI state
   myClassrooms = signal<ClassroomSummary[]>([]);

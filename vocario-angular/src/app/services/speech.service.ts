@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { ToastService } from './toast.service';
 import { ApiService } from './api.service';
 import { UserStudyService } from './user-study.service';
+import { environment } from '../../environments/environment';
 
 export interface SpeechTokenFeedback {
   word: string;
@@ -28,7 +29,7 @@ export class SpeechService {
   private api = inject(ApiService);
   private studyService = inject(UserStudyService);
 
-  private readonly baseUrl = 'http://localhost:8088/api';
+  private readonly baseUrl = environment.apiUrl;
 
   // Trạng thái modal
   isOpen = signal<boolean>(false);
