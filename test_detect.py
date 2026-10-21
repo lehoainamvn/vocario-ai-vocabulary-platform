@@ -9,14 +9,16 @@ def main():
     # 1. Load mô hình YOLO-World
     model = YOLOWorld('yolov8s-worldv2.pt')
 
-    # 2. Đọc bộ từ vựng 1200+ từ từ LVIS dataset
-    lvis_json_path = os.path.join("YOLO-World", "data", "texts", "lvis_v1_class_texts.json")
-    with open(lvis_json_path, "r", encoding="utf-8") as f:
-        raw_classes = json.load(f)
-    vocab_1200 = [item[0] for item in raw_classes]
+    # 2. Đọc bộ từ vựng 1000+ từ thiết yếu chuẩn Vocario
+    target_classes_path = os.path.join("backend", "services", "target_classes.txt")
+    if os.path.exists(target_classes_path):
+        with open(target_classes_path, "r", encoding="utf-8") as f:
+            vocab_classes = [line.strip() for line in f if line.strip()]
+    else:
+        vocab_classes = ["desk", "chair", "laptop", "book", "pen", "lamp", "computer monitor", "keyboard", "mouse"]
 
-    print(f"📚 Đã nạp kho {len(vocab_1200)} từ vựng tiếng Anh vào mô hình...")
-    model.set_classes(vocab_1200)
+    print(f"📚 Đã nạp kho {len(vocab_classes)} từ vựng tiếng Anh vào mô hình...")
+    model.set_classes(vocab_classes)
 
     # 3. Chạy nhận diện với ngưỡng tin cậy conf=0.18 để phát hiện cả vật thể lớn và nhỏ
     print("🔍 Đang quét toàn bộ các vật thể trong bức ảnh góc học tập...")

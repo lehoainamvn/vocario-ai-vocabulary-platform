@@ -8,6 +8,8 @@
 # -------------------------------------------------------------------------
 tai_lieu_bao_cao/
 /tai_lieu_bao_cao/
+YOLO-World/
+/YOLO-World/
 *.docx
 *.doc
 *.pptx

@@ -121,7 +121,6 @@ DoAnTotNghiep/
 │   ├── figures/              # Biểu đồ đánh giá độ chính xác mAP, Loss, Confusion Matrix
 │   └── UI_DESIGN_SYSTEM_GUIDELINES.md
 │
-├── YOLO-World/               # Tập dữ liệu nhãn phân lớp từ vựng mở (LVIS Text Dataset)
 ├── huongdanchay.md           # Hướng dẫn chạy nhanh 3 Terminal
 ├── start_ai_service.bat      # Script khởi chạy nhanh AI Service
 ├── test_detect.py            # Script kiểm thử độc lập mô hình YOLO-World
