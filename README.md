@@ -113,6 +113,7 @@ DoAnTotNghiep/
 │   ├── database/             # File schema và migration SQL
 │   ├── evaluation/           # Script đo lường mAP, Precision, Recall và FPS
 │   ├── services/             # AI Vision Server, Groq Generator, Lexicon Service
+│   ├── Dockerfile            # Docker containerization cho Python AI Service
 │   └── requirements.txt      # Danh mục dependencies Python
 │
 ├── vocario-backend/          # Core Business Backend (Spring Boot 3 + Java 17)
@@ -123,6 +124,7 @@ DoAnTotNghiep/
 │   │   ├── entity/           # JPA Entities ánh xạ PostgreSQL
 │   │   ├── repository/       # Data Access Layer (Spring Data JPA)
 │   │   └── service/          # Business logic: SM-2, Certificate, Classroom
+│   ├── Dockerfile            # Multi-stage Docker build (Maven + Alpine JRE 17)
 │   └── pom.xml               # Maven configuration
 │
 ├── vocario-angular/          # Frontend Web Application (Angular 19 + Tailwind CSS)
@@ -130,6 +132,8 @@ DoAnTotNghiep/
 │   │   ├── components/       # UI Components (Admin, Scanner, Flashcard, Classroom)
 │   │   ├── models/           # TypeScript Data Models
 │   │   └── services/         # State Management via Angular Signals & HttpClient
+│   ├── Dockerfile            # Multi-stage Docker build với Nginx Alpine
+│   ├── nginx.conf            # Nginx reverse proxy & HTML5 SPA rewrite rules
 │   └── package.json
 │
 ├── docs/                     # Tài liệu kiến trúc & Thiết kế giao diện
@@ -139,6 +143,7 @@ DoAnTotNghiep/
 ├── scripts/                  # Tiện ích khởi chạy & Script kiểm thử độc lập
 │   ├── start_ai_service.bat  # Script khởi chạy nhanh AI Vision Server
 │   └── test_detect.py        # Script kiểm thử độc lập mô hình YOLO-World
+├── docker-compose.yml        # Điều phối 4 dịch vụ (PostgreSQL, AI, Spring Boot, Angular)
 ├── .gitignore                # Cấu hình bỏ qua tệp nháp, build cache & dữ liệu cá nhân
 ├── LICENSE                   # Giấy phép MIT bản quyền năm 2026
 └── README.md                 # Tài liệu tổng quan dự án
@@ -146,7 +151,31 @@ DoAnTotNghiep/
 
 ---
 
-## 5. YÊU CẦU MÔI TRƯỜNG
+## 5. KHỞI CHẠY NHANH BẰNG DOCKER (KHUYẾN NGHỊ)
+
+Dự án đã được đóng gói toàn diện bằng **Docker** và **Docker Compose**. Khởi động toàn bộ 4 dịch vụ chỉ bằng **1 câu lệnh duy nhất**:
+
+```bash
+docker compose up -d --build
+```
+
+| Dịch vụ | Nền tảng | Cổng nội bộ | Địa chỉ truy cập |
+| :--- | :--- | :---: | :--- |
+| **Frontend Web App** | Angular 19 + Nginx | `80` | [http://localhost:4200](http://localhost:4200) |
+| **Spring Boot Core API** | Java 17 + Temurin | `8088` | [http://localhost:8088/swagger-ui.html](http://localhost:8088/swagger-ui.html) |
+| **FastAPI AI Vision** | Python 3.11 + PyTorch | `8001` | [http://localhost:8001/docs](http://localhost:8001/docs) |
+| **PostgreSQL Database** | PostgreSQL 17 Alpine | `5432` | `localhost:5432` (db: `vocario_db`) |
+
+Để dừng toàn bộ hệ thống:
+```bash
+docker compose down
+```
+
+---
+
+## 6. KHỞI CHẠY THỦ CÔNG TỪNG BƯỚC (LOCAL DEV)
+
+### Yêu Cầu Môi Trường
 
 | Công cụ | Phiên bản khuyến nghị | Kiểm tra trong Terminal |
 | :--- | :--- | :--- |
@@ -158,7 +187,7 @@ DoAnTotNghiep/
 
 ---
 
-## 6. HƯỚNG DẪN KHỞI CHẠY TỪNG BƯỚC
+### Hướng Dẫn Khởi Chạy Thủ Công
 
 ### Bước 1: Khởi Tạo Cơ Sở Dữ Liệu PostgreSQL
 1. Mở công cụ quản lý PostgreSQL (**pgAdmin** hoặc **DBeaver**).

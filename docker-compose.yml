@@ -1,0 +1,98 @@
+services:
+  # ---------------------------------------------------------------------------
+  # 1. PostgreSQL Database Server
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:17-alpine
+    container_name: vocario-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: vocario_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d vocario_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vocario-network
+
+  # ---------------------------------------------------------------------------
+  # 2. Python AI Vision & Groq LLM Microservice (FastAPI + YOLO-World v2)
+  # ---------------------------------------------------------------------------
+  ai-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: vocario-ai-service
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    environment:
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      PORT: 8001
+    networks:
+      - vocario-network
+
+  # ---------------------------------------------------------------------------
+  # 3. Core Enterprise Backend (Spring Boot 3 + SuperMemo SM-2)
+  # ---------------------------------------------------------------------------
+  backend:
+    build:
+      context: ./vocario-backend
+      dockerfile: Dockerfile
+    container_name: vocario-backend
+    restart: unless-stopped
+    ports:
+      - "8088:8088"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/vocario_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      UPLOAD_DIR: /app/uploads
+    volumes:
+      - vocario_uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ai-service:
+        condition: service_started
+    networks:
+      - vocario-network
+
+  # ---------------------------------------------------------------------------
+  # 4. Web Client Frontend (Angular 19 + TailwindCSS + Nginx)
+  # ---------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./vocario-angular
+      dockerfile: Dockerfile
+    container_name: vocario-frontend
+    restart: unless-stopped
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+    networks:
+      - vocario-network
+
+# -----------------------------------------------------------------------------
+# Persistent Volumes & Network Topology
+# -----------------------------------------------------------------------------
+volumes:
+  postgres_data:
+    name: vocario_postgres_data
+  vocario_uploads:
+    name: vocario_uploads
+
+networks:
+  vocario-network:
+    name: vocario-network
+    driver: bridge

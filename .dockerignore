@@ -1,0 +1,13 @@
+.git/
+.gitignore
+.agents/
+.gemini/
+tai_lieu_bao_cao/
+docs/
+*.md
+LICENSE
+node_modules/
+target/
+__pycache__/
+*.pt
+runs/
