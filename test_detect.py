@@ -3,7 +3,7 @@ import os
 from ultralytics import YOLOWorld
 
 def main():
-    image_path = "Ban-hoc-sinh-go-cong-nghiep-tien-dung-GHS-41245-ava.png"
+    image_path = os.path.join("docs", "figures", "scene_01_study_desk.jpg")
     print(f"🚀 Bắt đầu nhận diện từ vựng trên bức ảnh: {image_path}")
 
     # 1. Load mô hình YOLO-World
