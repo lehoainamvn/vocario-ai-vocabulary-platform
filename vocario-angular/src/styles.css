@@ -1,0 +1,233 @@
+@import "tailwindcss";
+
+@theme {
+  /* ==========================================================================
+     VOCARIO DESIGN SYSTEM TOKENS (Trích xuất chuẩn 1:1 từ KaChiKa)
+     ========================================================================== */
+  /* Nền trang & Thẻ */
+  --color-brand-bg: #F8F6F1;             /* Nền kem ấm kiểu giấy Washi */
+  --color-brand-card: #FFFFFF;           /* Thẻ trắng chính */
+  --color-brand-card-sub: #FAF7F2;       /* Thẻ phụ / Hover */
+  --color-brand-pill-bg: #EBEFEB;        /* Nền cụm viên thuốc control */
+  --color-brand-border: #EAE4D9;         /* Viền thẻ & đường kẻ ngăn cách */
+
+  /* Màu chủ đạo & Điểm nhấn */
+  --color-brand-brown: #7D6853;          /* Nâu đất chủ đạo (Tiêu đề, CTA, Logo) */
+  --color-brand-brown-dark: #635241;     /* Nâu đậm khi hover */
+  --color-brand-brown-light: #947E69;    /* Nâu nhạt */
+  --color-brand-yellow: #F7D147;         /* Vàng nổi bật (Tag từ vựng) */
+  --color-brand-yellow-hover: #E8BF30;   /* Vàng đậm khi hover tag */
+  --color-brand-slate: #526668;          /* Xám rêu (Icon Lucide, Pill meta, Theme toggle) */
+
+  /* Chữ & Nội dung */
+  --color-brand-text: #2D2823;           /* Chữ đen nội dung chính */
+  --color-brand-muted: #5C5249;          /* Chữ phụ / Subtitle / Nav links */
+  --color-brand-tag-text: #1A1612;       /* Chữ đen đậm trên nhãn vàng */
+
+  /* Typography chuẩn KaChiKa & Editorial Figma */
+  --font-heading: "Outfit", sans-serif;
+  --font-sans: "Outfit", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif: "Newsreader", Georgia, Cambria, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+:root {
+  color-scheme: light;
+  font-family: var(--font-sans);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #F8F6F1;
+  color: #2D2823;
+  font-family: "Outfit", -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Subtle scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+}
+::-webkit-scrollbar-track {
+  background: #F8F6F1;
+}
+::-webkit-scrollbar-thumb {
+  background: #D8D2C5;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #C4BDAE;
+}
+
+/* Toast animations & Feedback effects */
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-toast-in {
+  animation: toastIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+
+.animate-shake {
+  animation: shake 0.35s ease-in-out;
+}
+
+/* ==========================================================================
+   VOCARIO DARK MODE SYSTEM (KaChiKa Warm Dark Theme)
+   ========================================================================== */
+
+/* Chuyển màu mượt mà khi bật/tắt theme */
+html {
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+body, header, nav, main, footer, div, section, article {
+  transition: background-color 0.22s ease, border-color 0.22s ease, color 0.22s ease;
+}
+
+/* Khi kích hoạt class .dark trên thẻ html */
+html.dark {
+  color-scheme: dark;
+}
+
+html.dark body {
+  background-color: #141210 !important;
+  color: #EDE7DE !important;
+}
+
+/* 1. Nền trang và vùng bao phủ */
+html.dark .bg-\[\#F8F6F1\],
+html.dark .bg-\[\#FAF8F5\] {
+  background-color: #141210 !important;
+}
+
+/* 2. Thẻ trắng chính (CardBox, PageShell Header) */
+html.dark .bg-white {
+  background-color: #1E1B17 !important;
+}
+
+/* 3. Thẻ phụ, Pill container, Khu vực lồng thẻ con */
+html.dark .bg-\[\#FAF7F2\],
+html.dark .bg-\[\#F1ECE3\] {
+  background-color: #27231E !important;
+}
+
+html.dark .bg-\[\#F2ECE1\] {
+  background-color: #302B24 !important;
+}
+
+html.dark .bg-stone-50 {
+  background-color: #221F1A !important;
+}
+
+html.dark .bg-stone-100 {
+  background-color: #2B2620 !important;
+}
+
+html.dark .bg-stone-200 {
+  background-color: #38322B !important;
+}
+
+/* 4. Viền thẻ và đường phân cách */
+html.dark .border-\[\#EAE4D9\],
+html.dark .border-\[\#E5DED3\] {
+  border-color: #38322B !important;
+}
+
+html.dark .border-\[\#EAE4D9\]\/60,
+html.dark .border-\[\#EAE4D9\]\/80,
+html.dark .border-\[\#E5DED3\]\/60,
+html.dark .border-\[\#E5DED3\]\/80 {
+  border-color: rgba(56, 50, 43, 0.7) !important;
+}
+
+html.dark .border-stone-200,
+html.dark .border-stone-300 {
+  border-color: #38322B !important;
+}
+
+/* 5. Chữ nội dung và tiêu đề */
+html.dark .text-\[\#2D2823\],
+html.dark .text-\[\#29251F\] {
+  color: #EDE7DE !important;
+}
+
+html.dark .text-\[\#5C5249\],
+html.dark .text-\[\#746B60\] {
+  color: #A3998C !important;
+}
+
+html.dark .text-\[\#7D6853\] {
+  color: #C9AD8E !important;
+}
+
+/* 6. Thanh Header & Navbar trên cùng */
+html.dark header[style*="background-color: rgba(251, 250, 246"] {
+  background-color: rgba(20, 18, 16, 0.90) !important;
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.45) !important;
+  border-bottom: 1px solid #38322B !important;
+}
+
+/* Brand logo trên dark */
+html.dark a[style*="color: rgb(139, 115, 85)"] {
+  color: #D8BBA0 !important;
+}
+
+/* Nav links hover trên dark */
+html.dark nav a:not(.bg-\[\#7D6853\]) {
+  color: #A3998C !important;
+}
+
+html.dark nav a:not(.bg-\[\#7D6853\]):hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: #EDE7DE !important;
+}
+
+/* 7. Dropdown menu tài khoản trên Dark */
+html.dark .shadow-xl.bg-white {
+  background-color: #221F1A !important;
+  border-color: #38322B !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* 8. Input, Textarea, Select */
+html.dark input,
+html.dark textarea,
+html.dark select {
+  background-color: #27231E !important;
+  color: #EDE7DE !important;
+  border-color: #38322B !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #7D7365 !important;
+}
+
+/* 9. Scrollbar trên Dark Mode */
+html.dark ::-webkit-scrollbar-track {
+  background: #141210;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #38322B;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #4A4239;
+}

@@ -1,0 +1,103 @@
+# =========================================================================
+# VOCARIO MONOREPO .GITIGNORE
+# Hệ thống Học Từ Vựng Tiếng Anh Qua Thị Giác Máy Tính & Thuật Toán SM-2
+# =========================================================================
+
+# -------------------------------------------------------------------------
+# 1. TÀI LIỆU BÁO CÁO & LUẬN VĂN HỌC THUẬT (Local Archive Only)
+# -------------------------------------------------------------------------
+tai_lieu_bao_cao/
+/tai_lieu_bao_cao/
+*.docx
+*.doc
+*.pptx
+*.pdf
+MSSV_*
+
+# -------------------------------------------------------------------------
+# 2. BẢO MẬT & BIẾN MÔI TRƯỜNG (Environment Secrets)
+# -------------------------------------------------------------------------
+.env
+*.env
+backend/.env
+vocario-backend/.env
+*.pem
+*.key
+
+# -------------------------------------------------------------------------
+# 3. JAVA & SPRING BOOT (vocario-backend)
+# -------------------------------------------------------------------------
+vocario-backend/target/
+target/
+*.class
+*.jar
+*.war
+*.ear
+.mvn/wrapper/maven-wrapper.jar
+vocario-backend/logs/
+logs/
+vocario-backend/uploads/
+uploads/
+
+# -------------------------------------------------------------------------
+# 4. NODE & ANGULAR (vocario-angular)
+# -------------------------------------------------------------------------
+vocario-angular/node_modules/
+node_modules/
+vocario-angular/.angular/
+.angular/
+vocario-angular/dist/
+dist/
+.npm
+.yarn/
+*.tsbuildinfo
+
+# -------------------------------------------------------------------------
+# 5. PYTHON & AI VISION ENGINE (backend)
+# -------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+runs/
+test_output/
+*.pt
+*.pth
+.pytest_cache/
+.coverage
+htmlcov/
+cache/
+
+# -------------------------------------------------------------------------
+# 6. HỆ ĐIỀU HÀNH & TRÌNH SOẠN THẢO (OS & IDEs)
+# -------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+[Dd]esktop.ini
+
+# IDE config
+.idea/
+*.iml
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+*.sublime-project
+*.sublime-workspace
+.project
+.classpath
+.settings/
+
+# Agent IDE metadata
+.gemini/
+.agents/

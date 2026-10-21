@@ -1,0 +1,1234 @@
+[
+  {
+    "id": 1,
+    "title": "Thư Viện & Góc Tự Học",
+    "filename": "new_01_library.jpg",
+    "output_image": "batch2_01_library.jpg",
+    "scene": "Bàn Học, Văn Phòng & Trường Học",
+    "scene_confidence": "98.0%",
+    "raw_count": 4,
+    "verified_count": 4,
+    "objects": [
+      {
+        "label": "library",
+        "confidence": 0.41,
+        "box_pixels": [
+          1.8,
+          0.0,
+          767.7,
+          530.0
+        ],
+        "box_percent": [
+          0.0,
+          0.2,
+          99.4,
+          96.0
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "bookshelf",
+        "confidence": 0.39,
+        "box_pixels": [
+          0.1,
+          4.1,
+          217.0,
+          533.0
+        ],
+        "box_percent": [
+          0.8,
+          0.0,
+          100.0,
+          27.1
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "bookshelf",
+        "confidence": 0.33,
+        "box_pixels": [
+          550.0,
+          5.3,
+          800.0,
+          533.0
+        ],
+        "box_percent": [
+          1.0,
+          68.7,
+          100.0,
+          100.0
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "bookshelf",
+        "confidence": 0.31,
+        "box_pixels": [
+          211.0,
+          3.3,
+          553.5,
+          533.0
+        ],
+        "box_percent": [
+          0.6,
+          26.4,
+          100.0,
+          69.2
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "library",
+        "ipa": "/ˈlaɪbrɛˌri/",
+        "vietnamese": "thư viện",
+        "level": "A1"
+      },
+      {
+        "word": "bookshelf",
+        "ipa": "/ˈbʊkˌʃɛlf/",
+        "vietnamese": "kệ sách phòng khách",
+        "level": "A2"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Bệnh Viện & Phòng Khám Y Tế",
+    "filename": "new_02_hospital.jpg",
+    "output_image": "batch2_02_hospital.jpg",
+    "scene": "Phòng Khách, Nội Thất & Đồ Trang Trí",
+    "scene_confidence": "68.0%",
+    "raw_count": 5,
+    "verified_count": 3,
+    "objects": [
+      {
+        "label": "menu",
+        "confidence": 0.51,
+        "box_pixels": [
+          634.3,
+          163.8,
+          739.3,
+          244.9
+        ],
+        "box_percent": [
+          30.1,
+          79.3,
+          45.0,
+          92.4
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "mirror",
+        "confidence": 0.49,
+        "box_pixels": [
+          322.8,
+          183.3,
+          645.7,
+          393.2
+        ],
+        "box_percent": [
+          33.7,
+          40.3,
+          72.3,
+          80.7
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "library",
+        "confidence": 0.24,
+        "box_pixels": [
+          0.0,
+          5.3,
+          795.2,
+          541.7
+        ],
+        "box_percent": [
+          1.0,
+          0.0,
+          99.6,
+          99.4
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "menu",
+        "ipa": "/ˈmɛnju/",
+        "vietnamese": "thực đơn",
+        "level": "A2"
+      },
+      {
+        "word": "mirror",
+        "ipa": "/ˈmɪrər/",
+        "vietnamese": "tấm gương soi",
+        "level": "A1"
+      },
+      {
+        "word": "library",
+        "ipa": "/ˈlaɪbrɛˌri/",
+        "vietnamese": "thư viện",
+        "level": "A1"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Phòng Tập Gym & Thể Thao",
+    "filename": "new_03_gym.jpg",
+    "output_image": "batch2_03_gym.jpg",
+    "scene": "Thể Thao & Hoạt Động Ngoài Trời",
+    "scene_confidence": "95.0%",
+    "raw_count": 5,
+    "verified_count": 2,
+    "objects": [
+      {
+        "label": "library",
+        "confidence": 0.58,
+        "box_pixels": [
+          1.2,
+          5.9,
+          799.9,
+          526.7
+        ],
+        "box_percent": [
+          1.1,
+          0.2,
+          98.8,
+          100.0
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "person",
+        "confidence": 0.2,
+        "box_pixels": [
+          574.5,
+          161.7,
+          675.5,
+          338.5
+        ],
+        "box_percent": [
+          30.3,
+          71.8,
+          63.5,
+          84.4
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "library",
+        "ipa": "/ˈlaɪbrɛˌri/",
+        "vietnamese": "thư viện",
+        "level": "A1"
+      },
+      {
+        "word": "person",
+        "ipa": "/ˈpərsən/",
+        "vietnamese": "con người",
+        "level": "A1"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "title": "Nhà Hàng & Bàn Tiệc Ẩm Thực",
+    "filename": "new_04_restaurant.jpg",
+    "output_image": "batch2_04_restaurant.jpg",
+    "scene": "Bàn Ăn, Dụng Cụ Bếp & Bữa Ăn",
+    "scene_confidence": "98.0%",
+    "raw_count": 11,
+    "verified_count": 9,
+    "objects": [
+      {
+        "label": "chair",
+        "confidence": 0.34,
+        "box_pixels": [
+          206.3,
+          340.6,
+          345.0,
+          514.2
+        ],
+        "box_percent": [
+          63.9,
+          25.8,
+          96.5,
+          43.1
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "library",
+        "confidence": 0.33,
+        "box_pixels": [
+          46.0,
+          4.9,
+          799.5,
+          533.0
+        ],
+        "box_percent": [
+          0.9,
+          5.8,
+          100.0,
+          99.9
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "chair",
+        "confidence": 0.33,
+        "box_pixels": [
+          0.0,
+          327.1,
+          39.5,
+          461.8
+        ],
+        "box_percent": [
+          61.4,
+          0.0,
+          86.6,
+          4.9
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "chair",
+        "confidence": 0.33,
+        "box_pixels": [
+          342.0,
+          334.2,
+          463.8,
+          497.5
+        ],
+        "box_percent": [
+          62.7,
+          42.7,
+          93.3,
+          58.0
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "napkin",
+        "confidence": 0.32,
+        "box_pixels": [
+          763.0,
+          400.9,
+          800.0,
+          435.2
+        ],
+        "box_percent": [
+          75.2,
+          95.4,
+          81.7,
+          100.0
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "dining table",
+        "confidence": 0.3,
+        "box_pixels": [
+          675.4,
+          336.7,
+          800.0,
+          529.1
+        ],
+        "box_percent": [
+          63.2,
+          84.4,
+          99.3,
+          100.0
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "chair",
+        "confidence": 0.25,
+        "box_pixels": [
+          71.8,
+          315.0,
+          170.4,
+          428.7
+        ],
+        "box_percent": [
+          59.1,
+          9.0,
+          80.4,
+          21.3
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "chair",
+        "confidence": 0.22,
+        "box_pixels": [
+          645.9,
+          387.0,
+          799.3,
+          530.4
+        ],
+        "box_percent": [
+          72.6,
+          80.7,
+          99.5,
+          99.9
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "plate",
+        "confidence": 0.2,
+        "box_pixels": [
+          708.0,
+          351.7,
+          759.2,
+          368.3
+        ],
+        "box_percent": [
+          66.0,
+          88.5,
+          69.1,
+          94.9
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "chair",
+        "ipa": "/ʧɛr/",
+        "vietnamese": "chiếc ghế",
+        "level": "A1"
+      },
+      {
+        "word": "library",
+        "ipa": "/ˈlaɪbrɛˌri/",
+        "vietnamese": "thư viện",
+        "level": "A1"
+      },
+      {
+        "word": "napkin",
+        "ipa": "/ˈnæpkɪn/",
+        "vietnamese": "khăn ăn giấy hoặc vải",
+        "level": "A2"
+      },
+      {
+        "word": "dining table",
+        "ipa": "/ˈdaɪnɪŋ ˈteɪbəl/",
+        "vietnamese": "bàn ăn",
+        "level": "A1"
+      },
+      {
+        "word": "plate",
+        "ipa": "/pleɪt/",
+        "vietnamese": "chiếc đĩa",
+        "level": "A1"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "title": "Bãi Biển & Du Lịch Tự Nhiên",
+    "filename": "new_05_beach.jpg",
+    "output_image": "batch2_05_beach.jpg",
+    "scene": "Thể Thao & Hoạt Động Ngoài Trời",
+    "scene_confidence": "68.0%",
+    "raw_count": 2,
+    "verified_count": 2,
+    "objects": [
+      {
+        "label": "sand",
+        "confidence": 0.56,
+        "box_pixels": [
+          0.3,
+          301.1,
+          794.3,
+          530.7
+        ],
+        "box_percent": [
+          56.6,
+          0.0,
+          99.8,
+          99.3
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "ocean",
+        "confidence": 0.5,
+        "box_pixels": [
+          1.1,
+          235.5,
+          799.7,
+          515.2
+        ],
+        "box_percent": [
+          44.3,
+          0.1,
+          96.8,
+          100.0
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "sand",
+        "ipa": "/sænd/",
+        "vietnamese": "cát",
+        "level": "B1"
+      },
+      {
+        "word": "ocean",
+        "ipa": "/ˈoʊʃən/",
+        "vietnamese": "biển",
+        "level": "B1"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "title": "Thú Cưng & Động Vật Đời Sống",
+    "filename": "new_06_pets.jpg",
+    "output_image": "batch2_06_pets.jpg",
+    "scene": "Phương Tiện Giao Thông, Xe Cộ & Đường Phố",
+    "scene_confidence": "68.0%",
+    "raw_count": 3,
+    "verified_count": 3,
+    "objects": [
+      {
+        "label": "dog",
+        "confidence": 0.7,
+        "box_pixels": [
+          148.1,
+          74.0,
+          647.2,
+          599.0
+        ],
+        "box_percent": [
+          12.3,
+          18.5,
+          99.8,
+          80.9
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "collar",
+        "confidence": 0.48,
+        "box_pixels": [
+          245.3,
+          442.5,
+          539.4,
+          598.9
+        ],
+        "box_percent": [
+          73.8,
+          30.7,
+          99.8,
+          67.4
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "collar",
+        "confidence": 0.33,
+        "box_pixels": [
+          250.8,
+          268.7,
+          515.0,
+          435.3
+        ],
+        "box_percent": [
+          44.8,
+          31.4,
+          72.6,
+          64.4
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "dog",
+        "ipa": "/dɔg/",
+        "vietnamese": "chú chó",
+        "level": "A1"
+      },
+      {
+        "word": "collar",
+        "ipa": "/ˈkɑlər/",
+        "vietnamese": "cổ áo",
+        "level": "B1"
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "title": "Sân Bay & Hành Khách Du Lịch",
+    "filename": "new_07_airport.jpg",
+    "output_image": "batch2_07_airport.jpg",
+    "scene": "Phòng Khách, Nội Thất & Đồ Trang Trí",
+    "scene_confidence": "98.0%",
+    "raw_count": 6,
+    "verified_count": 5,
+    "objects": [
+      {
+        "label": "suitcase",
+        "confidence": 0.65,
+        "box_pixels": [
+          130.4,
+          290.3,
+          240.3,
+          530.3
+        ],
+        "box_percent": [
+          54.5,
+          16.3,
+          99.5,
+          30.0
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "airplane",
+        "confidence": 0.52,
+        "box_pixels": [
+          187.7,
+          19.1,
+          364.7,
+          116.7
+        ],
+        "box_percent": [
+          3.6,
+          23.5,
+          21.9,
+          45.6
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "chair",
+        "confidence": 0.42,
+        "box_pixels": [
+          399.7,
+          118.1,
+          800.0,
+          529.9
+        ],
+        "box_percent": [
+          22.1,
+          50.0,
+          99.4,
+          100.0
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "jacket",
+        "confidence": 0.25,
+        "box_pixels": [
+          449.0,
+          111.1,
+          685.2,
+          364.8
+        ],
+        "box_percent": [
+          20.8,
+          56.1,
+          68.4,
+          85.6
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "person",
+        "confidence": 0.23,
+        "box_pixels": [
+          114.8,
+          19.4,
+          689.5,
+          368.3
+        ],
+        "box_percent": [
+          3.6,
+          14.3,
+          69.1,
+          86.2
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "suitcase",
+        "ipa": "/ˈsutˌkeɪs/",
+        "vietnamese": "vali kéo du lịch",
+        "level": "A2"
+      },
+      {
+        "word": "airplane",
+        "ipa": "/ˈɛrˌpleɪn/",
+        "vietnamese": "máy bay chở khách",
+        "level": "A1"
+      },
+      {
+        "word": "chair",
+        "ipa": "/ʧɛr/",
+        "vietnamese": "chiếc ghế",
+        "level": "A1"
+      },
+      {
+        "word": "jacket",
+        "ipa": "/ˈʤækɪt/",
+        "vietnamese": "áo khoác ngắn",
+        "level": "A1"
+      },
+      {
+        "word": "person",
+        "ipa": "/ˈpərsən/",
+        "vietnamese": "con người",
+        "level": "A1"
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "title": "Cửa Hàng Thời Trang & Quần Áo",
+    "filename": "new_08_clothing_store.jpg",
+    "output_image": "batch2_08_clothing_store.jpg",
+    "scene": "Quần Áo & Giày Dép Hằng Ngày",
+    "scene_confidence": "98.0%",
+    "raw_count": 17,
+    "verified_count": 8,
+    "objects": [
+      {
+        "label": "clothes rack",
+        "confidence": 0.64,
+        "box_pixels": [
+          50.4,
+          129.3,
+          219.5,
+          260.1
+        ],
+        "box_percent": [
+          24.2,
+          6.3,
+          48.7,
+          27.4
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "library",
+        "confidence": 0.58,
+        "box_pixels": [
+          4.8,
+          36.0,
+          636.4,
+          528.3
+        ],
+        "box_percent": [
+          6.7,
+          0.6,
+          98.9,
+          79.5
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "clothes rack",
+        "confidence": 0.29,
+        "box_pixels": [
+          578.9,
+          128.3,
+          769.0,
+          264.0
+        ],
+        "box_percent": [
+          24.0,
+          72.4,
+          49.4,
+          96.1
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "clothes rack",
+        "confidence": 0.25,
+        "box_pixels": [
+          0.0,
+          15.1,
+          32.4,
+          208.5
+        ],
+        "box_percent": [
+          2.8,
+          0.0,
+          39.0,
+          4.1
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "clothes rack",
+        "confidence": 0.22,
+        "box_pixels": [
+          63.0,
+          33.2,
+          203.3,
+          87.1
+        ],
+        "box_percent": [
+          6.2,
+          7.9,
+          16.3,
+          25.4
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "suitcase",
+        "confidence": 0.22,
+        "box_pixels": [
+          489.7,
+          395.7,
+          622.0,
+          444.2
+        ],
+        "box_percent": [
+          74.1,
+          61.2,
+          83.2,
+          77.8
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "clothes rack",
+        "confidence": 0.22,
+        "box_pixels": [
+          593.6,
+          98.4,
+          742.4,
+          138.9
+        ],
+        "box_percent": [
+          18.4,
+          74.2,
+          26.0,
+          92.8
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "backpack",
+        "confidence": 0.2,
+        "box_pixels": [
+          412.3,
+          118.4,
+          480.7,
+          168.4
+        ],
+        "box_percent": [
+          22.2,
+          51.5,
+          31.5,
+          60.1
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "clothes rack",
+        "ipa": "/kloʊðz ræk/",
+        "vietnamese": "giá treo quần áo",
+        "level": "B2"
+      },
+      {
+        "word": "library",
+        "ipa": "/ˈlaɪbrɛˌri/",
+        "vietnamese": "thư viện",
+        "level": "A1"
+      },
+      {
+        "word": "suitcase",
+        "ipa": "/ˈsutˌkeɪs/",
+        "vietnamese": "vali kéo du lịch",
+        "level": "A2"
+      },
+      {
+        "word": "backpack",
+        "ipa": "/ˈbækˌpæk/",
+        "vietnamese": "balo",
+        "level": "A1"
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "title": "Phòng Tắm & Thiết Bị Vệ Sinh",
+    "filename": "new_09_bathroom.jpg",
+    "output_image": "batch2_09_bathroom.jpg",
+    "scene": "Phòng Tắm & Đồ Dùng Vệ Sinh",
+    "scene_confidence": "98.0%",
+    "raw_count": 15,
+    "verified_count": 9,
+    "objects": [
+      {
+        "label": "counter",
+        "confidence": 0.72,
+        "box_pixels": [
+          468.8,
+          322.4,
+          799.9,
+          531.9
+        ],
+        "box_percent": [
+          60.5,
+          58.6,
+          99.8,
+          100.0
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "faucet",
+        "confidence": 0.71,
+        "box_pixels": [
+          581.6,
+          291.3,
+          632.8,
+          349.4
+        ],
+        "box_percent": [
+          54.6,
+          72.7,
+          65.6,
+          79.1
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "mirror",
+        "confidence": 0.69,
+        "box_pixels": [
+          585.2,
+          0.8,
+          799.9,
+          356.0
+        ],
+        "box_percent": [
+          0.2,
+          73.2,
+          66.8,
+          100.0
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "toilet",
+        "confidence": 0.45,
+        "box_pixels": [
+          420.8,
+          383.1,
+          479.3,
+          487.6
+        ],
+        "box_percent": [
+          71.9,
+          52.6,
+          91.5,
+          59.9
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "counter",
+        "confidence": 0.37,
+        "box_pixels": [
+          37.8,
+          420.0,
+          228.4,
+          531.3
+        ],
+        "box_percent": [
+          78.8,
+          4.7,
+          99.7,
+          28.5
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "dumbbell",
+        "confidence": 0.24,
+        "box_pixels": [
+          425.5,
+          338.1,
+          445.1,
+          361.9
+        ],
+        "box_percent": [
+          63.4,
+          53.2,
+          67.9,
+          55.6
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "clothes rack",
+        "confidence": 0.24,
+        "box_pixels": [
+          342.2,
+          253.4,
+          416.5,
+          370.3
+        ],
+        "box_percent": [
+          47.6,
+          42.8,
+          69.5,
+          52.1
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "towel",
+        "confidence": 0.23,
+        "box_pixels": [
+          369.2,
+          261.4,
+          412.1,
+          368.4
+        ],
+        "box_percent": [
+          49.0,
+          46.1,
+          69.1,
+          51.5
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "shower",
+        "confidence": 0.2,
+        "box_pixels": [
+          28.3,
+          5.7,
+          274.8,
+          523.3
+        ],
+        "box_percent": [
+          1.1,
+          3.5,
+          98.2,
+          34.4
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "counter",
+        "ipa": "/ˈkaʊntər/",
+        "vietnamese": "bàn bếp",
+        "level": "B2"
+      },
+      {
+        "word": "faucet",
+        "ipa": "/ˈfɔsət/",
+        "vietnamese": "vòi nước",
+        "level": "A2"
+      },
+      {
+        "word": "mirror",
+        "ipa": "/ˈmɪrər/",
+        "vietnamese": "tấm gương soi",
+        "level": "A1"
+      },
+      {
+        "word": "toilet",
+        "ipa": "/ˈtɔɪlət/",
+        "vietnamese": "bồn cầu vệ sinh",
+        "level": "A1"
+      },
+      {
+        "word": "dumbbell",
+        "ipa": "/ˈdəmˌbɛl/",
+        "vietnamese": "quả tạ tay",
+        "level": "A2"
+      },
+      {
+        "word": "clothes rack",
+        "ipa": "/kloʊðz ræk/",
+        "vietnamese": "giá treo quần áo",
+        "level": "B2"
+      },
+      {
+        "word": "towel",
+        "ipa": "/taʊəl/",
+        "vietnamese": "chiếc khăn tắm",
+        "level": "A1"
+      },
+      {
+        "word": "shower",
+        "ipa": "/ʃaʊər/",
+        "vietnamese": "vòi hoa sen phòng tắm",
+        "level": "A1"
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "title": "Tiệm Bánh Mì & Bánh Ngọt",
+    "filename": "new_10_bakery.jpg",
+    "output_image": "batch2_10_bakery.jpg",
+    "scene": "Thực Phẩm, Trái Cây & Bách Hóa",
+    "scene_confidence": "98.0%",
+    "raw_count": 5,
+    "verified_count": 4,
+    "objects": [
+      {
+        "label": "bread",
+        "confidence": 0.4,
+        "box_pixels": [
+          385.1,
+          0.7,
+          679.1,
+          170.1
+        ],
+        "box_percent": [
+          0.1,
+          48.1,
+          32.0,
+          84.9
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "bread",
+        "confidence": 0.29,
+        "box_pixels": [
+          265.4,
+          159.7,
+          702.0,
+          497.5
+        ],
+        "box_percent": [
+          30.0,
+          33.2,
+          93.5,
+          87.8
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "bread",
+        "confidence": 0.24,
+        "box_pixels": [
+          53.1,
+          23.0,
+          386.4,
+          329.7
+        ],
+        "box_percent": [
+          4.3,
+          6.6,
+          62.0,
+          48.3
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      },
+      {
+        "label": "tray",
+        "confidence": 0.2,
+        "box_pixels": [
+          29.0,
+          11.7,
+          738.8,
+          520.2
+        ],
+        "box_percent": [
+          2.2,
+          3.6,
+          97.8,
+          92.4
+        ],
+        "is_verified": true,
+        "verifier_method": "Deep-Two-Stage-V2"
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "bread",
+        "ipa": "/brɛd/",
+        "vietnamese": "ổ bánh mì",
+        "level": "A1"
+      },
+      {
+        "word": "tray",
+        "ipa": "/treɪ/",
+        "vietnamese": "chiếc khay",
+        "level": "B2"
+      }
+    ]
+  }
+]

@@ -1,0 +1,412 @@
+{
+  "mode_a": {
+    "precision": 19.78021978021978,
+    "recall": 42.857142857142854,
+    "f1": 27.06766917293233,
+    "tp": 18,
+    "fp": 73,
+    "fn": 24,
+    "avg_latency_ms": 546.0567814963205,
+    "details": [
+      {
+        "filename": "study_desk_01.png",
+        "detected": [
+          "pepper mill",
+          "salt shaker",
+          "dish rack",
+          "scented candle",
+          "canopy bed",
+          "desk",
+          "coaster",
+          "pepper shaker",
+          "perfume bottle",
+          "chair",
+          "area rug",
+          "wall mirror",
+          "alarm clock",
+          "laptop",
+          "drapes"
+        ],
+        "expected": [
+          "desk",
+          "chair",
+          "laptop",
+          "book",
+          "potted plant",
+          "cup",
+          "bookshelf",
+          "table"
+        ],
+        "tp": 3,
+        "fp": 12,
+        "fn": 4,
+        "time_ms": 981.4004898071289
+      },
+      {
+        "filename": "study_desk_02.png",
+        "detected": [
+          "pepper mill",
+          "salt shaker",
+          "dish rack",
+          "scented candle",
+          "canopy bed",
+          "desk",
+          "coaster",
+          "pepper shaker",
+          "perfume bottle",
+          "chair",
+          "area rug",
+          "wall mirror",
+          "alarm clock",
+          "laptop",
+          "drapes"
+        ],
+        "expected": [
+          "desk",
+          "chair",
+          "laptop",
+          "book",
+          "potted plant",
+          "cup",
+          "bookshelf"
+        ],
+        "tp": 3,
+        "fp": 12,
+        "fn": 4,
+        "time_ms": 551.6796112060547
+      },
+      {
+        "filename": "living_room_01.jpg",
+        "detected": [
+          "houseplant",
+          "curtain",
+          "potted plant",
+          "scented candle",
+          "window",
+          "area rug",
+          "door",
+          "paperweight",
+          "coaster",
+          "throw pillow",
+          "index card",
+          "photo frame",
+          "novel",
+          "sugar bowl",
+          "couch",
+          "coffee table",
+          "pillow",
+          "chandelier",
+          "soup bowl",
+          "frog",
+          "book",
+          "bowl",
+          "lantern"
+        ],
+        "expected": [
+          "sofa",
+          "couch",
+          "coffee table",
+          "table",
+          "potted plant",
+          "book",
+          "pillow",
+          "cushion",
+          "carpet"
+        ],
+        "tp": 8,
+        "fp": 15,
+        "fn": 1,
+        "time_ms": 608.3381175994873
+      },
+      {
+        "filename": "traffic_bus_01.jpg",
+        "detected": [
+          "jeans",
+          "paper towel holder",
+          "camp stove",
+          "pavement",
+          "recycling bin",
+          "jumpsuit",
+          "leggings",
+          "jacket",
+          "trench coat",
+          "bus"
+        ],
+        "expected": [
+          "bus",
+          "person",
+          "car",
+          "road",
+          "street lamp"
+        ],
+        "tp": 1,
+        "fp": 9,
+        "fn": 4,
+        "time_ms": 465.63076972961426
+      },
+      {
+        "filename": "kitchen_01.png",
+        "detected": [
+          "refrigerator",
+          "salt shaker",
+          "conditioner bottle",
+          "soap dispenser",
+          "power socket",
+          "door handle",
+          "sanitizer bottle",
+          "sideboard"
+        ],
+        "expected": [
+          "refrigerator",
+          "bottle",
+          "kitchen counter",
+          "sink"
+        ],
+        "tp": 3,
+        "fp": 5,
+        "fn": 2,
+        "time_ms": 461.0931873321533
+      },
+      {
+        "filename": "camera_desk_01.jpg",
+        "detected": [
+          "pepper mill",
+          "towel",
+          "laundry hamper",
+          "ring",
+          "picture frame",
+          "hamburger",
+          "necklace",
+          "glass",
+          "figurine",
+          "photo frame",
+          "hair mask"
+        ],
+        "expected": [
+          "person",
+          "chair",
+          "bottle",
+          "desk",
+          "laptop"
+        ],
+        "tp": 0,
+        "fp": 11,
+        "fn": 5,
+        "time_ms": 388.3841037750244
+      },
+      {
+        "filename": "camera_desk_02.jpg",
+        "detected": [
+          "cake stand",
+          "pepper mill",
+          "towel",
+          "picture frame",
+          "choker",
+          "necklace",
+          "figurine",
+          "photo frame",
+          "hair mask"
+        ],
+        "expected": [
+          "person",
+          "chair",
+          "bottle",
+          "desk"
+        ],
+        "tp": 0,
+        "fp": 9,
+        "fn": 4,
+        "time_ms": 365.8711910247803
+      }
+    ]
+  },
+  "mode_b": {
+    "precision": 57.14285714285714,
+    "recall": 39.02439024390244,
+    "f1": 46.3768115942029,
+    "tp": 16,
+    "fp": 12,
+    "fn": 25,
+    "avg_latency_ms": 331.45945412772045,
+    "details": [
+      {
+        "filename": "study_desk_01.png",
+        "theme": "study_office",
+        "theme_name": "Bàn Học, Văn Phòng & Trường Học",
+        "theme_classes_count": 92,
+        "detected": [
+          "mousepad",
+          "desk",
+          "colored pencil",
+          "chair",
+          "laptop"
+        ],
+        "expected": [
+          "desk",
+          "chair",
+          "laptop",
+          "book",
+          "potted plant",
+          "cup",
+          "bookshelf",
+          "table"
+        ],
+        "tp": 3,
+        "fp": 2,
+        "fn": 4,
+        "time_ms": 412.88161277770996
+      },
+      {
+        "filename": "study_desk_02.png",
+        "theme": "study_office",
+        "theme_name": "Bàn Học, Văn Phòng & Trường Học",
+        "theme_classes_count": 92,
+        "detected": [
+          "mousepad",
+          "desk",
+          "colored pencil",
+          "chair",
+          "laptop"
+        ],
+        "expected": [
+          "desk",
+          "chair",
+          "laptop",
+          "book",
+          "potted plant",
+          "cup",
+          "bookshelf"
+        ],
+        "tp": 3,
+        "fp": 2,
+        "fn": 4,
+        "time_ms": 381.91843032836914
+      },
+      {
+        "filename": "living_room_01.jpg",
+        "theme": "living_room_decor",
+        "theme_name": "Phòng Khách, Nội Thất & Đồ Trang Trí",
+        "theme_classes_count": 72,
+        "detected": [
+          "display cabinet",
+          "potted plant",
+          "scented candle",
+          "side table",
+          "sofa",
+          "throw pillow",
+          "console table",
+          "photo frame",
+          "coffee table",
+          "area rug"
+        ],
+        "expected": [
+          "sofa",
+          "couch",
+          "coffee table",
+          "table",
+          "potted plant",
+          "book",
+          "pillow",
+          "cushion",
+          "carpet"
+        ],
+        "tp": 6,
+        "fp": 4,
+        "fn": 3,
+        "time_ms": 295.68028450012207
+      },
+      {
+        "filename": "traffic_bus_01.jpg",
+        "theme": "outdoor_vehicles_street",
+        "theme_name": "Phương Tiện Giao Thông, Xe Cộ & Đường Phố",
+        "theme_classes_count": 80,
+        "detected": [
+          "traffic sign",
+          "street sign",
+          "bus"
+        ],
+        "expected": [
+          "bus",
+          "person",
+          "car",
+          "road",
+          "street lamp"
+        ],
+        "tp": 1,
+        "fp": 2,
+        "fn": 4,
+        "time_ms": 313.4474754333496
+      },
+      {
+        "filename": "kitchen_01.png",
+        "theme": "kitchen_appliances",
+        "theme_name": "Nhà Bếp & Thiết Bị Gia Dụng",
+        "theme_classes_count": 75,
+        "detected": [
+          "knife block",
+          "paper towel holder",
+          "refrigerator"
+        ],
+        "expected": [
+          "refrigerator",
+          "bottle",
+          "kitchen counter",
+          "sink"
+        ],
+        "tp": 1,
+        "fp": 2,
+        "fn": 3,
+        "time_ms": 379.3187141418457
+      },
+      {
+        "filename": "camera_desk_01.jpg",
+        "theme": "study_office",
+        "theme_name": "Bàn Học, Văn Phòng & Trường Học",
+        "theme_classes_count": 92,
+        "detected": [
+          "chair"
+        ],
+        "expected": [
+          "person",
+          "chair",
+          "bottle",
+          "desk",
+          "laptop"
+        ],
+        "tp": 1,
+        "fp": 0,
+        "fn": 4,
+        "time_ms": 257.66587257385254
+      },
+      {
+        "filename": "camera_desk_02.jpg",
+        "theme": "study_office",
+        "theme_name": "Bàn Học, Văn Phòng & Trường Học",
+        "theme_classes_count": 92,
+        "detected": [
+          "desk"
+        ],
+        "expected": [
+          "person",
+          "chair",
+          "bottle",
+          "desk"
+        ],
+        "tp": 1,
+        "fp": 0,
+        "fn": 3,
+        "time_ms": 279.30378913879395
+      }
+    ]
+  },
+  "lexicon": {
+    "total_words": 1000,
+    "ipa_coverage": 945,
+    "ipa_rate": 94.5,
+    "vi_coverage": 1000,
+    "vi_rate": 100.0,
+    "cefr_coverage": 1000,
+    "cefr_rate": 100.0,
+    "avg_lookup_ms": 7.565780162811279
+  }
+}
