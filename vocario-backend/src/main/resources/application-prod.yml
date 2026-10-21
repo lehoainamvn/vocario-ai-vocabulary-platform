@@ -1,10 +1,10 @@
 # =========================================================================
-# Profile Prod: Dành riêng cho Cloud Deployment (Render + Supabase Database)
+# Profile Prod: Dành riêng cho Cloud Deployment (Render + Supabase IPv4 Pooler)
 # =========================================================================
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://db.ltviznwjqsfszbjbjjqj.supabase.co:5432/postgres?sslmode=require}
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres?sslmode=require}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres.ltviznwjqsfszbjbjjqj}
     password: "${SPRING_DATASOURCE_PASSWORD:Vocario2026@}"
     driver-class-name: org.postgresql.Driver
 
