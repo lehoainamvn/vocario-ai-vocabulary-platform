@@ -22,7 +22,7 @@ export class QuizStageService {
   private toast = inject(ToastService);
   private studyService = inject(UserStudyService);
 
-  private readonly STORAGE_STAGES_KEY = 'vocario_admin_quiz_stages';
+  private readonly STORAGE_STAGES_KEY = 'vocario_admin_quiz_stages_v2';
   private readonly STORAGE_WEEKLY_KEY = 'vocario_admin_weekly_stage_id';
 
   // Đấu trường chính thức mặc định tuần này
@@ -148,27 +148,27 @@ export class QuizStageService {
         colorText: 'text-amber-900',
         exampleEn: 'I use my laptop to work every day.',
         exampleVi: 'Tôi sử dụng máy tính xách tay để làm việc mỗi ngày.',
-        topPercent: 32,
-        leftPercent: 34,
-        widthPercent: 28,
-        heightPercent: 26
+        topPercent: 40,
+        leftPercent: 44,
+        widthPercent: 21,
+        heightPercent: 14
       },
       {
         id: 'sd-2',
-        word: 'desk lamp',
-        ipa: '/ˈdesk læmp/',
-        vietnamese: 'đèn học để bàn',
+        word: 'bookshelf',
+        ipa: '/ˈbʊkʃelf/',
+        vietnamese: 'giá sách để bàn',
         partOfSpeech: 'noun',
         level: 'A2',
         colorBg: 'bg-[#98D8AA]',
         colorBorder: 'border-emerald-400',
         colorText: 'text-emerald-950',
-        exampleEn: 'Turn on the desk lamp when reading at night.',
-        exampleVi: 'Hãy bật đèn học khi đọc sách vào ban đêm.',
-        topPercent: 12,
-        leftPercent: 12,
-        widthPercent: 18,
-        heightPercent: 34
+        exampleEn: 'The bookshelf holds my favorite textbooks.',
+        exampleVi: 'Giá sách chứa những cuốn sách giáo khoa yêu thích của tôi.',
+        topPercent: 8,
+        leftPercent: 27,
+        widthPercent: 63,
+        heightPercent: 46
       },
       {
         id: 'sd-3',
@@ -182,27 +182,27 @@ export class QuizStageService {
         colorText: 'text-rose-900',
         exampleEn: 'This ergonomic chair supports my back.',
         exampleVi: 'Chiếc ghế công thái học này nâng đỡ lưng của tôi.',
-        topPercent: 52,
-        leftPercent: 38,
-        widthPercent: 24,
-        heightPercent: 44
+        topPercent: 54,
+        leftPercent: 12,
+        widthPercent: 32,
+        heightPercent: 42
       },
       {
         id: 'sd-4',
-        word: 'notebook',
-        ipa: '/ˈnəʊtbʊk/',
-        vietnamese: 'sổ tay ghi chép',
+        word: 'drawer',
+        ipa: '/drɔːr/',
+        vietnamese: 'hộc tủ ngăn kéo',
         partOfSpeech: 'noun',
-        level: 'A1',
+        level: 'A2',
         colorBg: 'bg-[#CFF4FC]',
         colorBorder: 'border-cyan-400',
         colorText: 'text-cyan-900',
-        exampleEn: 'Write down key ideas in your notebook.',
-        exampleVi: 'Hãy viết các ý chính vào sổ tay của bạn.',
-        topPercent: 48,
-        leftPercent: 66,
-        widthPercent: 18,
-        heightPercent: 20
+        exampleEn: 'Keep stationery neatly inside the drawer.',
+        exampleVi: 'Cất giữ văn phòng phẩm gọn gàng bên trong ngăn kéo.',
+        topPercent: 60,
+        leftPercent: 63,
+        widthPercent: 27,
+        heightPercent: 32
       }
     ]
   };

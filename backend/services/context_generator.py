@@ -82,9 +82,15 @@ def _generate_fallback(words_list: List[Dict[str, str]], theme: str) -> Dict[str
             "highlightColor": HIGHLIGHT_COLORS[i % len(HIGHLIGHT_COLORS)]
         })
 
+    if 0 < num_words <= 2:
+        first_vn = words_list[0].get("vietnamese", words_list[0].get("word", "")).strip().title()
+        fallback_title = f"{first_vn} & Đời Sống Hằng Ngày"
+    else:
+        fallback_title = theme or "Bối cảnh thực tế đời sống"
+
     return {
         "contextSource": "fallback",
-        "sceneTitle": theme or "Bối cảnh thực tế đời sống",
+        "sceneTitle": fallback_title,
         "examples": examples,
         "dialogue": dialogue
     }
@@ -141,31 +147,93 @@ def generate_context(words_list: List[Dict[str, str]], theme: str = "", target_l
 
     # Giới hạn tối đa 8 từ nổi bật nhất để tối ưu token và độ tập trung
     subset_words = words_list[:8]
-    words_payload = [{"word": item["word"], "meaning": item.get("vietnamese", "")} for item in subset_words]
+
+    # Phân tích bố cục hình ảnh dựa trên bounding boxes & diện tích vật thể
+    enriched_payload = []
+    max_area = 0.0
+    dominant_word_info = ""
+
+    for item in subset_words:
+        w_name = item.get("word", "")
+        w_vi = item.get("vietnamese", w_name)
+        w_pct = float(item.get("widthPercent", 15.0))
+        h_pct = float(item.get("heightPercent", 15.0))
+        area = round((w_pct * h_pct) / 100.0, 1)
+
+        left = float(item.get("leftPercent", 30.0))
+        top = float(item.get("topPercent", 30.0))
+
+        pos_parts = []
+        if top < 33:
+            pos_parts.append("phía trên")
+        elif top > 66:
+            pos_parts.append("phía dưới")
+        else:
+            pos_parts.append("trung tâm")
+
+        if left < 33:
+            pos_parts.append("bên trái")
+        elif left > 66:
+            pos_parts.append("bên phải")
+        else:
+            pos_parts.append("chính giữa")
+
+        pos_str = " - ".join(pos_parts)
+        is_large = area >= 6.0 or (w_pct >= 20.0 or h_pct >= 35.0)
+
+        if area > max_area:
+            max_area = area
+            dominant_word_info = f"{w_vi} ({w_name})"
+
+        enriched_payload.append({
+            "word": w_name,
+            "meaning": w_vi,
+            "area_percentage": f"{area}% diện tích ảnh",
+            "position": pos_str,
+            "is_dominant_item": is_large
+        })
+
+    total_objects = len(subset_words)
+    is_focused_item = total_objects <= 2 or (max_area >= 8.0 and total_objects <= 3)
 
     level_instruction = _build_level_instructions(target_level)
 
     system_prompt = (
-        f"Bạn là một chuyên gia giáo dục tiếng Anh bản ngữ thiết kế bài học giao tiếp cho người Việt.\n"
-        f"{level_instruction}\n"
-        "Nhiệm vụ của bạn:\n"
-        "1. Với mỗi từ vựng được cung cấp, hãy viết một câu ví dụ tiếng Anh đời thường, tự nhiên, "
-        "đúng độ phức tạp ngữ pháp yêu cầu và bản dịch tiếng Việt chuẩn xác.\n"
-        "2. Viết một đoạn hội thoại giao tiếp tự nhiên từ 4 đến 6 lượt thoại giữa 'Bạn A' và 'Bạn B' "
-        "kết nối các đồ vật xuất hiện trong danh sách lại với nhau một cách hợp lý và sinh động.\n"
-        "3. Đặt một tiêu đề bối cảnh tiếng Việt cô đọng, cuốn hút (ví dụ: 'Góc Bàn Học Hiện Đại', 'Không Gian Phòng Khách').\n"
-        "RÀNG BUỘC:\n"
-        "- Chỉ trả về JSON hợp lệ theo đúng cấu trúc yêu cầu.\n"
-        "- Không bịa thêm các đồ vật lớn ngoài danh sách.\n"
-        "- Mỗi lượt hội thoại phải gán 'highlightWord' là một trong các từ trong danh sách.\n"
-        "- Ngôn từ tự nhiên, chuẩn mực, mang tính ứng dụng cao."
+        f"Bạn là một chuyên gia giáo dục tiếng Anh bản ngữ thiết kế bài học giao tiếp ngữ cảnh cho người Việt.\n"
+        f"{level_instruction}\n\n"
+        "QUY TẮC ĐẶT TIÊU ĐỀ BỐI CẢNH (sceneTitle) - ĐẶC BIỆT QUAN TRỌNG ĐỂ SÁT VỚI ẢNH THỰC TẾ:\n"
+        "1. TRƯỜNG HỢP VẬT THỂ CẬN CẢNH / CHỦ ĐẠO (Ảnh chỉ có 1 đến 2 vật thể nổi bật hoặc có vật thể chiếm diện tích lớn ở tiền cảnh/trung tâm):\n"
+        "   - BẮT BUỘC đặt tên bối cảnh gắn liền trực tiếp với vật thể đó và thói quen/hành động sử dụng hàng ngày.\n"
+        "   - Ví dụ: Thấy 'water bottle' đơn lẻ -> Đặt tên: 'Bình Nước Thể Thao Tiện Dụng', 'Thói Quen Uống Nước Hằng Ngày', 'Khoảnh Khắc Uống Nước Giải Khát'.\n"
+        "   - Ví dụ: Thấy 'coffee cup' đơn lẻ -> Đặt tên: 'Ly Cà Phê Nạp Năng Lượng', 'Giờ Nghỉ Thưởng Thức Cà Phê'.\n"
+        "   - Ví dụ: Thấy 'apple' đơn lẻ -> Đặt tên: 'Bữa Phụ Trái Cây Tươi Ngon', 'Năng Lượng Tự Nhiên Với Quả Táo'.\n"
+        "   - TUYỆT ĐỐI KHÔNG đặt tên không gian phòng chung chung (như 'Góc Bàn Làm Việc', 'Tổ Chức Không Gian', 'Văn Phòng') khi trong ảnh chỉ có 1-2 vật thể cá nhân được giơ lên trước camera!\n\n"
+        "2. TRƯỜNG HỢP KHÔNG GIAN TỔNG THỂ (Ảnh có từ 4 vật thể trở lên bao quát nhiều góc độ trong phòng như bàn, ghế, laptop, sách, đèn):\n"
+        "   - Đặt tên theo không gian hoạt động sinh động, phản ánh tính chất ngăn nắp, sáng tạo của nơi đó.\n"
+        "   - Ví dụ: 'Góc Bàn Học Hiện Đại & Gọn Gàng', 'Không Gian Làm Việc Sáng Tạo', 'Góc Bếp Tiện Nghi Ấm Cúng'.\n\n"
+        "3. HỘI THOẠI & VÍ DỤ:\n"
+        "   - Viết một đoạn hội thoại giao tiếp tự nhiên từ 4 đến 6 lượt thoại giữa 'Bạn A' và 'Bạn B' kết nối các đồ vật xuất hiện trong danh sách lại với nhau một cách hợp lý và sinh động.\n"
+        "   - Mỗi lượt hội thoại phải gán 'highlightWord' là một trong các từ trong danh sách.\n"
+        "   - Ràng buộc: Chỉ trả về JSON hợp lệ, không bịa đồ vật lớn ngoài danh sách, ngôn từ chuẩn mực và sinh động."
     )
+
+    if is_focused_item:
+        scene_mode_note = (
+            f"ĐẶC ĐIỂM BỐ CỤC ẢNH: Ảnh chụp cận cảnh tập trung vào 1-2 vật thể cá nhân (Vật thể nổi bật nhất: '{dominant_word_info}'). "
+            "HÃY BẮT BUỘC ĐẶT TIÊU ĐỀ XOAY QUANH VẬT THỂ NÀY (ví dụ: 'Bình Nước Thể Thao Tiện Dụng'), KHÔNG đặt tên phòng chung chung."
+        )
+    else:
+        scene_mode_note = (
+            f"ĐẶC ĐIỂM BỐ CỤC ẢNH: Ảnh chụp bao quát không gian gồm {total_objects} đồ vật đa dạng. "
+            "Hãy đặt tiêu đề mô tả không gian hoạt động chung sinh động, ngăn nắp."
+        )
 
     user_prompt = (
         f"Trình độ học viên: CEFR {target_level.upper()}\n"
-        f"Chủ đề bối cảnh: {theme or 'Góc sinh hoạt & học tập'}\n"
-        f"Danh sách từ vựng xuất hiện trong ảnh:\n"
-        f"{json.dumps(words_payload, ensure_ascii=False, indent=2)}\n\n"
+        f"Chủ đề bối cảnh tham khảo: {theme or 'Góc sinh hoạt & học tập'}\n"
+        f"{scene_mode_note}\n\n"
+        f"Danh sách chi tiết các vật thể bóc tách từ ảnh:\n"
+        f"{json.dumps(enriched_payload, ensure_ascii=False, indent=2)}\n\n"
         "Hãy trả về JSON theo đúng định dạng sau:\n"
         "{\n"
         '  "sceneTitle": "Tiêu đề tiếng Việt",\n'
