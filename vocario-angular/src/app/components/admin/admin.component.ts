@@ -5486,6 +5486,7 @@ import { environment } from '../../../environments/environment';
           </div>
 
         </div>
+        </div>
 
         <!-- Footer Modal -->
         <div class="p-4 border-t border-[#E5DED3] bg-[#FAF8F5] flex items-center justify-between shrink-0">
@@ -5515,7 +5516,7 @@ import { environment } from '../../../environments/environment';
          ========================================================================= -->
     <div 
       *ngIf="aiVisionPickerOpen()" 
-      class="fixed inset-0 bg-[#2D2823]/60 backdrop-blur-2xs z-60 flex items-center justify-center p-3 sm:p-4 animate-fade-in"
+      class="fixed inset-0 bg-[#2D2823]/60 backdrop-blur-2xs z-[70] flex items-center justify-center p-3 sm:p-4 animate-fade-in"
     >
       <div class="w-full max-w-4xl max-h-[88vh] bg-white rounded-[4px] border border-[#E5DED3] shadow-2xl flex flex-col overflow-hidden">
         
@@ -5647,7 +5648,7 @@ import { environment } from '../../../environments/environment';
          ========================================================================= -->
     <div 
       *ngIf="cefrPickerOpen()" 
-      class="fixed inset-0 bg-[#2D2823]/60 backdrop-blur-2xs z-60 flex items-center justify-center p-3 sm:p-4 animate-fade-in"
+      class="fixed inset-0 bg-[#2D2823]/60 backdrop-blur-2xs z-[70] flex items-center justify-center p-3 sm:p-4 animate-fade-in"
     >
       <div class="w-full max-w-lg max-h-[80vh] bg-white rounded-[4px] border border-[#E5DED3] shadow-2xl flex flex-col overflow-hidden">
         
@@ -5719,7 +5720,7 @@ import { environment } from '../../../environments/environment';
          ========================================================================= -->
     <div 
       *ngIf="deleteStageModalOpen()" 
-      class="fixed inset-0 bg-[#2D2823]/40 backdrop-blur-2xs z-60 flex items-center justify-center p-4 animate-fade-in"
+      class="fixed inset-0 bg-[#2D2823]/40 backdrop-blur-2xs z-[70] flex items-center justify-center p-4 animate-fade-in"
     >
       <div class="w-full max-w-sm bg-white rounded-[4px] border border-[#E5DED3] shadow-2xl p-5 space-y-4">
         
@@ -5763,7 +5764,7 @@ import { environment } from '../../../environments/environment';
          ========================================================================= -->
     <div 
       *ngIf="showClassroomDetailModal()" 
-      class="fixed inset-0 bg-[#2D2823]/40 backdrop-blur-2xs z-50 flex items-center justify-center p-3 sm:p-5 animate-fade-in"
+      class="fixed inset-0 bg-[#2D2823]/40 backdrop-blur-2xs z-[70] flex items-center justify-center p-3 sm:p-5 animate-fade-in"
     >
       <div class="w-full max-w-4xl bg-white rounded-[4px] border border-[#E5DED3] shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
         
@@ -6143,7 +6144,7 @@ import { environment } from '../../../environments/environment';
          ========================================================================= -->
     <div 
       *ngIf="showDeleteClassroomModal()" 
-      class="fixed inset-0 bg-[#2D2823]/40 backdrop-blur-2xs z-60 flex items-center justify-center p-4 animate-fade-in"
+      class="fixed inset-0 bg-[#2D2823]/40 backdrop-blur-2xs z-[70] flex items-center justify-center p-4 animate-fade-in"
     >
       <div class="w-full max-w-sm bg-white rounded-[4px] border border-[#E5DED3] shadow-2xl p-5 space-y-4">
         
@@ -6192,7 +6193,7 @@ import { environment } from '../../../environments/environment';
          ========================================================================= -->
     <div 
       *ngIf="editCertModalOpen()" 
-      class="fixed inset-0 bg-[#2D2823]/40 backdrop-blur-2xs z-60 flex items-center justify-center p-4 animate-fade-in"
+      class="fixed inset-0 bg-[#2D2823]/40 backdrop-blur-2xs z-[70] flex items-center justify-center p-4 animate-fade-in"
     >
       <div class="w-full max-w-lg bg-white rounded-[4px] border border-[#E5DED3] shadow-2xl overflow-hidden flex flex-col">
         <!-- Header -->
@@ -6326,7 +6327,7 @@ import { environment } from '../../../environments/environment';
          ========================================================================= -->
     <div 
       *ngIf="manualCertModalOpen()" 
-      class="fixed inset-0 bg-[#2D2823]/40 backdrop-blur-2xs z-60 flex items-center justify-center p-4 animate-fade-in"
+      class="fixed inset-0 bg-[#2D2823]/40 backdrop-blur-2xs z-[70] flex items-center justify-center p-4 animate-fade-in"
     >
       <div class="w-full max-w-lg bg-white rounded-[4px] border border-[#E5DED3] shadow-2xl overflow-hidden flex flex-col">
         <!-- Header -->
@@ -6449,7 +6450,7 @@ import { environment } from '../../../environments/environment';
          ========================================================================= -->
     <div 
       *ngIf="deleteCertModalOpen()" 
-      class="fixed inset-0 bg-[#2D2823]/40 backdrop-blur-2xs z-60 flex items-center justify-center p-4 animate-fade-in"
+      class="fixed inset-0 bg-[#2D2823]/40 backdrop-blur-2xs z-[70] flex items-center justify-center p-4 animate-fade-in"
     >
       <div class="w-full max-w-sm bg-white rounded-[4px] border border-[#E5DED3] shadow-2xl p-5 space-y-4">
         
@@ -6491,6 +6492,7 @@ import { environment } from '../../../environments/environment';
         </div>
 
       </div>
+    </div>
     <!-- =========================================================================
          19. MODAL: THÊM DẠNG LOẠI CHỨNG CHỈ MỚI (CREATE CERTIFICATE TYPE)
          ========================================================================= -->
