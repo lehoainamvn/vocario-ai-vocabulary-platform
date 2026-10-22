@@ -32,4 +32,4 @@ RUN mkdir -p /app/backend/services/cache
 
 EXPOSE 8001
 
-CMD ["uvicorn", "backend.services.ai_vision_server:app", "--host", "0.0.0.0", "--port", "8001"]
+CMD ["sh", "-c", "uvicorn backend.services.ai_vision_server:app --host 0.0.0.0 --port ${PORT:-8001}"]
