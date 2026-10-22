@@ -209,6 +209,11 @@ def get_word_details(raw_word: str):
     return meaning, ipa, cefr
 
 
+@app.get("/")
+def root():
+    return {"status": "ok", "service": "Vocario AI Vision Server"}
+
+
 @app.get("/health")
 def health_check():
     classes_count = len(model.names) if (model and hasattr(model, "names") and model.names) else 80
