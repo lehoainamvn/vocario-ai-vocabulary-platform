@@ -322,18 +322,20 @@ async def detect_objects(
                 "inference_ms": scene_res["inference_ms"],
                 "top_candidates": scene_res.get("top_candidates", [])
             }
-            apply_theme_classes("all")
-            effective_theme = scene_res["theme_name_vi"]
-            print(f"🌐 [ALL-CONTEXT AI] Quét toàn cảnh 1022 từ vựng (Bối cảnh gợi ý Places365: '{effective_theme}' {scene_res['confidence']*100:.1f}%)")
+            # Tầng 1 điều phối Tầng 2: Kích hoạt chính xác 30-50 từ vựng theo bối cảnh vừa phát hiện
+            detected_theme = scene_res.get("theme_key", "study_office")
+            apply_theme_classes(detected_theme)
+            effective_theme = scene_res.get("theme_name_vi", "Bàn Học, Văn Phòng & Trường Học")
+            print(f"🎯 [CONTEXT-AWARE AI] Kích hoạt bối cảnh '{effective_theme}' ({detected_theme}) theo đúng kiến trúc đồ án!")
         else:
             # Người dùng chọn bối cảnh thủ công
             apply_theme_classes(theme)
             effective_theme = theme
 
-        # Tầng 2: Chạy suy luận nhận diện đồ vật YOLO-World tối ưu CPU (imgsz=384, inference_mode)
+        # Tầng 2: Chạy suy luận nhận diện đồ vật YOLO-World siêu tốc trên CPU (imgsz=320, inference_mode)
         import torch
         with torch.inference_mode():
-            results = model.predict(pil_image, conf=conf, imgsz=384, verbose=False)
+            results = model.predict(pil_image, conf=conf, imgsz=320, verbose=False)
         
         detected_words = []
         seen_words = set()
