@@ -4711,57 +4711,57 @@ import { environment } from '../../../environments/environment';
           
           <!-- CỘT TRÁI (7/12): Khung ảnh lớn kèm Bounding Box overlays -->
           <div class="lg:col-span-7 space-y-2.5">
-            <div class="relative w-full rounded-[4px] overflow-hidden bg-stone-950 border border-[#E5DED3] shadow-inner select-none aspect-4/3 flex items-center justify-center">
-              
-              <img 
-                [src]="getImageUrl(selectedCapture()?.imageUrl || '')" 
-                (error)="handleImageError($event)"
-                alt="Bối cảnh AI Vision chi tiết"
-                class="w-full h-full object-cover"
-              />
+            <div class="relative w-full rounded-[4px] overflow-hidden bg-stone-950 border border-[#E5DED3] shadow-inner select-none flex items-center justify-center p-2">
+              <div class="relative inline-block max-w-full leading-none">
+                <img 
+                  [src]="getImageUrl(selectedCapture()?.imageUrl || '')" 
+                  (error)="handleImageError($event)"
+                  alt="Bối cảnh AI Vision chi tiết"
+                  class="block max-w-full max-h-[500px] w-auto h-auto select-none rounded-[2px]"
+                />
 
-              <!-- Overlay Bounding Boxes -->
-              <div 
-                *ngFor="let box of parsedCurrentBoxes(); let i = index"
-                (mouseenter)="selectedBoxIndex.set(i)"
-                (mouseleave)="selectedBoxIndex.set(null)"
-                (click)="selectedBoxIndex.set(i)"
-                [style.top.%]="box.topPercent"
-                [style.left.%]="box.leftPercent"
-                [style.width.%]="box.widthPercent"
-                [style.height.%]="box.heightPercent"
-                [class.border-amber-400]="selectedBoxIndex() === i"
-                [class.bg-amber-400/20]="selectedBoxIndex() === i"
-                [class.shadow-lg]="selectedBoxIndex() === i"
-                [class.z-20]="selectedBoxIndex() === i"
-                [class.border-white/80]="selectedBoxIndex() !== i"
-                [class.bg-black/20]="selectedBoxIndex() !== i"
-                class="absolute border-2 rounded-[2px] cursor-pointer transition-all duration-150 flex flex-col justify-between p-1 group"
-              >
-                <!-- Nhãn góc trên bounding box -->
-                <div class="flex items-center gap-1 self-start">
-                  <span 
-                    [class.bg-amber-400]="selectedBoxIndex() === i"
-                    [class.text-stone-900]="selectedBoxIndex() === i"
-                    [class.bg-black/70]="selectedBoxIndex() !== i"
-                    [class.text-white]="selectedBoxIndex() !== i"
-                    class="px-1.5 py-0.5 rounded-[2px] text-[10px] font-semibold tracking-wider backdrop-blur-xs flex items-center gap-1 shadow-xs transition-colors"
-                  >
-                    <app-icon name="tag" [size]="9"></app-icon>
-                    <span>{{ box.word }}</span>
-                  </span>
-                </div>
-
-                <!-- Tooltip nghĩa tiếng Việt khi hover -->
+                <!-- Overlay Bounding Boxes -->
                 <div 
-                  *ngIf="selectedBoxIndex() === i"
-                  class="self-start px-2 py-0.5 rounded-[2px] bg-stone-900/90 text-white text-[10px] font-medium backdrop-blur-md border border-white/20 mt-1 shadow-md animate-fade-in"
+                  *ngFor="let box of parsedCurrentBoxes(); let i = index"
+                  (mouseenter)="selectedBoxIndex.set(i)"
+                  (mouseleave)="selectedBoxIndex.set(null)"
+                  (click)="selectedBoxIndex.set(i)"
+                  [style.top.%]="box.topPercent"
+                  [style.left.%]="box.leftPercent"
+                  [style.width.%]="box.widthPercent"
+                  [style.height.%]="box.heightPercent"
+                  [class.border-amber-400]="selectedBoxIndex() === i"
+                  [class.bg-amber-400/20]="selectedBoxIndex() === i"
+                  [class.shadow-lg]="selectedBoxIndex() === i"
+                  [class.z-20]="selectedBoxIndex() === i"
+                  [class.border-white/80]="selectedBoxIndex() !== i"
+                  [class.bg-black/20]="selectedBoxIndex() !== i"
+                  class="absolute border-2 rounded-[2px] cursor-pointer transition-all duration-150 flex flex-col justify-between p-1 group"
                 >
-                  <span>{{ box.vietnamese }}</span>
-                  <span *ngIf="box.ipa" class="text-amber-300 ml-1 font-mono">{{ box.ipa }}</span>
+                  <!-- Nhãn góc trên bounding box -->
+                  <div class="flex items-center gap-1 self-start">
+                    <span 
+                      [class.bg-amber-400]="selectedBoxIndex() === i"
+                      [class.text-stone-900]="selectedBoxIndex() === i"
+                      [class.bg-black/70]="selectedBoxIndex() !== i"
+                      [class.text-white]="selectedBoxIndex() !== i"
+                      class="px-1.5 py-0.5 rounded-[2px] text-[10px] font-semibold tracking-wider backdrop-blur-xs flex items-center gap-1 shadow-xs transition-colors"
+                    >
+                      <app-icon name="tag" [size]="9"></app-icon>
+                      <span>{{ box.word }}</span>
+                    </span>
+                  </div>
+
+                  <!-- Tooltip nghĩa tiếng Việt khi hover -->
+                  <div 
+                    *ngIf="selectedBoxIndex() === i"
+                    class="self-start px-2 py-0.5 rounded-[2px] bg-stone-900/90 text-white text-[10px] font-medium backdrop-blur-md border border-white/20 mt-1 shadow-md animate-fade-in"
+                  >
+                    <span>{{ box.vietnamese }}</span>
+                    <span *ngIf="box.ipa" class="text-amber-300 ml-1 font-mono">{{ box.ipa }}</span>
+                  </div>
                 </div>
               </div>
-
             </div>
 
             <!-- Hướng dẫn tương tác -->
@@ -5166,18 +5166,21 @@ import { environment } from '../../../environments/environment';
 
             <!-- KHUNG XEM TRƯỚC ẢNH TƯƠNG TÁC BOUNDING BOXES TRỰC TIẾP TRÊN CANVAS -->
             <div 
-              #previewContainer
               *ngIf="stageFormImageUrl" 
-              (mousedown)="onCanvasMouseDown($event, previewContainer)"
-              class="relative w-full aspect-[16/9] max-h-80 rounded-[4px] overflow-hidden bg-stone-950 border border-[#E5DED3] select-none flex items-center justify-center cursor-crosshair group shadow-inner"
+              class="relative w-full rounded-[4px] overflow-hidden bg-stone-950 border border-[#E5DED3] select-none flex items-center justify-center p-2 shadow-inner"
             >
-              <img 
-                [src]="getImageUrl(stageFormImageUrl)" 
-                (error)="handleImageError($event)"
-                alt="Xem trước đấu trường" 
-                class="w-full h-full object-cover pointer-events-none"
-                draggable="false"
-              />
+              <div 
+                #previewContainer
+                (mousedown)="onCanvasMouseDown($event, previewContainer)"
+                class="relative inline-block max-w-full leading-none cursor-crosshair group"
+              >
+                <img 
+                  [src]="getImageUrl(stageFormImageUrl)" 
+                  (error)="handleImageError($event)"
+                  alt="Xem trước đấu trường" 
+                  class="block max-h-80 w-auto max-w-full pointer-events-none select-none rounded-[2px]"
+                  draggable="false"
+                />
 
               <!-- Thanh chỉ dẫn thao tác chuột trực tiếp -->
               <div class="absolute top-2 left-2 right-2 flex items-center justify-between text-[11px] pointer-events-none z-30">
