@@ -302,6 +302,12 @@ async def detect_objects(
         pil_image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
         width, height = pil_image.size
 
+        # Tối ưu hóa kích thước ảnh tối đa 640px cho CPU Cloud để xử lý siêu tốc (<2s), tránh timeout 502
+        if max(width, height) > 640:
+            scale = 640.0 / max(width, height)
+            pil_image = pil_image.resize((int(width * scale), int(height * scale)), Image.Resampling.BILINEAR)
+            width, height = pil_image.size
+
         # Tầng 1: Tự động phân tích bối cảnh tham khảo bằng ResNet-18 (Places365)
         auto_scene_info = None
         clean_theme = (theme or "auto").strip().lower()
@@ -316,8 +322,6 @@ async def detect_objects(
                 "inference_ms": scene_res["inference_ms"],
                 "top_candidates": scene_res.get("top_candidates", [])
             }
-            # Mở khóa toàn diện: Kích hoạt toàn bộ 1022 từ vựng để nhận diện MỌI VẬT THỂ trong ảnh
-            # Không gò bó, không bóp nghẹt mô hình vào một bối cảnh hẹp
             apply_theme_classes("all")
             effective_theme = scene_res["theme_name_vi"]
             print(f"🌐 [ALL-CONTEXT AI] Quét toàn cảnh 1022 từ vựng (Bối cảnh gợi ý Places365: '{effective_theme}' {scene_res['confidence']*100:.1f}%)")
@@ -326,8 +330,10 @@ async def detect_objects(
             apply_theme_classes(theme)
             effective_theme = theme
 
-        # Tầng 2: Chạy suy luận nhận diện đồ vật YOLO-World
-        results = model.predict(pil_image, conf=conf, verbose=False)
+        # Tầng 2: Chạy suy luận nhận diện đồ vật YOLO-World tối ưu CPU (imgsz=384, inference_mode)
+        import torch
+        with torch.inference_mode():
+            results = model.predict(pil_image, conf=conf, imgsz=384, verbose=False)
         
         detected_words = []
         seen_words = set()
@@ -391,7 +397,7 @@ async def detect_objects(
         # 2. Loại bỏ dị biệt hình học (Aspect ratio / Area constraints)
         # 3. Hiệu chuẩn độ tin cậy theo Ma trận Đồng xuất hiện bối cảnh (Co-occurrence)
         # 4. Triệt tiêu hộp bao lồng nhau (Soft Containment NMS)
-        active_scene_key = auto_scene_info.get("theme_key") if (auto_scene_info and auto_scene_info.get("enabled")) else matched_theme_key
+        active_scene_key = auto_scene_info.get("theme_key") if (auto_scene_info and auto_scene_info.get("enabled")) else (clean_theme or "general")
         verified_words = verifier_service.verify_and_refine(pil_image, detected_words, scene_key=active_scene_key)
 
         # Fallback nếu bộ thẩm định lọc quá tay hoặc với ảnh tranh vẽ / hoạt hình
@@ -464,6 +470,9 @@ async def detect_objects(
             reasons.append(f"Không có vật thể nào trong bối cảnh '{effective_theme}' đạt ngưỡng tin cậy conf >= {conf*100:.0f}%")
             diag_msg = "; ".join(reasons)
             print(f"ℹ️ [DIAGNOSTIC] {diag_msg}")
+
+        import gc
+        gc.collect()
 
         return {
             "success": True,
