@@ -591,6 +591,47 @@ interface ClickFeedback {
             <span>Độ chính xác: <strong class="text-[#29251F]">{{ accuracyPercentage() }}%</strong></span>
           </div>
 
+          <!-- Word Chips Bar: bấm thay thế cho bounding box nhỏ -->
+          <div class="pt-3 border-t border-[#E5DED3]">
+            <p class="text-[10px] font-bold uppercase tracking-widest text-[#8C827A] mb-2">
+              Hoặc bấm vào tên đồ vật:
+            </p>
+            <div class="flex flex-wrap gap-2">
+              <ng-container *ngFor="let item of currentStage()?.words">
+                <button
+                  type="button"
+                  (click)="onBoxClick(item, $event)"
+                  [disabled]="isShowingSuccess()"
+                  class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] border text-xs font-semibold cursor-pointer transition-all duration-150 active:scale-95 disabled:cursor-not-allowed select-none"
+                  [class.bg-[#287A59]]="isWordSolved(item.id)"
+                  [class.border-[#287A59]]="isWordSolved(item.id)"
+                  [class.text-white]="isWordSolved(item.id)"
+                  [class.bg-rose-50]="wrongClickedWord()?.id === item.id"
+                  [class.border-rose-400]="wrongClickedWord()?.id === item.id"
+                  [class.text-rose-700]="wrongClickedWord()?.id === item.id"
+                  [class.bg-amber-50]="isCurrentTarget(item.id) && !isWordSolved(item.id) && wrongClickedWord()?.id !== item.id"
+                  [class.border-amber-400]="isCurrentTarget(item.id) && !isWordSolved(item.id) && wrongClickedWord()?.id !== item.id"
+                  [class.text-amber-900]="isCurrentTarget(item.id) && !isWordSolved(item.id) && wrongClickedWord()?.id !== item.id"
+                  [class.ring-2]="isCurrentTarget(item.id) && !isWordSolved(item.id)"
+                  [class.ring-amber-300]="isCurrentTarget(item.id) && !isWordSolved(item.id)"
+                  [class.bg-[#FAF8F5]]="!isWordSolved(item.id) && !isCurrentTarget(item.id) && wrongClickedWord()?.id !== item.id"
+                  [class.border-[#E5DED3]]="!isWordSolved(item.id) && !isCurrentTarget(item.id) && wrongClickedWord()?.id !== item.id"
+                  [class.text-[#5C5249]]="!isWordSolved(item.id) && !isCurrentTarget(item.id) && wrongClickedWord()?.id !== item.id"
+                  [class.hover:bg-[#EFE9E0]]="!isWordSolved(item.id) && !isCurrentTarget(item.id) && wrongClickedWord()?.id !== item.id"
+                >
+                  <app-icon
+                    *ngIf="isWordSolved(item.id)"
+                    name="check"
+                    [size]="11"
+                    svgClass="text-white"
+                  ></app-icon>
+                  <span>{{ item.word }}</span>
+                  <span class="text-[9px] font-mono opacity-60">{{ item.vietnamese }}</span>
+                </button>
+              </ng-container>
+            </div>
+          </div>
+
         </div>
       </ng-container>
 
