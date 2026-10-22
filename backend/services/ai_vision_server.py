@@ -363,11 +363,11 @@ async def detect_objects(
                 w_pct = round(((x2 - x1) / width) * 100, 1)
                 h_pct = round(((y2 - y1) / height) * 100, 1)
 
-                # Giới hạn kích thước hợp lý cho UI box
-                w_pct = max(10.0, min(80.0, w_pct))
-                h_pct = max(6.0, min(80.0, h_pct))
-                left_pct = max(2.0, min(95.0 - w_pct, left_pct))
-                top_pct = max(2.0, min(95.0 - h_pct, top_pct))
+                # Giữ nguyên tỷ lệ và tọa độ thực tế chính xác của mô hình
+                w_pct = round(max(2.0, min(99.0, w_pct)), 1)
+                h_pct = round(max(2.0, min(99.0, h_pct)), 1)
+                left_pct = round(max(0.0, min(100.0 - w_pct, left_pct)), 1)
+                top_pct = round(max(0.0, min(100.0 - h_pct, top_pct)), 1)
 
                 meaning, ipa, cefr = get_word_details(word_name)
                 palette = color_palettes[item_index % len(color_palettes)]

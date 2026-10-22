@@ -272,51 +272,58 @@ export interface Album {
           </div>
 
           <!-- Scene Preview with Interactive Bounding Boxes & Bottom Caption -->
-          <figure class="relative h-[360px] sm:h-[400px] bg-[#1E1B18] overflow-hidden select-none m-0 shadow-sm">
-            <img [src]="current.image" [alt]="current.imageAlt || current.title" class="w-full h-full object-cover" />
-            
-            <!-- Bottom Gradient Shade for Legibility -->
-            <div class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[rgba(30,27,24,0.88)] via-[rgba(30,27,24,0.45)] to-transparent pointer-events-none z-10"></div>
+          <figure class="relative bg-[#1E1B18] rounded-[4px] overflow-hidden select-none m-0 shadow-sm flex items-center justify-center">
+            <!-- Exact Natural Image Frame (Khung ôm sát tỉ lệ ảnh thực tế, loại bỏ crop làm lệch bounding box) -->
+            <div class="relative inline-block max-w-full leading-none">
+              <img 
+                [src]="current.image" 
+                [alt]="current.imageAlt || current.title" 
+                class="block max-w-full max-h-[480px] sm:max-h-[520px] w-auto h-auto select-none pointer-events-none" 
+              />
+              
+              <!-- Bottom Gradient Shade for Legibility -->
+              <div class="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[rgba(30,27,24,0.92)] via-[rgba(30,27,24,0.45)] to-transparent pointer-events-none z-10"></div>
 
-            <!-- Interactive Bounding Boxes Overlay on Image -->
-            <div class="absolute inset-0 z-20 pointer-events-none">
-              <div 
-                *ngFor="let word of current.words"
-                (click)="focusWord(word.english); $event.stopPropagation()"
-                (mouseenter)="selectedWord.set(word.english)"
-                (mouseleave)="selectedWord.set(null)"
-                class="absolute pointer-events-auto cursor-pointer transition-all duration-150 rounded-md group/box"
-                [style.top.%]="word.topPercent"
-                [style.left.%]="word.leftPercent"
-                [style.width.%]="word.widthPercent"
-                [style.height.%]="word.heightPercent"
-                [style.border]="selectedWord() === word.english || expandedWords().has(word.english) ? '2.5px solid #F2C94C' : '2px solid rgba(255, 255, 255, 0.85)'"
-                [style.background-color]="selectedWord() === word.english || expandedWords().has(word.english) ? 'rgba(242, 201, 76, 0.28)' : 'rgba(0, 0, 0, 0.08)'"
-                [title]="word.english + ': ' + word.vietnamese"
-              >
-                <!-- Label Tag on Box -->
-                <span 
-                  class="absolute -top-6 left-0 px-2 py-0.5 rounded-[4px] text-[10px] font-bold shadow-md flex items-center gap-1.5 whitespace-nowrap z-30 select-none transition-all"
-                  [class.bg-[#F2C94C]]="selectedWord() === word.english || expandedWords().has(word.english)"
-                  [class.text-[#29251F]]="selectedWord() === word.english || expandedWords().has(word.english)"
-                  [class.bg-[#29251F]/90]="selectedWord() !== word.english && !expandedWords().has(word.english)"
-                  [class.text-white]="selectedWord() !== word.english && !expandedWords().has(word.english)"
+              <!-- Interactive Bounding Boxes Overlay on Image -->
+              <div class="absolute inset-0 z-20 pointer-events-none">
+                <div 
+                  *ngFor="let word of current.words"
+                  (click)="focusWord(word.english); $event.stopPropagation()"
+                  (mouseenter)="selectedWord.set(word.english)"
+                  (mouseleave)="selectedWord.set(null)"
+                  class="absolute pointer-events-auto cursor-pointer transition-all duration-150 rounded-[3px] group/box"
+                  [style.top.%]="word.topPercent"
+                  [style.left.%]="word.leftPercent"
+                  [style.width.%]="word.widthPercent"
+                  [style.height.%]="word.heightPercent"
+                  [style.border]="selectedWord() === word.english || expandedWords().has(word.english) ? '2.5px solid #F2C94C' : '2px solid rgba(255, 255, 255, 0.85)'"
+                  [style.background-color]="selectedWord() === word.english || expandedWords().has(word.english) ? 'rgba(242, 201, 76, 0.28)' : 'rgba(0, 0, 0, 0.08)'"
+                  [title]="word.english + ': ' + word.vietnamese"
                 >
-                  <span>{{ word.english }}</span>
-                  <span *ngIf="word.confidence" class="text-[8px] font-mono opacity-80">{{ (word.confidence * 100).toFixed(0) }}%</span>
-                </span>
+                  <!-- Label Tag on Box -->
+                  <span 
+                    class="absolute -top-6 left-0 px-2 py-0.5 rounded-[4px] text-[10px] font-bold shadow-md flex items-center gap-1.5 whitespace-nowrap z-30 select-none transition-all"
+                    [class.bg-[#F2C94C]]="selectedWord() === word.english || expandedWords().has(word.english)"
+                    [class.text-[#29251F]]="selectedWord() === word.english || expandedWords().has(word.english)"
+                    [class.bg-[#29251F]/90]="selectedWord() !== word.english && !expandedWords().has(word.english)"
+                    [class.text-white]="selectedWord() !== word.english && !expandedWords().has(word.english)"
+                  >
+                    <span>{{ word.english }}</span>
+                    <span *ngIf="word.confidence" class="text-[8px] font-mono opacity-80">{{ (word.confidence * 100).toFixed(0) }}%</span>
+                  </span>
+                </div>
               </div>
-            </div>
 
-            <!-- Figcaption -->
-            <figcaption class="absolute bottom-5 left-6 right-6 text-white pointer-events-none flex flex-col z-20">
-              <span class="text-[9px] font-bold uppercase tracking-[0.09em] text-[#F2C94C] mb-1">
-                {{ current.category }}
-              </span>
-              <strong class="font-serif text-[21px] font-medium leading-[1.25] drop-shadow-sm">
-                {{ current.title }}
-              </strong>
-            </figcaption>
+              <!-- Figcaption -->
+              <figcaption class="absolute bottom-4 left-5 right-5 text-left text-white pointer-events-none flex flex-col z-20">
+                <span class="text-[9px] font-bold uppercase tracking-[0.09em] text-[#F2C94C] mb-1">
+                  {{ current.category }}
+                </span>
+                <strong class="font-serif text-[18px] sm:text-[20px] font-medium leading-[1.25] drop-shadow-sm">
+                  {{ current.title }}
+                </strong>
+              </figcaption>
+            </div>
           </figure>
 
           <!-- Lexicon Section Heading -->

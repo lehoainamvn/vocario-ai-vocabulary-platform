@@ -101,7 +101,7 @@ import { IconComponent } from '../common/icon.component';
                 autoplay 
                 playsinline 
                 muted 
-                class="w-full h-full object-cover absolute inset-0"
+                class="w-full h-full object-contain absolute inset-0"
                 [class.hidden]="!isCameraActive() || capturedImagePreview()"
               ></video>
 
@@ -166,8 +166,8 @@ import { IconComponent } from '../common/icon.component';
 
               <!-- Trạng thái Ảnh vừa chụp Preview kèm Bounding Boxes -->
               <div *ngIf="capturedImagePreview()" class="relative w-full h-full min-h-[440px] sm:min-h-[480px] flex items-center justify-center p-4">
-                <div class="relative inline-flex items-center justify-center max-w-full max-h-full">
-                  <img [src]="capturedImagePreview()" alt="Ảnh vừa chụp" class="max-h-[420px] w-auto max-w-full object-contain rounded-[4px] border border-white/10 select-none pointer-events-none" />
+                <div class="relative inline-block max-w-full leading-none">
+                  <img [src]="capturedImagePreview()" alt="Ảnh vừa chụp" class="block max-h-[440px] sm:max-h-[480px] w-auto max-w-full rounded-[4px] border border-white/10 select-none pointer-events-none" />
 
                   <!-- Bounding boxes overlay on top of image -->
                   <div *ngIf="hasScanned() && studyService.activeScene()?.words?.length" class="absolute inset-0 pointer-events-none">
@@ -235,8 +235,8 @@ import { IconComponent } from '../common/icon.component';
 
               <!-- Preview ảnh vừa tải lên -->
               <div *ngIf="uploadedImagePreview()" class="relative w-full h-full min-h-[440px] sm:min-h-[480px] flex items-center justify-center p-4">
-                <div class="relative inline-flex items-center justify-center max-w-full max-h-full">
-                  <img [src]="uploadedImagePreview()" alt="Ảnh vừa tải" class="max-h-[420px] w-auto max-w-full object-contain rounded-[4px] border border-white/10 select-none pointer-events-none" />
+                <div class="relative inline-block max-w-full leading-none">
+                  <img [src]="uploadedImagePreview()" alt="Ảnh vừa tải" class="block max-h-[440px] sm:max-h-[480px] w-auto max-w-full rounded-[4px] border border-white/10 select-none pointer-events-none" />
 
                   <!-- Bounding boxes overlay on top of uploaded image -->
                   <div *ngIf="hasScanned() && studyService.activeScene()?.words?.length" class="absolute inset-0 pointer-events-none">

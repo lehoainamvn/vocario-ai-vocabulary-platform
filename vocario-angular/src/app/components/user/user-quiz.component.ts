@@ -505,12 +505,12 @@ interface ClickFeedback {
             <div 
               #photoContainer
               (click)="onBackgroundClick($event)"
-              class="relative inline-flex items-center justify-center max-w-full max-h-[560px] cursor-crosshair select-none"
+              class="relative inline-block max-w-full leading-none cursor-crosshair select-none"
             >
               <img 
                 [src]="currentStage()?.imageUrl" 
                 [alt]="currentStage()?.title" 
-                class="max-h-[540px] w-auto max-w-full object-contain block mx-auto rounded-lg pointer-events-none select-none"
+                class="block max-h-[540px] w-auto max-w-full mx-auto rounded-lg pointer-events-none select-none"
               />
 
               <!-- Bounding boxes -->
