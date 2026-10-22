@@ -104,4 +104,6 @@ Thumbs.db
 
 # Agent IDE metadata
 .gemini/
-.agents/
+.agents/*
+!.agents/rules/
+!.agents/skills/
