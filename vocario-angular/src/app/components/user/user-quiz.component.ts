@@ -502,10 +502,30 @@ interface ClickFeedback {
 
           <!-- Interactive Photo Container -->
           <section class="relative rounded-2xl overflow-hidden bg-[#29251F] border border-[#E5DED3] flex items-center justify-center p-3 select-none">
+
+            <!-- Công cụ phóng to kính lúp (Magnifier tool) -->
+            <div class="absolute top-4 right-4 z-40 flex items-center gap-2">
+              <button
+                type="button"
+                (click)="toggleZoom($event)"
+                class="px-3 py-1.5 rounded-lg bg-[#1F1C18]/85 hover:bg-[#1F1C18] text-white border border-white/20 text-xs font-semibold backdrop-blur-md shadow-lg flex items-center gap-1.5 transition-all cursor-pointer active:scale-95"
+                [class.bg-[#287A59]]="isZoomed()"
+                [class.border-[#287A59]]="isZoomed()"
+                title="Phóng to 1.6x để soi các đồ vật nhỏ"
+              >
+                <app-icon name="search" [size]="13"></app-icon>
+                <span>{{ isZoomed() ? 'Thu nhỏ (1x)' : 'Kính lúp (1.6x)' }}</span>
+              </button>
+            </div>
+
             <div 
               #photoContainer
-              (click)="onBackgroundClick($event)"
-              class="relative w-fit leading-none cursor-crosshair select-none"
+              (click)="onPhotoClick($event)"
+              class="relative w-fit leading-none select-none transition-transform duration-200"
+              [class.cursor-crosshair]="!isZoomed()"
+              [class.cursor-zoom-out]="isZoomed()"
+              [class.scale-150]="isZoomed()"
+              [style.transform-origin]="zoomOrigin().x + '% ' + zoomOrigin().y + '%'"
             >
               <img 
                 [src]="currentStage()?.imageUrl" 
@@ -513,121 +533,133 @@ interface ClickFeedback {
                 class="block max-h-[540px] w-auto max-w-full rounded-lg pointer-events-none select-none"
               />
 
-              <!-- Bounding boxes -->
+              <!-- Overlay Layers: Chỉ hiển thị khi tìm đúng, bấm nhầm, hoặc đồ vật đã giải -->
               <ng-container *ngFor="let item of currentStage()?.words">
+                <!-- 1. Hiệu ứng ăn mừng khi tìm đúng mục tiêu hiện tại -->
                 <div 
-                  (click)="onBoxClick(item, $event)"
-                  class="absolute rounded-[6px] transition-all duration-200 cursor-pointer select-none group/bbox z-10"
+                  *ngIf="isShowingSuccess() && isCurrentTarget(item.id)"
+                  class="absolute rounded-[6px] border-2 border-[#287A59] bg-[#287A59]/35 shadow-lg shadow-[#287A59]/40 z-30 pointer-events-none animate-pulse"
                   [style.top.%]="item.topPercent"
                   [style.left.%]="item.leftPercent"
                   [style.width.%]="item.widthPercent"
                   [style.height.%]="item.heightPercent"
-                  [class.border-2]="true"
-                  [class.border-[#287A59]]="isWordSolved(item.id) && !isCurrentTarget(item.id)"
-                  [class.bg-[#287A59]/20]="isWordSolved(item.id) && !isCurrentTarget(item.id)"
-                  [class.border-[#287A59]]="isShowingSuccess() && isCurrentTarget(item.id)"
-                  [class.bg-[#287A59]/35]="isShowingSuccess() && isCurrentTarget(item.id)"
-                  [class.border-rose-500]="wrongClickedWord()?.id === item.id"
-                  [class.bg-rose-500/30]="wrongClickedWord()?.id === item.id"
-                  [class.border-dashed]="!isWordSolved(item.id) && !(isShowingSuccess() && isCurrentTarget(item.id)) && wrongClickedWord()?.id !== item.id"
-                  [class.border-white/80]="!isWordSolved(item.id) && !(isShowingSuccess() && isCurrentTarget(item.id)) && wrongClickedWord()?.id !== item.id"
-                  [class.bg-white/10]="!isWordSolved(item.id) && !(isShowingSuccess() && isCurrentTarget(item.id)) && wrongClickedWord()?.id !== item.id"
-                  [class.hover:border-amber-300]="!isWordSolved(item.id) && !isShowingSuccess()"
-                  [class.hover:bg-amber-300/20]="!isWordSolved(item.id) && !isShowingSuccess()"
                 >
-                  <!-- Success notification tag -->
-                  <span 
-                    *ngIf="isShowingSuccess() && isCurrentTarget(item.id)"
-                    class="absolute -top-8 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-[6px] bg-[#287A59] text-white text-[11px] font-semibold whitespace-nowrap shadow-md z-30 pointer-events-none"
-                  >
+                  <span class="absolute -top-8 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-[6px] bg-[#287A59] text-white text-[11px] font-semibold whitespace-nowrap shadow-md z-30 pointer-events-none">
                     Chính xác: {{ item.word }} (+{{ lastEarnedXp() }} XP)
                   </span>
+                </div>
 
-                  <!-- Wrong clicked feedback tag -->
-                  <span 
-                    *ngIf="wrongClickedWord()?.id === item.id"
-                    class="absolute -top-8 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-[6px] bg-[#B91C1C] text-white text-[11px] font-semibold whitespace-nowrap shadow-md z-30 pointer-events-none"
-                  >
-                    Đây là {{ item.word }} ({{ item.vietnamese }}), không phải {{ currentTargetWord()?.word }}!
+                <!-- 2. Cảnh báo khi người chơi bấm nhầm vào vật thể khác trong ảnh -->
+                <div 
+                  *ngIf="wrongClickedWord()?.id === item.id"
+                  class="absolute rounded-[6px] border-2 border-rose-500 bg-rose-500/30 shadow-md z-30 pointer-events-none transition-all"
+                  [style.top.%]="item.topPercent"
+                  [style.left.%]="item.leftPercent"
+                  [style.width.%]="item.widthPercent"
+                  [style.height.%]="item.heightPercent"
+                >
+                  <span class="absolute -top-8 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-[6px] bg-[#B91C1C] text-white text-[11px] font-semibold whitespace-nowrap shadow-md z-30 pointer-events-none">
+                    Đó là {{ item.word }} ({{ item.vietnamese }}), hãy tìm {{ currentTargetWord()?.word }}! (-2s)
                   </span>
+                </div>
 
-                  <!-- Solved checkmark -->
-                  <span 
-                    *ngIf="isWordSolved(item.id) && !isShowingSuccess()"
-                    class="absolute top-1 left-1 px-1.5 py-0.5 rounded-[4px] bg-[#287A59]/90 text-white text-[9px] font-semibold pointer-events-none flex items-center gap-1"
-                  >
+                <!-- 3. Ghim đánh dấu những đồ vật đã hoàn thành (tinh tế, không che ảnh) -->
+                <div 
+                  *ngIf="isWordSolved(item.id) && !isShowingSuccess()"
+                  class="absolute rounded-[6px] border border-[#287A59]/40 bg-[#287A59]/10 pointer-events-none z-10 transition-opacity"
+                  [style.top.%]="item.topPercent"
+                  [style.left.%]="item.leftPercent"
+                  [style.width.%]="item.widthPercent"
+                  [style.height.%]="item.heightPercent"
+                >
+                  <span class="absolute top-1 left-1 px-1.5 py-0.5 rounded-[4px] bg-[#287A59] text-white text-[9px] font-semibold shadow-xs flex items-center gap-1">
                     <app-icon name="check" [size]="9"></app-icon>
                     <span>{{ item.word }}</span>
                   </span>
                 </div>
               </ng-container>
 
-              <!-- Hint outline -->
+              <!-- Gợi ý radar quét xung quanh vật thể mục tiêu -->
               <div 
                 *ngIf="isHintActive() && currentTargetWord() as target"
-                class="absolute pointer-events-none rounded-lg transition-all animate-pulse z-20"
+                class="absolute pointer-events-none rounded-xl transition-all animate-ping z-20"
                 [style.top.%]="target.topPercent - 2"
                 [style.left.%]="target.leftPercent - 2"
                 [style.width.%]="target.widthPercent + 4"
                 [style.height.%]="target.heightPercent + 4"
                 style="border: 2px dashed #D97706; background-color: rgba(217, 119, 6, 0.2);"
               ></div>
+              <div 
+                *ngIf="isHintActive() && currentTargetWord() as target"
+                class="absolute pointer-events-none rounded-lg z-20"
+                [style.top.%]="target.topPercent - 1"
+                [style.left.%]="target.leftPercent - 1"
+                [style.width.%]="target.widthPercent + 2"
+                [style.height.%]="target.heightPercent + 2"
+                style="border: 2px solid #D97706; background-color: rgba(217, 119, 6, 0.15);"
+              ></div>
 
-              <!-- Click outside feedback -->
+              <!-- Hiệu ứng gợn sóng khi nhấp vào khoảng trống (Miss) -->
               <div 
                 *ngIf="clickFeedback() as fb"
                 class="absolute pointer-events-none -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-30"
                 [style.top.%]="fb.y"
                 [style.left.%]="fb.x"
               >
-                <div *ngIf="!fb.isHit" class="w-8 h-8 rounded-full border border-rose-500 bg-rose-500/30 animate-ping"></div>
+                <div class="w-8 h-8 rounded-full border-2 border-rose-500 bg-rose-500/40 animate-ping"></div>
+                <span class="mt-1 px-2 py-0.5 rounded bg-rose-600 text-white text-[10px] font-bold whitespace-nowrap shadow">
+                  -2s
+                </span>
               </div>
             </div>
           </section>
 
-          <!-- Bottom instructions -->
+          <!-- Chỉ dẫn chơi game tinh mắt -->
           <div class="flex items-center justify-between text-xs text-[#746B60] pt-1">
-            <span>Di chuột và chạm trực tiếp vào đồ vật trong bức ảnh để trả lời.</span>
+            <span>Dùng mắt quan sát ảnh thật và chạm trực tiếp vào vật thể để trả lời.</span>
             <span>Độ chính xác: <strong class="text-[#29251F]">{{ accuracyPercentage() }}%</strong></span>
           </div>
 
-          <!-- Word Chips Bar: bấm thay thế cho bounding box nhỏ -->
+          <!-- Tiến độ nhiệm vụ tinh mắt (Không lộ đáp án, không bấm ăn gian) -->
           <div class="pt-3 border-t border-[#E5DED3]">
-            <p class="text-[10px] font-bold uppercase tracking-widest text-[#8C827A] mb-2">
-              Hoặc bấm vào tên đồ vật:
-            </p>
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-[10px] font-bold uppercase tracking-widest text-[#8C827A] m-0">
+                Tiến độ thử thách ({{ solvedWordIds().size }}/{{ currentStage()?.words?.length || 0 }} đồ vật):
+              </p>
+              <span class="text-[11px] text-[#746B60] hidden sm:inline">
+                {{ isZoomed() ? 'Bấm Kính lúp để thu nhỏ lại' : 'Có thể bật Kính lúp ở góc trên ảnh để soi đồ vật nhỏ' }}
+              </span>
+            </div>
+
             <div class="flex flex-wrap gap-2">
-              <ng-container *ngFor="let item of currentStage()?.words">
-                <button
-                  type="button"
-                  (click)="onBoxClick(item, $event)"
-                  [disabled]="isShowingSuccess()"
-                  class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] border text-xs font-semibold cursor-pointer transition-all duration-150 active:scale-95 disabled:cursor-not-allowed select-none"
-                  [class.bg-[#287A59]]="isWordSolved(item.id)"
-                  [class.border-[#287A59]]="isWordSolved(item.id)"
-                  [class.text-white]="isWordSolved(item.id)"
-                  [class.bg-rose-50]="wrongClickedWord()?.id === item.id"
-                  [class.border-rose-400]="wrongClickedWord()?.id === item.id"
-                  [class.text-rose-700]="wrongClickedWord()?.id === item.id"
-                  [class.bg-amber-50]="isCurrentTarget(item.id) && !isWordSolved(item.id) && wrongClickedWord()?.id !== item.id"
-                  [class.border-amber-400]="isCurrentTarget(item.id) && !isWordSolved(item.id) && wrongClickedWord()?.id !== item.id"
-                  [class.text-amber-900]="isCurrentTarget(item.id) && !isWordSolved(item.id) && wrongClickedWord()?.id !== item.id"
-                  [class.ring-2]="isCurrentTarget(item.id) && !isWordSolved(item.id)"
-                  [class.ring-amber-300]="isCurrentTarget(item.id) && !isWordSolved(item.id)"
-                  [class.bg-[#FAF8F5]]="!isWordSolved(item.id) && !isCurrentTarget(item.id) && wrongClickedWord()?.id !== item.id"
-                  [class.border-[#E5DED3]]="!isWordSolved(item.id) && !isCurrentTarget(item.id) && wrongClickedWord()?.id !== item.id"
-                  [class.text-[#5C5249]]="!isWordSolved(item.id) && !isCurrentTarget(item.id) && wrongClickedWord()?.id !== item.id"
-                  [class.hover:bg-[#EFE9E0]]="!isWordSolved(item.id) && !isCurrentTarget(item.id) && wrongClickedWord()?.id !== item.id"
+              <ng-container *ngFor="let item of currentStage()?.words; let idx = index">
+                <!-- Đã tìm thấy -->
+                <div
+                  *ngIf="isWordSolved(item.id)"
+                  class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] bg-[#287A59]/10 border border-[#287A59] text-[#287A59] text-xs font-semibold select-none"
                 >
-                  <app-icon
-                    *ngIf="isWordSolved(item.id)"
-                    name="check"
-                    [size]="11"
-                    svgClass="text-white"
-                  ></app-icon>
+                  <app-icon name="check" [size]="12"></app-icon>
                   <span>{{ item.word }}</span>
-                  <span class="text-[9px] font-mono opacity-60">{{ item.vietnamese }}</span>
-                </button>
+                  <span class="text-[9px] opacity-75">({{ item.vietnamese }})</span>
+                </div>
+
+                <!-- Đang săn tìm -->
+                <div
+                  *ngIf="isCurrentTarget(item.id) && !isWordSolved(item.id)"
+                  class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] bg-amber-50 border-2 border-amber-500 text-amber-950 text-xs font-bold ring-2 ring-amber-200/60 select-none animate-pulse"
+                >
+                  <app-icon name="search" [size]="12" svgClass="text-amber-600"></app-icon>
+                  <span>Đang tìm: {{ item.word }}</span>
+                </div>
+
+                <!-- Đồ vật ẩn chưa đến lượt -->
+                <div
+                  *ngIf="!isWordSolved(item.id) && !isCurrentTarget(item.id)"
+                  class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] bg-[#FAF8F5] border border-[#E5DED3] text-[#8C827A] text-xs font-medium select-none"
+                >
+                  <span class="w-2 h-2 rounded-full bg-[#D1C7BA]"></span>
+                  <span>Đồ vật ẩn #{{ idx + 1 }}</span>
+                </div>
               </ng-container>
             </div>
           </div>
@@ -771,6 +803,18 @@ export class UserQuizComponent implements OnInit, OnDestroy {
   isHintActive = signal<boolean>(false);
   isShowingSuccess = signal<boolean>(false);
   clickFeedback = signal<ClickFeedback | null>(null);
+
+  // Tính năng Kính lúp (Magnifier Zoom 1.6x để soi đồ vật nhỏ)
+  isZoomed = signal<boolean>(false);
+  zoomOrigin = signal<{ x: number; y: number }>({ x: 50, y: 50 });
+
+  toggleZoom(event?: MouseEvent) {
+    if (event) event.stopPropagation();
+    this.isZoomed.update(z => !z);
+    if (!this.isZoomed()) {
+      this.zoomOrigin.set({ x: 50, y: 50 });
+    }
+  }
 
   // Lưu danh sách id các từ vựng đã giải đúng trong ván hiện tại
   solvedWordIds = signal<Set<string>>(new Set());
@@ -925,6 +969,7 @@ export class UserQuizComponent implements OnInit, OnDestroy {
     this.clickFeedback.set(null);
     this.solvedWordIds.set(new Set());
     this.wrongClickedWord.set(null);
+    this.isZoomed.set(false);
 
     // Chuyển sang màn hình chơi
     this.gameMode.set('PLAYING');
@@ -998,69 +1043,110 @@ export class UserQuizComponent implements OnInit, OnDestroy {
     this.nextQuestion();
   }
 
-  // Nhấp vào một khung Bounding Box của vật thể trên ảnh
-  onBoxClick(item: ContextWord, event: MouseEvent) {
-    event.stopPropagation();
-    if (this.isShowingSuccess()) return; // Đang chạy ăn mừng, không nhận click tiếp
+  // Tương tác trực tiếp trên bức ảnh (Stealth Hidden Object Mode)
+  onPhotoClick(event: MouseEvent) {
+    if (this.isShowingSuccess()) return;
 
     const target = this.currentTargetWord();
     if (!target) return;
 
+    const container = event.currentTarget as HTMLElement;
+    const rect = container.getBoundingClientRect();
+    const clickX = ((event.clientX - rect.left) / rect.width) * 100;
+    const clickY = ((event.clientY - rect.top) / rect.height) * 100;
+
+    // Cập nhật tâm Zoom theo vị trí nhấp
+    this.zoomOrigin.set({
+      x: Math.min(95, Math.max(5, Math.round(clickX))),
+      y: Math.min(95, Math.max(5, Math.round(clickY)))
+    });
+
     this.totalClicks.update(c => c + 1);
 
-    // Kiểm tra xem khung nhấp vào có phải là từ mục tiêu hay không
-    if (item.id === target.id || item.word.toLowerCase() === target.word.toLowerCase()) {
-      this.wrongClickedWord.set(null);
-      this.handleCorrectHit(target);
+    const words = this.currentStage()?.words || [];
+
+    // Tìm tất cả các vật thể chứa điểm click (tính cả Hitbox tolerance cho vật thể nhỏ)
+    const matches: { word: ContextWord; area: number; isTarget: boolean }[] = [];
+
+    for (const item of words) {
+      // Đã giải rồi thì không bắt click lại
+      if (this.isWordSolved(item.id)) continue;
+
+      // Nới rộng vùng bấm vô hình cho các vật thể nhỏ (Hitbox tolerance)
+      const isSmall = item.widthPercent < 12 || item.heightPercent < 12;
+      const padX = isSmall ? 3.5 : 1.5;
+      const padY = isSmall ? 3.5 : 1.5;
+
+      const minX = item.leftPercent - padX;
+      const maxX = item.leftPercent + item.widthPercent + padX;
+      const minY = item.topPercent - padY;
+      const maxY = item.topPercent + item.heightPercent + padY;
+
+      if (clickX >= minX && clickX <= maxX && clickY >= minY && clickY <= maxY) {
+        const area = item.widthPercent * item.heightPercent;
+        const isTarget = item.id === target.id || item.word.toLowerCase() === target.word.toLowerCase();
+        matches.push({ word: item, area, isTarget });
+      }
+    }
+
+    if (matches.length > 0) {
+      // Ưu tiên 1: Nếu trúng đúng mục tiêu đang tìm kiếm -> Thắng ngay câu này!
+      const targetMatch = matches.find(m => m.isTarget);
+      if (targetMatch) {
+        this.wrongClickedWord.set(null);
+        this.handleCorrectHit(target);
+        return;
+      }
+
+      // Ưu tiên 2: Khi các vật thể lồng nhau (vd: mousepad trên bàn) -> Ưu tiên vật thể có diện tích nhỏ nhất
+      matches.sort((a, b) => a.area - b.area);
+      const wrongMatch = matches[0].word;
+      this.handleWrongObjectClick(wrongMatch, target);
     } else {
-      // Nhấp nhầm vào vật thể khác trong bối cảnh
-      this.wrongClickedWord.set(item);
-      this.playSfx('miss');
-      this.comboMultiplier.set(1.0); // Reset combo
-
-      const cur = this.timerSeconds();
-      this.timerSeconds.set(Math.max(1, cur - 2));
-
-      this.toast.info(
-        `Đó là "${item.word}" (${item.vietnamese}), hãy tìm "${target.word}"!`,
-        'Chưa Đúng (-2s)'
-      );
-
-      setTimeout(() => {
-        if (this.wrongClickedWord()?.id === item.id) {
-          this.wrongClickedWord.set(null);
-        }
-      }, 1500);
+      // Bấm vào khoảng trống không có vật thể nào (Miss)
+      this.handleMissClick(clickX, clickY);
     }
   }
 
-  // Nhấp vào vùng nền ảnh bên ngoài các khung vật thể
-  onBackgroundClick(event: MouseEvent) {
-    if (this.isShowingSuccess()) return;
-
-    this.totalClicks.update(c => c + 1);
+  private handleWrongObjectClick(item: ContextWord, target: ContextWord) {
+    this.wrongClickedWord.set(item);
     this.playSfx('miss');
     this.comboMultiplier.set(1.0);
 
     const cur = this.timerSeconds();
     this.timerSeconds.set(Math.max(1, cur - 2));
 
-    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
-    const clickX = ((event.clientX - rect.left) / rect.width) * 100;
-    const clickY = ((event.clientY - rect.top) / rect.height) * 100;
+    this.toast.info(
+      `Đó là "${item.word}" (${item.vietnamese}), hãy tìm "${target.word}"!`,
+      'Chưa Đúng (-2s)'
+    );
+
+    setTimeout(() => {
+      if (this.wrongClickedWord()?.id === item.id) {
+        this.wrongClickedWord.set(null);
+      }
+    }, 1500);
+  }
+
+  private handleMissClick(clickX: number, clickY: number) {
+    this.playSfx('miss');
+    this.comboMultiplier.set(1.0);
+
+    const cur = this.timerSeconds();
+    this.timerSeconds.set(Math.max(1, cur - 2));
 
     this.clickFeedback.set({
       x: clickX,
       y: clickY,
       isHit: false,
-      message: 'Hãy nhấp vào một trong các khung vật thể màu trắng! (-2s)'
+      message: '-2s'
     });
 
     setTimeout(() => {
       if (this.clickFeedback()?.isHit === false) {
         this.clickFeedback.set(null);
       }
-    }, 1200);
+    }, 1000);
   }
 
   // Xử lý khi nhấp đúng đồ vật
