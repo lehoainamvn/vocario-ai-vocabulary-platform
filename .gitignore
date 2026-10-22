@@ -74,6 +74,8 @@ test_output/
 .coverage
 htmlcov/
 cache/
+!backend/services/cache/
+!backend/services/cache/**
 
 # -------------------------------------------------------------------------
 # 6. HỆ ĐIỀU HÀNH & TRÌNH SOẠN THẢO (OS & IDEs)

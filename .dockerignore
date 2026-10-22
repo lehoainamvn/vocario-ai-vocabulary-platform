@@ -10,4 +10,5 @@ node_modules/
 target/
 __pycache__/
 *.pt
+!backend/services/cache/*.pt
 runs/

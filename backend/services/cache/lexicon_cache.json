@@ -1,0 +1,5187 @@
+{
+  "laptop": {
+    "vietnamese": "máy tính xách tay",
+    "ipa": "/ˈlæpˌtɑp/",
+    "level": "A1"
+  },
+  "computer monitor": {
+    "vietnamese": "màn hình vi tính",
+    "ipa": "/kəmˈpjutər ˈmɑnətər/",
+    "level": "A2"
+  },
+  "keyboard": {
+    "vietnamese": "bàn phím vi tính",
+    "ipa": "/ˈkiˌbɔrd/",
+    "level": "A1"
+  },
+  "computer mouse": {
+    "vietnamese": "chuột máy vi tính",
+    "ipa": "/kəmˈpjutər maʊs/",
+    "level": "A1"
+  },
+  "mousepad": {
+    "vietnamese": "lót chuột",
+    "ipa": "/ˈmaʊspæd/",
+    "level": "A2"
+  },
+  "desk": {
+    "vietnamese": "bàn làm việc",
+    "ipa": "/dɛsk/",
+    "level": "A1"
+  },
+  "chair": {
+    "vietnamese": "chiếc ghế",
+    "ipa": "/ʧɛr/",
+    "level": "A1"
+  },
+  "office chair": {
+    "vietnamese": "ghế văn phòng",
+    "ipa": "/ˈɔfəs ʧɛr/",
+    "level": "A2"
+  },
+  "swivel chair": {
+    "vietnamese": "ghế xoay",
+    "ipa": "/sˈwɪvəl ʧɛr/",
+    "level": "B1"
+  },
+  "desk lamp": {
+    "vietnamese": "đèn bàn học",
+    "ipa": "/dɛsk læmp/",
+    "level": "A2"
+  },
+  "book": {
+    "vietnamese": "quyển sách",
+    "ipa": "/bʊk/",
+    "level": "A1"
+  },
+  "notebook": {
+    "vietnamese": "quyển vở",
+    "ipa": "/ˈnoʊtˌbʊk/",
+    "level": "A1"
+  },
+  "textbook": {
+    "vietnamese": "sách giáo khoa",
+    "ipa": "/ˈtɛkstˌbʊk/",
+    "level": "A2"
+  },
+  "novel": {
+    "vietnamese": "tiểu thuyết",
+    "ipa": "/ˈnɑvəl/",
+    "level": "B1"
+  },
+  "dictionary": {
+    "vietnamese": "từ điển",
+    "ipa": "/ˈdɪkʃəˌnɛri/",
+    "level": "A2"
+  },
+  "magazine": {
+    "vietnamese": "tạp chí",
+    "ipa": "/ˈmægəˌzin/",
+    "level": "A2"
+  },
+  "newspaper": {
+    "vietnamese": "tờ báo",
+    "ipa": "/ˈnuzˌpeɪpər/",
+    "level": "A2"
+  },
+  "pen": {
+    "vietnamese": "bút mực",
+    "ipa": "/pɛn/",
+    "level": "A1"
+  },
+  "ballpoint pen": {
+    "vietnamese": "bút bi",
+    "ipa": "/ˈbɔlpɔɪnt pɛn/",
+    "level": "A2"
+  },
+  "pencil": {
+    "vietnamese": "bút chì",
+    "ipa": "/ˈpɛnsəl/",
+    "level": "A1"
+  },
+  "colored pencil": {
+    "vietnamese": "bút chì màu",
+    "ipa": "/ˈkələrd ˈpɛnsəl/",
+    "level": "A2"
+  },
+  "crayon": {
+    "vietnamese": "bút sáp màu",
+    "ipa": "/kreɪɑn/",
+    "level": "A2"
+  },
+  "marker": {
+    "vietnamese": "bút lông",
+    "ipa": "/ˈmɑrkər/",
+    "level": "A2"
+  },
+  "highlighter": {
+    "vietnamese": "bút dạ quang",
+    "ipa": "/highlighter/",
+    "level": "A2"
+  },
+  "whiteboard marker": {
+    "vietnamese": "bút viết bảng",
+    "ipa": "/whiteboard ˈmɑrkər/",
+    "level": "A2"
+  },
+  "fountain pen": {
+    "vietnamese": "bút máy",
+    "ipa": "/ˈfaʊntən pɛn/",
+    "level": "B1"
+  },
+  "eraser": {
+    "vietnamese": "cục tẩy",
+    "ipa": "/ɪˈreɪsər/",
+    "level": "A1"
+  },
+  "pencil sharpener": {
+    "vietnamese": "gọt bút chì",
+    "ipa": "/ˈpɛnsəl sharpener/",
+    "level": "A2"
+  },
+  "pencil case": {
+    "vietnamese": "hộp bút",
+    "ipa": "/ˈpɛnsəl keɪs/",
+    "level": "A2"
+  },
+  "ruler": {
+    "vietnamese": "thước kẻ",
+    "ipa": "/ˈrulər/",
+    "level": "A1"
+  },
+  "scissors": {
+    "vietnamese": "cây kéo",
+    "ipa": "/ˈsɪzərz/",
+    "level": "A1"
+  },
+  "stapler": {
+    "vietnamese": "dập ghim",
+    "ipa": "/ˈsteɪpələr/",
+    "level": "A2"
+  },
+  "staples": {
+    "vietnamese": "ghim bấm",
+    "ipa": "/ˈsteɪpəlz/",
+    "level": "A2"
+  },
+  "staple remover": {
+    "vietnamese": "gỡ ghim",
+    "ipa": "/ˈsteɪpəl rɪˈmuvər/",
+    "level": "B1"
+  },
+  "paperclip": {
+    "vietnamese": "kẹp giấy",
+    "ipa": "/paperclip/",
+    "level": "A2"
+  },
+  "binder clip": {
+    "vietnamese": "kẹp bướm",
+    "ipa": "/ˈbaɪndər klɪp/",
+    "level": "B1"
+  },
+  "calculator": {
+    "vietnamese": "máy tính cầm tay",
+    "ipa": "/ˈkælkjəˌleɪtər/",
+    "level": "A2"
+  },
+  "backpack": {
+    "vietnamese": "balo",
+    "ipa": "/ˈbækˌpæk/",
+    "level": "A1"
+  },
+  "schoolbag": {
+    "vietnamese": "cặp sách",
+    "ipa": "/schoolbag/",
+    "level": "A1"
+  },
+  "briefcase": {
+    "vietnamese": "cặp công tác",
+    "ipa": "/ˈbrifˌkeɪs/",
+    "level": "B1"
+  },
+  "folder": {
+    "vietnamese": "bìa hồ sơ",
+    "ipa": "/ˈfoʊldər/",
+    "level": "A2"
+  },
+  "binder": {
+    "vietnamese": "bìa còng",
+    "ipa": "/ˈbaɪndər/",
+    "level": "B1"
+  },
+  "clipboard": {
+    "vietnamese": "bảng kẹp tài liệu",
+    "ipa": "/ˈklɪpˌbɔrd/",
+    "level": "B1"
+  },
+  "document": {
+    "vietnamese": "tài liệu",
+    "ipa": "/ˈdɑkjəmɛnt/",
+    "level": "A2"
+  },
+  "contract": {
+    "vietnamese": "hợp đồng",
+    "ipa": "/ˈkɑnˌtrækt/",
+    "level": "B1"
+  },
+  "envelope": {
+    "vietnamese": "phong bì",
+    "ipa": "/ˈɛnvəˌloʊp/",
+    "level": "A2"
+  },
+  "stamp": {
+    "vietnamese": "con tem",
+    "ipa": "/stæmp/",
+    "level": "A2"
+  },
+  "seal": {
+    "vietnamese": "con dấu",
+    "ipa": "/sil/",
+    "level": "B1"
+  },
+  "whiteboard": {
+    "vietnamese": "bảng trắng",
+    "ipa": "/whiteboard/",
+    "level": "A2"
+  },
+  "chalkboard": {
+    "vietnamese": "bảng đen",
+    "ipa": "/chalkboard/",
+    "level": "A2"
+  },
+  "chalk": {
+    "vietnamese": "viên phấn",
+    "ipa": "/ʧɔk/",
+    "level": "A2"
+  },
+  "duster": {
+    "vietnamese": "khăn lau bảng",
+    "ipa": "/ˈdəstər/",
+    "level": "A2"
+  },
+  "sticky note": {
+    "vietnamese": "giấy note",
+    "ipa": "/ˈstɪki noʊt/",
+    "level": "A2"
+  },
+  "notepad": {
+    "vietnamese": "sổ tay nhỏ",
+    "ipa": "/notepad/",
+    "level": "A2"
+  },
+  "calendar": {
+    "vietnamese": "cuốn lịch",
+    "ipa": "/ˈkæləndər/",
+    "level": "A1"
+  },
+  "desk calendar": {
+    "vietnamese": "lịch để bàn",
+    "ipa": "/dɛsk ˈkæləndər/",
+    "level": "A2"
+  },
+  "wall calendar": {
+    "vietnamese": "lịch treo tường",
+    "ipa": "/wɔl ˈkæləndər/",
+    "level": "A2"
+  },
+  "clock": {
+    "vietnamese": "đồng hồ",
+    "ipa": "/klɑk/",
+    "level": "A1"
+  },
+  "water bottle": {
+    "vietnamese": "bình nước thể thao",
+    "ipa": "/ˈwɔtər ˈbɑtəl/",
+    "level": "A1"
+  },
+  "paperweight": {
+    "vietnamese": "cục chặn giấy",
+    "ipa": "/ˈpeɪpərˌweɪt/",
+    "level": "B1"
+  },
+  "wastebasket": {
+    "vietnamese": "thùng rác nhỏ",
+    "ipa": "/ˈweɪstˌbæskət/",
+    "level": "A2"
+  },
+  "shredder": {
+    "vietnamese": "máy hủy tài liệu",
+    "ipa": "/ʃˈrɛdər/",
+    "level": "B2"
+  },
+  "filing cabinet": {
+    "vietnamese": "tủ tài liệu",
+    "ipa": "/ˈfaɪlɪŋ ˈkæbənət/",
+    "level": "B1"
+  },
+  "bookshelf": {
+    "vietnamese": "kệ sách phòng khách",
+    "ipa": "/ˈbʊkˌʃɛlf/",
+    "level": "A2"
+  },
+  "bookcase": {
+    "vietnamese": "tủ sách",
+    "ipa": "/ˈbʊkˌkeɪs/",
+    "level": "A2"
+  },
+  "bookend": {
+    "vietnamese": "thanh chặn sách",
+    "ipa": "/ˈbʊˌkɛnd/",
+    "level": "B1"
+  },
+  "bookmark": {
+    "vietnamese": "thẻ đánh dấu trang",
+    "ipa": "/ˈbʊkmɑrk/",
+    "level": "A2"
+  },
+  "globe": {
+    "vietnamese": "quả địa cầu",
+    "ipa": "/gloʊb/",
+    "level": "B1"
+  },
+  "magnifying glass": {
+    "vietnamese": "kính lúp",
+    "ipa": "/ˈmægnəˌfaɪɪŋ glæs/",
+    "level": "B1"
+  },
+  "compass": {
+    "vietnamese": "com-pa",
+    "ipa": "/ˈkəmpəs/",
+    "level": "B1"
+  },
+  "protractor": {
+    "vietnamese": "thước đo góc",
+    "ipa": "/protractor/",
+    "level": "B1"
+  },
+  "set square": {
+    "vietnamese": "ê-ke",
+    "ipa": "/sɛt skwɛr/",
+    "level": "B1"
+  },
+  "drafting table": {
+    "vietnamese": "bàn vẽ kỹ thuật",
+    "ipa": "/ˈdræftɪŋ ˈteɪbəl/",
+    "level": "B2"
+  },
+  "drawing board": {
+    "vietnamese": "bảng vẽ",
+    "ipa": "/drɔɪŋ bɔrd/",
+    "level": "B1"
+  },
+  "easel": {
+    "vietnamese": "giá vẽ tranh",
+    "ipa": "/ˈizəl/",
+    "level": "B1"
+  },
+  "paintbrush": {
+    "vietnamese": "cọ vẽ",
+    "ipa": "/ˈpeɪntˌbrəʃ/",
+    "level": "A2"
+  },
+  "paint palette": {
+    "vietnamese": "bảng pha màu",
+    "ipa": "/peɪnt ˈpælət/",
+    "level": "B1"
+  },
+  "watercolor set": {
+    "vietnamese": "bộ màu nước",
+    "ipa": "/ˈwɔtərˌkələr sɛt/",
+    "level": "B1"
+  },
+  "refrigerator": {
+    "vietnamese": "tủ lạnh",
+    "ipa": "/rɪˈfrɪʤərˌeɪtər/",
+    "level": "A1"
+  },
+  "freezer": {
+    "vietnamese": "ngăn đá tủ lạnh",
+    "ipa": "/ˈfrizər/",
+    "level": "A2"
+  },
+  "microwave oven": {
+    "vietnamese": "lò vi sóng",
+    "ipa": "/ˈmaɪkrəˌweɪv ˈəvən/",
+    "level": "A2"
+  },
+  "oven": {
+    "vietnamese": "lò nướng",
+    "ipa": "/ˈəvən/",
+    "level": "A2"
+  },
+  "toaster": {
+    "vietnamese": "máy nướng bánh mì",
+    "ipa": "/ˈtoʊstər/",
+    "level": "A2"
+  },
+  "toaster oven": {
+    "vietnamese": "lò nướng mini",
+    "ipa": "/ˈtoʊstər ˈəvən/",
+    "level": "B1"
+  },
+  "blender": {
+    "vietnamese": "máy xay sinh tố",
+    "ipa": "/ˈblɛndər/",
+    "level": "A2"
+  },
+  "food processor": {
+    "vietnamese": "máy xay đa năng",
+    "ipa": "/fud ˈprɑˌsɛsər/",
+    "level": "B1"
+  },
+  "electric kettle": {
+    "vietnamese": "ấm đun nước siêu tốc",
+    "ipa": "/ɪˈlɛktrɪk ˈkɛtəl/",
+    "level": "A2"
+  },
+  "kettle": {
+    "vietnamese": "ấm đun nước",
+    "ipa": "/ˈkɛtəl/",
+    "level": "A2"
+  },
+  "coffee maker": {
+    "vietnamese": "máy pha cà phê",
+    "ipa": "/ˈkɔfi ˈmeɪkər/",
+    "level": "A2"
+  },
+  "espresso machine": {
+    "vietnamese": "máy pha espresso",
+    "ipa": "/ˌɛˈsprɛsoʊ məˈʃin/",
+    "level": "B1"
+  },
+  "coffee grinder": {
+    "vietnamese": "máy xay cà phê",
+    "ipa": "/ˈkɔfi ˈgraɪndər/",
+    "level": "B1"
+  },
+  "juicer": {
+    "vietnamese": "máy ép trái cây",
+    "ipa": "/juicer/",
+    "level": "A2"
+  },
+  "slow cooker": {
+    "vietnamese": "nồi nấu chậm",
+    "ipa": "/sloʊ ˈkʊkər/",
+    "level": "B1"
+  },
+  "pressure cooker": {
+    "vietnamese": "nồi áp suất",
+    "ipa": "/ˈprɛʃər ˈkʊkər/",
+    "level": "B1"
+  },
+  "air fryer": {
+    "vietnamese": "nồi chiên không dầu",
+    "ipa": "/ɛr fraɪər/",
+    "level": "A2"
+  },
+  "rice cooker": {
+    "vietnamese": "nồi cơm điện",
+    "ipa": "/raɪs ˈkʊkər/",
+    "level": "A2"
+  },
+  "waffle maker": {
+    "vietnamese": "máy làm bánh waffle",
+    "ipa": "/ˈwɑfəl ˈmeɪkər/",
+    "level": "B1"
+  },
+  "sandwich maker": {
+    "vietnamese": "máy ép bánh mì",
+    "ipa": "/ˈsænwɪʧ ˈmeɪkər/",
+    "level": "B1"
+  },
+  "gas stove": {
+    "vietnamese": "bếp ga",
+    "ipa": "/gæs stoʊv/",
+    "level": "A2"
+  },
+  "electric stove": {
+    "vietnamese": "bếp điện",
+    "ipa": "/ɪˈlɛktrɪk stoʊv/",
+    "level": "A2"
+  },
+  "induction cooker": {
+    "vietnamese": "bếp từ",
+    "ipa": "/ˌɪnˈdəkʃən ˈkʊkər/",
+    "level": "B1"
+  },
+  "range hood": {
+    "vietnamese": "máy hút mùi bếp",
+    "ipa": "/reɪnʤ hʊd/",
+    "level": "B1"
+  },
+  "dishwasher": {
+    "vietnamese": "máy rửa bát",
+    "ipa": "/ˈdɪʃˌwɑʃər/",
+    "level": "A2"
+  },
+  "kitchen sink": {
+    "vietnamese": "bồn rửa bát",
+    "ipa": "/ˈkɪʧən sɪŋk/",
+    "level": "A2"
+  },
+  "faucet": {
+    "vietnamese": "vòi nước",
+    "ipa": "/ˈfɔsət/",
+    "level": "A2"
+  },
+  "water filter": {
+    "vietnamese": "máy lọc nước",
+    "ipa": "/ˈwɔtər ˈfɪltər/",
+    "level": "A2"
+  },
+  "ice maker": {
+    "vietnamese": "máy làm đá",
+    "ipa": "/aɪs ˈmeɪkər/",
+    "level": "B1"
+  },
+  "kitchen island": {
+    "vietnamese": "bàn đảo bếp",
+    "ipa": "/ˈkɪʧən ˈaɪlənd/",
+    "level": "B1"
+  },
+  "kitchen cabinet": {
+    "vietnamese": "tủ bếp",
+    "ipa": "/ˈkɪʧən ˈkæbənət/",
+    "level": "A2"
+  },
+  "pantry": {
+    "vietnamese": "tủ chứa thực phẩm",
+    "ipa": "/ˈpæntri/",
+    "level": "B1"
+  },
+  "dish rack": {
+    "vietnamese": "giá để bát đĩa",
+    "ipa": "/dɪʃ ræk/",
+    "level": "A2"
+  },
+  "spice rack": {
+    "vietnamese": "kệ để gia vị",
+    "ipa": "/spaɪs ræk/",
+    "level": "A2"
+  },
+  "paper towel holder": {
+    "vietnamese": "giá treo khăn giấy",
+    "ipa": "/ˈpeɪpər taʊəl ˈhoʊldər/",
+    "level": "B1"
+  },
+  "kitchen timer": {
+    "vietnamese": "đồng hồ bấm giờ bếp",
+    "ipa": "/ˈkɪʧən ˈtaɪmər/",
+    "level": "A2"
+  },
+  "kitchen scale": {
+    "vietnamese": "cân nhà bếp",
+    "ipa": "/ˈkɪʧən skeɪl/",
+    "level": "A2"
+  },
+  "cutting board": {
+    "vietnamese": "thớt nấu ăn",
+    "ipa": "/ˈkətɪŋ bɔrd/",
+    "level": "A2"
+  },
+  "knife block": {
+    "vietnamese": "khối cắm dao",
+    "ipa": "/naɪf blɑk/",
+    "level": "B1"
+  },
+  "chef knife": {
+    "vietnamese": "dao làm bếp",
+    "ipa": "/ʃɛf naɪf/",
+    "level": "B1"
+  },
+  "cleaver": {
+    "vietnamese": "dao chặt xương",
+    "ipa": "/ˈklivər/",
+    "level": "B1"
+  },
+  "paring knife": {
+    "vietnamese": "dao gọt hoa quả",
+    "ipa": "/ˈpɛrɪŋ naɪf/",
+    "level": "B1"
+  },
+  "bread knife": {
+    "vietnamese": "dao cắt bánh mì",
+    "ipa": "/brɛd naɪf/",
+    "level": "B1"
+  },
+  "knife sharpener": {
+    "vietnamese": "dụng cụ mài dao",
+    "ipa": "/naɪf sharpener/",
+    "level": "B1"
+  },
+  "kitchen shears": {
+    "vietnamese": "kéo nhà bếp",
+    "ipa": "/ˈkɪʧən ʃirz/",
+    "level": "B1"
+  },
+  "frying pan": {
+    "vietnamese": "chảo rán",
+    "ipa": "/fraɪɪŋ pæn/",
+    "level": "A2"
+  },
+  "saucepan": {
+    "vietnamese": "nồi có tay cầm",
+    "ipa": "/ˈsɔˌspæn/",
+    "level": "A2"
+  },
+  "stockpot": {
+    "vietnamese": "nồi nấu canh lớn",
+    "ipa": "/stockpot/",
+    "level": "B1"
+  },
+  "wok": {
+    "vietnamese": "chảo sâu lòng chảo xào",
+    "ipa": "/wɑk/",
+    "level": "B1"
+  },
+  "baking sheet": {
+    "vietnamese": "khay nướng bánh",
+    "ipa": "/ˈbeɪkɪŋ ʃit/",
+    "level": "B1"
+  },
+  "baking pan": {
+    "vietnamese": "khuôn nướng bánh",
+    "ipa": "/ˈbeɪkɪŋ pæn/",
+    "level": "B1"
+  },
+  "muffin tin": {
+    "vietnamese": "khuôn bánh muffin",
+    "ipa": "/ˈməfən tɪn/",
+    "level": "B1"
+  },
+  "casserole dish": {
+    "vietnamese": "nồi sứ nướng",
+    "ipa": "/ˈkæsərˌoʊl dɪʃ/",
+    "level": "B2"
+  },
+  "spatula": {
+    "vietnamese": "xẻng lật thức ăn",
+    "ipa": "/ˈspæˌʧʊlə/",
+    "level": "A2"
+  },
+  "ladle": {
+    "vietnamese": "muôi múc canh",
+    "ipa": "/ˈleɪdəl/",
+    "level": "A2"
+  },
+  "slotted spoon": {
+    "vietnamese": "muôi thủng",
+    "ipa": "/sˈlɑtɪd spun/",
+    "level": "B1"
+  },
+  "tongs": {
+    "vietnamese": "kẹp gắp thức ăn",
+    "ipa": "/tɔŋz/",
+    "level": "A2"
+  },
+  "whisk": {
+    "vietnamese": "phới lồng đánh trứng",
+    "ipa": "/wɪsk/",
+    "level": "A2"
+  },
+  "potato masher": {
+    "vietnamese": "dụng cụ nghiền khoai",
+    "ipa": "/pəˈteɪˌtoʊ masher/",
+    "level": "B1"
+  },
+  "peeler": {
+    "vietnamese": "dao nạo vỏ",
+    "ipa": "/ˈpilər/",
+    "level": "A2"
+  },
+  "grater": {
+    "vietnamese": "bàn nạo phô mai",
+    "ipa": "/ˈgreɪtər/",
+    "level": "A2"
+  },
+  "garlic press": {
+    "vietnamese": "dụng cụ ép tỏi",
+    "ipa": "/ˈgɑrlɪk prɛs/",
+    "level": "B1"
+  },
+  "can opener": {
+    "vietnamese": "dụng cụ mở hộp thiếc",
+    "ipa": "/kən ˈoʊpənər/",
+    "level": "A2"
+  },
+  "bottle opener": {
+    "vietnamese": "đồ khui nắp chai",
+    "ipa": "/ˈbɑtəl ˈoʊpənər/",
+    "level": "A2"
+  },
+  "corkscrew": {
+    "vietnamese": "đồ khui nút bần rượu",
+    "ipa": "/ˈkɔrkˌskru/",
+    "level": "B1"
+  },
+  "measuring cup": {
+    "vietnamese": "cốc đong gia vị",
+    "ipa": "/ˈmɛʒərɪŋ kəp/",
+    "level": "A2"
+  },
+  "measuring spoon": {
+    "vietnamese": "thìa đong",
+    "ipa": "/ˈmɛʒərɪŋ spun/",
+    "level": "A2"
+  },
+  "colander": {
+    "vietnamese": "rổ lọc thức ăn",
+    "ipa": "/ˈkɑləndər/",
+    "level": "A2"
+  },
+  "strainer": {
+    "vietnamese": "vợt lưới lọc",
+    "ipa": "/strainer/",
+    "level": "A2"
+  },
+  "salad spinner": {
+    "vietnamese": "dụng cụ quay vắt rau",
+    "ipa": "/ˈsæləd ˈspɪnər/",
+    "level": "B2"
+  },
+  "mixing bowl": {
+    "vietnamese": "bát trộn nguyên liệu",
+    "ipa": "/ˈmɪksɪŋ boʊl/",
+    "level": "A2"
+  },
+  "rolling pin": {
+    "vietnamese": "cây cán bột",
+    "ipa": "/ˈroʊlɪŋ pɪn/",
+    "level": "B1"
+  },
+  "pastry brush": {
+    "vietnamese": "chổi quét dầu ăn",
+    "ipa": "/ˈpeɪstri brəʃ/",
+    "level": "B1"
+  },
+  "piping bag": {
+    "vietnamese": "túi bắt kem",
+    "ipa": "/ˈpaɪpɪŋ bæg/",
+    "level": "B2"
+  },
+  "apron": {
+    "vietnamese": "tạp dề nấu ăn",
+    "ipa": "/ˈeɪprən/",
+    "level": "A2"
+  },
+  "dining table": {
+    "vietnamese": "bàn ăn",
+    "ipa": "/ˈdaɪnɪŋ ˈteɪbəl/",
+    "level": "A1"
+  },
+  "dining chair": {
+    "vietnamese": "ghế bàn ăn",
+    "ipa": "/ˈdaɪnɪŋ ʧɛr/",
+    "level": "A1"
+  },
+  "tablecloth": {
+    "vietnamese": "khăn trải bàn",
+    "ipa": "/ˈteɪbəlˌklɔθ/",
+    "level": "A2"
+  },
+  "table runner": {
+    "vietnamese": "dải khăn giữa bàn ăn",
+    "ipa": "/ˈteɪbəl ˈrənər/",
+    "level": "B1"
+  },
+  "placemat": {
+    "vietnamese": "miếng lót đĩa ăn",
+    "ipa": "/ˈpleɪsˌmæt/",
+    "level": "B1"
+  },
+  "coaster": {
+    "vietnamese": "miếng lót cốc",
+    "ipa": "/ˈkoʊstər/",
+    "level": "A2"
+  },
+  "plate": {
+    "vietnamese": "chiếc đĩa",
+    "ipa": "/pleɪt/",
+    "level": "A1"
+  },
+  "dinner plate": {
+    "vietnamese": "đĩa ăn chính",
+    "ipa": "/ˈdɪnər pleɪt/",
+    "level": "A2"
+  },
+  "salad plate": {
+    "vietnamese": "đĩa ăn salad",
+    "ipa": "/ˈsæləd pleɪt/",
+    "level": "B1"
+  },
+  "dessert plate": {
+    "vietnamese": "đĩa tráng miệng",
+    "ipa": "/dɪˈzərt pleɪt/",
+    "level": "B1"
+  },
+  "bowl": {
+    "vietnamese": "chiếc bát tô",
+    "ipa": "/boʊl/",
+    "level": "A1"
+  },
+  "soup bowl": {
+    "vietnamese": "bát súp",
+    "ipa": "/sup boʊl/",
+    "level": "A2"
+  },
+  "cereal bowl": {
+    "vietnamese": "bát ngũ cốc",
+    "ipa": "/ˈsɪriəl boʊl/",
+    "level": "A2"
+  },
+  "rice bowl": {
+    "vietnamese": "bát cơm",
+    "ipa": "/raɪs boʊl/",
+    "level": "A1"
+  },
+  "saucer": {
+    "vietnamese": "đĩa lót tách trà",
+    "ipa": "/ˈsɔsər/",
+    "level": "A2"
+  },
+  "cup": {
+    "vietnamese": "chiếc cốc",
+    "ipa": "/kəp/",
+    "level": "A1"
+  },
+  "teacup": {
+    "vietnamese": "tách uống trà",
+    "ipa": "/ˈtiˌkəp/",
+    "level": "A2"
+  },
+  "coffee cup": {
+    "vietnamese": "tách cà phê",
+    "ipa": "/ˈkɔfi kəp/",
+    "level": "A1"
+  },
+  "mug": {
+    "vietnamese": "cốc có quai lớn",
+    "ipa": "/məg/",
+    "level": "A1"
+  },
+  "glass": {
+    "vietnamese": "cốc thủy tinh",
+    "ipa": "/glæs/",
+    "level": "A1"
+  },
+  "water glass": {
+    "vietnamese": "ly uống nước",
+    "ipa": "/ˈwɔtər glæs/",
+    "level": "A1"
+  },
+  "wine glass": {
+    "vietnamese": "ly uống rượu vang",
+    "ipa": "/waɪn glæs/",
+    "level": "A2"
+  },
+  "champagne flute": {
+    "vietnamese": "ly uống sâm banh",
+    "ipa": "/ʃæmˈpeɪn flut/",
+    "level": "B1"
+  },
+  "cocktail glass": {
+    "vietnamese": "ly cocktail",
+    "ipa": "/ˈkɑkˌteɪl glæs/",
+    "level": "B1"
+  },
+  "beer mug": {
+    "vietnamese": "ly vại bia",
+    "ipa": "/bɪr məg/",
+    "level": "A2"
+  },
+  "shot glass": {
+    "vietnamese": "ly nhỏ uống rượu mạnh",
+    "ipa": "/ʃɑt glæs/",
+    "level": "B1"
+  },
+  "tumbler": {
+    "vietnamese": "cốc thủy tinh đáy phẳng",
+    "ipa": "/ˈtəmblər/",
+    "level": "B1"
+  },
+  "goblet": {
+    "vietnamese": "ly có chân cao",
+    "ipa": "/ˈgɑblət/",
+    "level": "B2"
+  },
+  "teapot": {
+    "vietnamese": "ấm pha trà",
+    "ipa": "/ˈtiˌpɑt/",
+    "level": "A2"
+  },
+  "coffee pot": {
+    "vietnamese": "bình đựng cà phê",
+    "ipa": "/ˈkɔfi pɑt/",
+    "level": "A2"
+  },
+  "pitcher": {
+    "vietnamese": "bình rót nước có quai",
+    "ipa": "/ˈpɪʧər/",
+    "level": "A2"
+  },
+  "carafe": {
+    "vietnamese": "bình thủy tinh rót rượu",
+    "ipa": "/kəˈræf/",
+    "level": "B1"
+  },
+  "thermos": {
+    "vietnamese": "bình giữ nhiệt",
+    "ipa": "/ˈθərməs/",
+    "level": "A2"
+  },
+  "fork": {
+    "vietnamese": "chiếc nĩa",
+    "ipa": "/fɔrk/",
+    "level": "A1"
+  },
+  "dinner fork": {
+    "vietnamese": "nĩa ăn chính",
+    "ipa": "/ˈdɪnər fɔrk/",
+    "level": "A2"
+  },
+  "salad fork": {
+    "vietnamese": "nĩa ăn salad",
+    "ipa": "/ˈsæləd fɔrk/",
+    "level": "B1"
+  },
+  "dessert fork": {
+    "vietnamese": "nĩa ăn tráng miệng",
+    "ipa": "/dɪˈzərt fɔrk/",
+    "level": "B1"
+  },
+  "spoon": {
+    "vietnamese": "chiếc thìa",
+    "ipa": "/spun/",
+    "level": "A1"
+  },
+  "soup spoon": {
+    "vietnamese": "thìa ăn súp",
+    "ipa": "/sup spun/",
+    "level": "A2"
+  },
+  "teaspoon": {
+    "vietnamese": "thìa cà phê",
+    "ipa": "/ˈtiˌspun/",
+    "level": "A2"
+  },
+  "dessert spoon": {
+    "vietnamese": "thìa tráng miệng",
+    "ipa": "/dɪˈzərt spun/",
+    "level": "B1"
+  },
+  "table knife": {
+    "vietnamese": "dao ăn trên bàn",
+    "ipa": "/ˈteɪbəl naɪf/",
+    "level": "A2"
+  },
+  "steak knife": {
+    "vietnamese": "dao cắt bít tết",
+    "ipa": "/steɪk naɪf/",
+    "level": "B1"
+  },
+  "butter knife": {
+    "vietnamese": "dao phết bơ",
+    "ipa": "/ˈbətər naɪf/",
+    "level": "B1"
+  },
+  "chopsticks": {
+    "vietnamese": "đôi đũa",
+    "ipa": "/ˈʧɑpˌstɪks/",
+    "level": "A1"
+  },
+  "chopstick rest": {
+    "vietnamese": "gác đũa",
+    "ipa": "/ˈʧɑpˌstɪk rɛst/",
+    "level": "A2"
+  },
+  "napkin": {
+    "vietnamese": "khăn ăn giấy hoặc vải",
+    "ipa": "/ˈnæpkɪn/",
+    "level": "A2"
+  },
+  "napkin ring": {
+    "vietnamese": "vòng đeo khăn ăn",
+    "ipa": "/ˈnæpkɪn rɪŋ/",
+    "level": "B1"
+  },
+  "napkin holder": {
+    "vietnamese": "hộp cắm khăn ăn",
+    "ipa": "/ˈnæpkɪn ˈhoʊldər/",
+    "level": "A2"
+  },
+  "salt shaker": {
+    "vietnamese": "lọ rắc muối",
+    "ipa": "/sɔlt ˈʃeɪkər/",
+    "level": "A2"
+  },
+  "pepper shaker": {
+    "vietnamese": "lọ rắc hạt tiêu",
+    "ipa": "/ˈpɛpər ˈʃeɪkər/",
+    "level": "A2"
+  },
+  "pepper mill": {
+    "vietnamese": "cối xay hạt tiêu",
+    "ipa": "/ˈpɛpər mɪl/",
+    "level": "B1"
+  },
+  "sugar bowl": {
+    "vietnamese": "hũ đựng đường",
+    "ipa": "/ˈʃʊgər boʊl/",
+    "level": "A2"
+  },
+  "creamer": {
+    "vietnamese": "bình rót sữa nhỏ",
+    "ipa": "/ˈkrimər/",
+    "level": "B1"
+  },
+  "gravy boat": {
+    "vietnamese": "thuyền rót nước sốt",
+    "ipa": "/ˈgreɪvi boʊt/",
+    "level": "B2"
+  },
+  "butter dish": {
+    "vietnamese": "đĩa đựng bơ có nắp",
+    "ipa": "/ˈbətər dɪʃ/",
+    "level": "B1"
+  },
+  "tureen": {
+    "vietnamese": "thố sứ đựng súp lớn",
+    "ipa": "/tureen/",
+    "level": "B2"
+  },
+  "serving platter": {
+    "vietnamese": "đĩa bày món ăn lớn",
+    "ipa": "/ˈsərvɪŋ ˈplætər/",
+    "level": "B1"
+  },
+  "serving bowl": {
+    "vietnamese": "tô lớn đựng canh",
+    "ipa": "/ˈsərvɪŋ boʊl/",
+    "level": "B1"
+  },
+  "serving spoon": {
+    "vietnamese": "thìa chia thức ăn lớn",
+    "ipa": "/ˈsərvɪŋ spun/",
+    "level": "B1"
+  },
+  "serving tongs": {
+    "vietnamese": "kẹp gắp thức ăn bàn tiệc",
+    "ipa": "/ˈsərvɪŋ tɔŋz/",
+    "level": "B1"
+  },
+  "cake stand": {
+    "vietnamese": "giá để bánh kem",
+    "ipa": "/keɪk stænd/",
+    "level": "B1"
+  },
+  "cake server": {
+    "vietnamese": "dao xẻng cắt bánh kem",
+    "ipa": "/keɪk ˈsərvər/",
+    "level": "B1"
+  },
+  "fruit bowl": {
+    "vietnamese": "tô đựng trái cây",
+    "ipa": "/frut boʊl/",
+    "level": "A2"
+  },
+  "bread basket": {
+    "vietnamese": "giỏ đựng bánh mì",
+    "ipa": "/brɛd ˈbæskət/",
+    "level": "A2"
+  },
+  "apple": {
+    "vietnamese": "quả táo",
+    "ipa": "/ˈæpəl/",
+    "level": "A1"
+  },
+  "banana": {
+    "vietnamese": "quả chuối",
+    "ipa": "/bəˈnænə/",
+    "level": "A1"
+  },
+  "orange": {
+    "vietnamese": "quả cam",
+    "ipa": "/ˈɔrɪnʤ/",
+    "level": "A1"
+  },
+  "lemon": {
+    "vietnamese": "quả chanh vàng",
+    "ipa": "/ˈlɛmən/",
+    "level": "A2"
+  },
+  "lime": {
+    "vietnamese": "quả chanh xanh",
+    "ipa": "/laɪm/",
+    "level": "A2"
+  },
+  "strawberry": {
+    "vietnamese": "quả dâu tây",
+    "ipa": "/ˈstrɔˌbɛri/",
+    "level": "A1"
+  },
+  "grape": {
+    "vietnamese": "chùm nho",
+    "ipa": "/greɪp/",
+    "level": "A1"
+  },
+  "watermelon": {
+    "vietnamese": "quả dưa hấu",
+    "ipa": "/ˈwɔtərˌmɛlən/",
+    "level": "A1"
+  },
+  "mango": {
+    "vietnamese": "quả xoài",
+    "ipa": "/ˈmæŋgoʊ/",
+    "level": "A1"
+  },
+  "pineapple": {
+    "vietnamese": "quả dứa",
+    "ipa": "/ˈpaɪˌnæpəl/",
+    "level": "A2"
+  },
+  "peach": {
+    "vietnamese": "quả đào",
+    "ipa": "/piʧ/",
+    "level": "A2"
+  },
+  "pear": {
+    "vietnamese": "quả lê",
+    "ipa": "/pɛr/",
+    "level": "A2"
+  },
+  "plum": {
+    "vietnamese": "quả mận",
+    "ipa": "/pləm/",
+    "level": "A2"
+  },
+  "cherry": {
+    "vietnamese": "quả anh đào",
+    "ipa": "/ˈʧɛri/",
+    "level": "A2"
+  },
+  "avocado": {
+    "vietnamese": "quả bơ",
+    "ipa": "/ˌævəˈkɑdoʊ/",
+    "level": "A2"
+  },
+  "kiwi": {
+    "vietnamese": "quả kiwi",
+    "ipa": "/ˈkiwi/",
+    "level": "A2"
+  },
+  "papaya": {
+    "vietnamese": "quả đu đủ",
+    "ipa": "/pəˈpaɪə/",
+    "level": "A2"
+  },
+  "coconut": {
+    "vietnamese": "quả dừa",
+    "ipa": "/ˈkoʊkəˌnət/",
+    "level": "A2"
+  },
+  "pomegranate": {
+    "vietnamese": "quả lựu",
+    "ipa": "/ˌpɑməˈgrænət/",
+    "level": "B1"
+  },
+  "fig": {
+    "vietnamese": "quả sung quả vả",
+    "ipa": "/fɪg/",
+    "level": "B1"
+  },
+  "blueberry": {
+    "vietnamese": "quả việt quất",
+    "ipa": "/ˈbluˌbɛri/",
+    "level": "A2"
+  },
+  "raspberry": {
+    "vietnamese": "quả mâm xôi",
+    "ipa": "/ˈræzˌbɛri/",
+    "level": "A2"
+  },
+  "blackberry": {
+    "vietnamese": "quả mâm xôi đen",
+    "ipa": "/ˈblækˌbɛri/",
+    "level": "B1"
+  },
+  "cantaloupe": {
+    "vietnamese": "quả dưa lưới",
+    "ipa": "/ˈkæntəˌloʊp/",
+    "level": "B1"
+  },
+  "grapefruit": {
+    "vietnamese": "quả bưởi",
+    "ipa": "/ˈgreɪpˌfrut/",
+    "level": "A2"
+  },
+  "passion fruit": {
+    "vietnamese": "quả chanh leo",
+    "ipa": "/ˈpæʃən frut/",
+    "level": "B1"
+  },
+  "dragon fruit": {
+    "vietnamese": "quả thanh long",
+    "ipa": "/ˈdrægən frut/",
+    "level": "A2"
+  },
+  "guava": {
+    "vietnamese": "quả ổi",
+    "ipa": "/gˈwɑvə/",
+    "level": "A2"
+  },
+  "lychee": {
+    "vietnamese": "quả vải",
+    "ipa": "/lychee/",
+    "level": "A2"
+  },
+  "durian": {
+    "vietnamese": "quả sầu riêng",
+    "ipa": "/durian/",
+    "level": "B1"
+  },
+  "tomato": {
+    "vietnamese": "quả cà chua",
+    "ipa": "/təˈmɑˌtoʊ/",
+    "level": "A1"
+  },
+  "potato": {
+    "vietnamese": "củ khoai tây",
+    "ipa": "/pəˈteɪˌtoʊ/",
+    "level": "A1"
+  },
+  "sweet potato": {
+    "vietnamese": "củ khoai lang",
+    "ipa": "/swit pəˈteɪˌtoʊ/",
+    "level": "A2"
+  },
+  "carrot": {
+    "vietnamese": "củ cà rốt",
+    "ipa": "/ˈkɛrət/",
+    "level": "A1"
+  },
+  "onion": {
+    "vietnamese": "củ hành tây",
+    "ipa": "/ˈənjən/",
+    "level": "A1"
+  },
+  "garlic": {
+    "vietnamese": "củ tỏi",
+    "ipa": "/ˈgɑrlɪk/",
+    "level": "A2"
+  },
+  "ginger": {
+    "vietnamese": "củ gừng",
+    "ipa": "/ˈʤɪnʤər/",
+    "level": "A2"
+  },
+  "cucumber": {
+    "vietnamese": "quả dưa chuột",
+    "ipa": "/ˈkjukəmbər/",
+    "level": "A1"
+  },
+  "lettuce": {
+    "vietnamese": "rau xà lách",
+    "ipa": "/ˈlɛtəs/",
+    "level": "A2"
+  },
+  "cabbage": {
+    "vietnamese": "bắp cải",
+    "ipa": "/ˈkæbɪʤ/",
+    "level": "A2"
+  },
+  "broccoli": {
+    "vietnamese": "súp lơ xanh",
+    "ipa": "/ˈbrɑkəli/",
+    "level": "A2"
+  },
+  "cauliflower": {
+    "vietnamese": "súp lơ trắng",
+    "ipa": "/ˈkɑləˌflaʊər/",
+    "level": "A2"
+  },
+  "spinach": {
+    "vietnamese": "rau chân vịt rau bina",
+    "ipa": "/ˈspɪnəʧ/",
+    "level": "A2"
+  },
+  "bell pepper": {
+    "vietnamese": "ớt chuông",
+    "ipa": "/bɛl ˈpɛpər/",
+    "level": "A2"
+  },
+  "chili pepper": {
+    "vietnamese": "trái ớt cay",
+    "ipa": "/ˈʧɪli ˈpɛpər/",
+    "level": "A2"
+  },
+  "eggplant": {
+    "vietnamese": "quả cà tím",
+    "ipa": "/ˈɛgˌplænt/",
+    "level": "A2"
+  },
+  "zucchini": {
+    "vietnamese": "quả bí ngòi",
+    "ipa": "/zuˈkini/",
+    "level": "B1"
+  },
+  "pumpkin": {
+    "vietnamese": "quả bí ngô",
+    "ipa": "/ˈpəmpkɪn/",
+    "level": "A2"
+  },
+  "corn": {
+    "vietnamese": "bắp ngô",
+    "ipa": "/kɔrn/",
+    "level": "A2"
+  },
+  "mushroom": {
+    "vietnamese": "cây nấm",
+    "ipa": "/ˈməʃrum/",
+    "level": "A2"
+  },
+  "celery": {
+    "vietnamese": "cần tây",
+    "ipa": "/ˈsɛləri/",
+    "level": "B1"
+  },
+  "asparagus": {
+    "vietnamese": "măng tây",
+    "ipa": "/əˈspɛrəgəs/",
+    "level": "B1"
+  },
+  "green beans": {
+    "vietnamese": "đậu que",
+    "ipa": "/grin binz/",
+    "level": "A2"
+  },
+  "peas": {
+    "vietnamese": "hạt đậu Hà Lan",
+    "ipa": "/piz/",
+    "level": "A2"
+  },
+  "bread": {
+    "vietnamese": "ổ bánh mì",
+    "ipa": "/brɛd/",
+    "level": "A1"
+  },
+  "baguette": {
+    "vietnamese": "bánh mì Pháp baguette",
+    "ipa": "/ˌbæˈgɛt/",
+    "level": "A2"
+  },
+  "toast": {
+    "vietnamese": "bánh mì nướng lát",
+    "ipa": "/toʊst/",
+    "level": "A1"
+  },
+  "croissant": {
+    "vietnamese": "bánh sừng bò",
+    "ipa": "/kˌwɑˈsɑnt/",
+    "level": "A2"
+  },
+  "bagel": {
+    "vietnamese": "bánh mì vòng bagel",
+    "ipa": "/ˈbeɪgəl/",
+    "level": "B1"
+  },
+  "sandwich": {
+    "vietnamese": "bánh mì kẹp sandwich",
+    "ipa": "/ˈsænwɪʧ/",
+    "level": "A1"
+  },
+  "hamburger": {
+    "vietnamese": "bánh burger",
+    "ipa": "/ˈhæmbərgər/",
+    "level": "A1"
+  },
+  "cheeseburger": {
+    "vietnamese": "bánh burger phô mai",
+    "ipa": "/ˈʧizbərgər/",
+    "level": "A2"
+  },
+  "hot dog": {
+    "vietnamese": "bánh kẹp xúc xích",
+    "ipa": "/hɑt dɔg/",
+    "level": "A1"
+  },
+  "pizza": {
+    "vietnamese": "bánh pizza",
+    "ipa": "/ˈpitsə/",
+    "level": "A1"
+  },
+  "pasta": {
+    "vietnamese": "mì Ý pasta",
+    "ipa": "/ˈpɑstə/",
+    "level": "A2"
+  },
+  "spaghetti": {
+    "vietnamese": "mì sợi spaghetti",
+    "ipa": "/spəˈgɛti/",
+    "level": "A2"
+  },
+  "noodles": {
+    "vietnamese": "mì sợi",
+    "ipa": "/ˈnudəlz/",
+    "level": "A1"
+  },
+  "ramen": {
+    "vietnamese": "mì ramen",
+    "ipa": "/ramen/",
+    "level": "A2"
+  },
+  "rice": {
+    "vietnamese": "cơm gạo",
+    "ipa": "/raɪs/",
+    "level": "A1"
+  },
+  "fried rice": {
+    "vietnamese": "cơm chiên",
+    "ipa": "/frid raɪs/",
+    "level": "A2"
+  },
+  "sushi": {
+    "vietnamese": "món sushi",
+    "ipa": "/ˈsuʃi/",
+    "level": "A2"
+  },
+  "taco": {
+    "vietnamese": "bánh taco",
+    "ipa": "/ˈtɑkoʊ/",
+    "level": "A2"
+  },
+  "burrito": {
+    "vietnamese": "bánh cuộn burrito",
+    "ipa": "/bərˈitoʊ/",
+    "level": "B1"
+  },
+  "egg": {
+    "vietnamese": "quả trứng",
+    "ipa": "/ɛg/",
+    "level": "A1"
+  },
+  "fried egg": {
+    "vietnamese": "trứng ốp la",
+    "ipa": "/frid ɛg/",
+    "level": "A1"
+  },
+  "boiled egg": {
+    "vietnamese": "trứng luộc",
+    "ipa": "/bɔɪld ɛg/",
+    "level": "A1"
+  },
+  "cheese": {
+    "vietnamese": "miếng phô mai",
+    "ipa": "/ʧiz/",
+    "level": "A1"
+  },
+  "butter": {
+    "vietnamese": "thỏi bơ",
+    "ipa": "/ˈbətər/",
+    "level": "A1"
+  },
+  "milk": {
+    "vietnamese": "sữa tươi",
+    "ipa": "/mɪlk/",
+    "level": "A1"
+  },
+  "yogurt": {
+    "vietnamese": "sữa chua",
+    "ipa": "/ˈjoʊgərt/",
+    "level": "A2"
+  },
+  "cream": {
+    "vietnamese": "kem tươi",
+    "ipa": "/krim/",
+    "level": "A2"
+  },
+  "ice cream": {
+    "vietnamese": "kem que kem ốc quế",
+    "ipa": "/aɪs krim/",
+    "level": "A1"
+  },
+  "cake": {
+    "vietnamese": "bánh ngọt bánh kem",
+    "ipa": "/keɪk/",
+    "level": "A1"
+  },
+  "cupcake": {
+    "vietnamese": "bánh cupcake",
+    "ipa": "/ˈkəpˌkeɪk/",
+    "level": "A2"
+  },
+  "cookie": {
+    "vietnamese": "bánh quy",
+    "ipa": "/ˈkʊki/",
+    "level": "A1"
+  },
+  "biscuit": {
+    "vietnamese": "bánh quy giòn",
+    "ipa": "/ˈbɪskət/",
+    "level": "A2"
+  },
+  "donut": {
+    "vietnamese": "bánh rán vòng donut",
+    "ipa": "/ˈdoʊˌnət/",
+    "level": "A2"
+  },
+  "pancake": {
+    "vietnamese": "bánh kếp pancake",
+    "ipa": "/ˈpænˌkeɪk/",
+    "level": "A2"
+  },
+  "waffle": {
+    "vietnamese": "bánh quế waffle",
+    "ipa": "/ˈwɑfəl/",
+    "level": "A2"
+  },
+  "muffin": {
+    "vietnamese": "bánh nướng muffin",
+    "ipa": "/ˈməfən/",
+    "level": "A2"
+  },
+  "sofa": {
+    "vietnamese": "ghế sofa",
+    "ipa": "/ˈsoʊfə/",
+    "level": "A1"
+  },
+  "couch": {
+    "vietnamese": "ghế đi-văng",
+    "ipa": "/kaʊʧ/",
+    "level": "A2"
+  },
+  "armchair": {
+    "vietnamese": "ghế bành",
+    "ipa": "/ˈɑrmˌʧɛr/",
+    "level": "A2"
+  },
+  "recliner": {
+    "vietnamese": "ghế ngả lưng thư giãn",
+    "ipa": "/rɪˈklaɪnər/",
+    "level": "B1"
+  },
+  "ottoman": {
+    "vietnamese": "ghế đôn đệm chân",
+    "ipa": "/ˈɑtəmən/",
+    "level": "B1"
+  },
+  "coffee table": {
+    "vietnamese": "bàn trà phòng khách",
+    "ipa": "/ˈkɔfi ˈteɪbəl/",
+    "level": "A2"
+  },
+  "side table": {
+    "vietnamese": "bàn phụ nhỏ cạnh ghế",
+    "ipa": "/saɪd ˈteɪbəl/",
+    "level": "A2"
+  },
+  "end table": {
+    "vietnamese": "bàn góc nhỏ",
+    "ipa": "/ɛnd ˈteɪbəl/",
+    "level": "B1"
+  },
+  "console table": {
+    "vietnamese": "bàn console kê tường",
+    "ipa": "/ˈkɑnsoʊl ˈteɪbəl/",
+    "level": "B2"
+  },
+  "tv": {
+    "vietnamese": "ti vi",
+    "ipa": "/ˌtɛləˈvɪʒən/",
+    "level": "A1"
+  },
+  "television": {
+    "vietnamese": "máy truyền hình",
+    "ipa": "/ˈtɛləˌvɪʒən/",
+    "level": "A1"
+  },
+  "remote control": {
+    "vietnamese": "điều khiển từ xa",
+    "ipa": "/rɪˈmoʊt kənˈtroʊl/",
+    "level": "A1"
+  },
+  "tv stand": {
+    "vietnamese": "kệ để ti vi",
+    "ipa": "/ˌtɛləˈvɪʒən stænd/",
+    "level": "A2"
+  },
+  "soundbar": {
+    "vietnamese": "loa thanh dài",
+    "ipa": "/soundbar/",
+    "level": "B1"
+  },
+  "speaker": {
+    "vietnamese": "chiếc loa âm thanh",
+    "ipa": "/ˈspikər/",
+    "level": "A2"
+  },
+  "subwoofer": {
+    "vietnamese": "loa siêu trầm",
+    "ipa": "/subwoofer/",
+    "level": "B2"
+  },
+  "cushion": {
+    "vietnamese": "gối tựa lưng sofa",
+    "ipa": "/ˈkʊʃən/",
+    "level": "A2"
+  },
+  "throw pillow": {
+    "vietnamese": "gối trang trí sofa",
+    "ipa": "/θroʊ ˈpɪloʊ/",
+    "level": "A2"
+  },
+  "throw blanket": {
+    "vietnamese": "chăn mỏng đắp sofa",
+    "ipa": "/θroʊ ˈblæŋkɪt/",
+    "level": "B1"
+  },
+  "carpet": {
+    "vietnamese": "tấm thảm trải sàn lớn",
+    "ipa": "/ˈkɑrpət/",
+    "level": "A2"
+  },
+  "area rug": {
+    "vietnamese": "thảm trang trí sàn",
+    "ipa": "/ˈɛriə rəg/",
+    "level": "A2"
+  },
+  "doormat": {
+    "vietnamese": "thảm chùi chân",
+    "ipa": "/ˈdɔrˌmæt/",
+    "level": "A2"
+  },
+  "curtain": {
+    "vietnamese": "rèm cửa sổ vải",
+    "ipa": "/ˈkərtən/",
+    "level": "A2"
+  },
+  "drapes": {
+    "vietnamese": "rèm cửa dài dày",
+    "ipa": "/dreɪps/",
+    "level": "B1"
+  },
+  "window blinds": {
+    "vietnamese": "rèm chớp sáo cửa sổ",
+    "ipa": "/ˈwɪndoʊ blaɪndz/",
+    "level": "B1"
+  },
+  "air conditioner": {
+    "vietnamese": "máy điều hòa không khí",
+    "ipa": "/ɛr kənˈdɪʃənər/",
+    "level": "A2"
+  },
+  "ceiling fan": {
+    "vietnamese": "quạt trần",
+    "ipa": "/ˈsilɪŋ fæn/",
+    "level": "A2"
+  },
+  "standing fan": {
+    "vietnamese": "quạt cây đứng",
+    "ipa": "/ˈstændɪŋ fæn/",
+    "level": "A2"
+  },
+  "desk fan": {
+    "vietnamese": "quạt để bàn",
+    "ipa": "/dɛsk fæn/",
+    "level": "A2"
+  },
+  "air purifier": {
+    "vietnamese": "máy lọc không khí",
+    "ipa": "/ɛr ˈpjʊrəˌfaɪər/",
+    "level": "B1"
+  },
+  "humidifier": {
+    "vietnamese": "máy tạo độ ẩm",
+    "ipa": "/hjuˈmɪdəˌfaɪər/",
+    "level": "B1"
+  },
+  "dehumidifier": {
+    "vietnamese": "máy hút ẩm",
+    "ipa": "/dihjuˈmɪdəfaɪər/",
+    "level": "B2"
+  },
+  "heater": {
+    "vietnamese": "máy sưởi ấm",
+    "ipa": "/ˈhitər/",
+    "level": "A2"
+  },
+  "radiator": {
+    "vietnamese": "lò sưởi tản nhiệt",
+    "ipa": "/ˈreɪdiˌeɪtər/",
+    "level": "B1"
+  },
+  "fireplace": {
+    "vietnamese": "lò sưởi củi",
+    "ipa": "/ˈfaɪərˌpleɪs/",
+    "level": "A2"
+  },
+  "fireplace mantel": {
+    "vietnamese": "bệ lò sưởi",
+    "ipa": "/ˈfaɪərˌpleɪs ˈmæntəl/",
+    "level": "B2"
+  },
+  "potted plant": {
+    "vietnamese": "chậu cây cảnh",
+    "ipa": "/ˈpɑtɪd plænt/",
+    "level": "A2"
+  },
+  "houseplant": {
+    "vietnamese": "cây cảnh trong nhà",
+    "ipa": "/houseplant/",
+    "level": "A2"
+  },
+  "vase": {
+    "vietnamese": "bình cắm hoa",
+    "ipa": "/vɑz/",
+    "level": "A2"
+  },
+  "flower arrangement": {
+    "vietnamese": "lẵng hoa bình hoa",
+    "ipa": "/flaʊər ərˈeɪnʤmənt/",
+    "level": "B1"
+  },
+  "artificial flowers": {
+    "vietnamese": "hoa giả trang trí",
+    "ipa": "/ˌɑrtəˈfɪʃəl flaʊərz/",
+    "level": "A2"
+  },
+  "wall clock": {
+    "vietnamese": "đồng hồ treo tường",
+    "ipa": "/wɔl klɑk/",
+    "level": "A2"
+  },
+  "grandfather clock": {
+    "vietnamese": "đồng hồ cây cổ quả lắc",
+    "ipa": "/ˈgrænˌfɑðər klɑk/",
+    "level": "B2"
+  },
+  "painting": {
+    "vietnamese": "bức tranh vẽ",
+    "ipa": "/ˈpeɪnɪŋ/",
+    "level": "A2"
+  },
+  "picture frame": {
+    "vietnamese": "khung ảnh",
+    "ipa": "/ˈpɪkʧər freɪm/",
+    "level": "A2"
+  },
+  "photo frame": {
+    "vietnamese": "khung hình kỷ niệm",
+    "ipa": "/ˈfoʊˌtoʊ freɪm/",
+    "level": "A2"
+  },
+  "mirror": {
+    "vietnamese": "tấm gương soi",
+    "ipa": "/ˈmɪrər/",
+    "level": "A1"
+  },
+  "wall mirror": {
+    "vietnamese": "gương treo tường",
+    "ipa": "/wɔl ˈmɪrər/",
+    "level": "A2"
+  },
+  "chandelier": {
+    "vietnamese": "đèn chùm trần nhà",
+    "ipa": "/ʃændəˈlɪr/",
+    "level": "B1"
+  },
+  "pendant light": {
+    "vietnamese": "đèn thả trần",
+    "ipa": "/ˈpɛndənt laɪt/",
+    "level": "B1"
+  },
+  "floor lamp": {
+    "vietnamese": "đèn cây đứng phòng khách",
+    "ipa": "/flɔr læmp/",
+    "level": "A2"
+  },
+  "table lamp": {
+    "vietnamese": "đèn bàn trang trí",
+    "ipa": "/ˈteɪbəl læmp/",
+    "level": "A2"
+  },
+  "wall sconce": {
+    "vietnamese": "đèn gắn tường",
+    "ipa": "/wɔl skɑns/",
+    "level": "B2"
+  },
+  "candle": {
+    "vietnamese": "cây nến sáp",
+    "ipa": "/ˈkændəl/",
+    "level": "A2"
+  },
+  "candlestick": {
+    "vietnamese": "chân cắm nến",
+    "ipa": "/ˈkændəlˌstɪk/",
+    "level": "B1"
+  },
+  "candle holder": {
+    "vietnamese": "đế đỡ nến cốc nến",
+    "ipa": "/ˈkændəl ˈhoʊldər/",
+    "level": "B1"
+  },
+  "scented candle": {
+    "vietnamese": "nến thơm",
+    "ipa": "/ˈsɛntɪd ˈkændəl/",
+    "level": "A2"
+  },
+  "diffuser": {
+    "vietnamese": "máy khuếch tán tinh dầu",
+    "ipa": "/diffuser/",
+    "level": "B1"
+  },
+  "statue": {
+    "vietnamese": "bức tượng nhỏ",
+    "ipa": "/ˈstæˌʧu/",
+    "level": "A2"
+  },
+  "sculpture": {
+    "vietnamese": "tác phẩm điêu khắc",
+    "ipa": "/ˈskəlpʧər/",
+    "level": "B1"
+  },
+  "figurine": {
+    "vietnamese": "bức tượng trang trí nhỏ",
+    "ipa": "/ˌfɪgjərˈin/",
+    "level": "B1"
+  },
+  "display cabinet": {
+    "vietnamese": "tủ kính trưng bày",
+    "ipa": "/dɪˈspleɪ ˈkæbənət/",
+    "level": "B1"
+  },
+  "sideboard": {
+    "vietnamese": "tủ buffet phòng khách",
+    "ipa": "/sideboard/",
+    "level": "B2"
+  },
+  "door": {
+    "vietnamese": "cửa ra vào",
+    "ipa": "/dɔːr/",
+    "level": "A1"
+  },
+  "door handle": {
+    "vietnamese": "tay nắm cửa",
+    "ipa": "/dɔr ˈhændəl/",
+    "level": "A2"
+  },
+  "doorknob": {
+    "vietnamese": "quả đấm tay nắm cửa tròn",
+    "ipa": "/ˈdurnɑb/",
+    "level": "A2"
+  },
+  "doorbell": {
+    "vietnamese": "chuông cửa",
+    "ipa": "/ˈdɔrˌbɛl/",
+    "level": "A2"
+  },
+  "keyhole": {
+    "vietnamese": "lỗ khóa cửa",
+    "ipa": "/ˈkiˌhoʊl/",
+    "level": "B1"
+  },
+  "window": {
+    "vietnamese": "cửa sổ",
+    "ipa": "/ˈwɪn.doʊ/",
+    "level": "A1"
+  },
+  "windowsill": {
+    "vietnamese": "bậu cửa sổ",
+    "ipa": "/windowsill/",
+    "level": "B1"
+  },
+  "power socket": {
+    "vietnamese": "ổ cắm điện trên tường",
+    "ipa": "/paʊər ˈsɑkət/",
+    "level": "A2"
+  },
+  "bed": {
+    "vietnamese": "chiếc giường ngủ",
+    "ipa": "/bɛd/",
+    "level": "A1"
+  },
+  "mattress": {
+    "vietnamese": "chiếc đệm nằm",
+    "ipa": "/ˈmætrəs/",
+    "level": "A2"
+  },
+  "bedframe": {
+    "vietnamese": "khung giường",
+    "ipa": "/bedframe/",
+    "level": "B1"
+  },
+  "headboard": {
+    "vietnamese": "thành đầu giường",
+    "ipa": "/ˈhɛdˌbɔrd/",
+    "level": "B1"
+  },
+  "bedsheet": {
+    "vietnamese": "ga trải giường",
+    "ipa": "/bedsheet/",
+    "level": "A2"
+  },
+  "fitted sheet": {
+    "vietnamese": "ga bọc đệm",
+    "ipa": "/ˈfɪtɪd ʃit/",
+    "level": "B1"
+  },
+  "pillow": {
+    "vietnamese": "chiếc gối nằm",
+    "ipa": "/ˈpɪloʊ/",
+    "level": "A1"
+  },
+  "pillowcase": {
+    "vietnamese": "vỏ bọc gối",
+    "ipa": "/pillowcase/",
+    "level": "A2"
+  },
+  "bolster": {
+    "vietnamese": "chiếc gối ôm",
+    "ipa": "/ˈboʊlstər/",
+    "level": "B1"
+  },
+  "blanket": {
+    "vietnamese": "chiếc chăn ấm",
+    "ipa": "/ˈblæŋkɪt/",
+    "level": "A1"
+  },
+  "duvet": {
+    "vietnamese": "ruột chăn bông dày",
+    "ipa": "/duvet/",
+    "level": "A2"
+  },
+  "duvet cover": {
+    "vietnamese": "vỏ bọc chăn bông",
+    "ipa": "/duvet ˈkəvər/",
+    "level": "B1"
+  },
+  "quilt": {
+    "vietnamese": "chăn chần bông nhẹ",
+    "ipa": "/kwɪlt/",
+    "level": "B1"
+  },
+  "bedspread": {
+    "vietnamese": "khăn phủ giường trang trí",
+    "ipa": "/ˈbɛdˌsprɛd/",
+    "level": "B2"
+  },
+  "nightstand": {
+    "vietnamese": "tab đầu giường",
+    "ipa": "/ˈnaɪtˌstænd/",
+    "level": "A2"
+  },
+  "bedside table": {
+    "vietnamese": "bàn nhỏ đầu giường",
+    "ipa": "/ˈbɛdˌsaɪd ˈteɪbəl/",
+    "level": "A2"
+  },
+  "bedside lamp": {
+    "vietnamese": "đèn ngủ đầu giường",
+    "ipa": "/ˈbɛdˌsaɪd læmp/",
+    "level": "A2"
+  },
+  "alarm clock": {
+    "vietnamese": "đồng hồ báo thức",
+    "ipa": "/əˈlɑrm klɑk/",
+    "level": "A2"
+  },
+  "wardrobe": {
+    "vietnamese": "tủ quần áo đứng",
+    "ipa": "/ˈwɔrˌdroʊb/",
+    "level": "A2"
+  },
+  "closet": {
+    "vietnamese": "tủ âm tường treo quần áo",
+    "ipa": "/ˈklɑzət/",
+    "level": "A2"
+  },
+  "clothes hanger": {
+    "vietnamese": "móc treo quần áo",
+    "ipa": "/kloʊðz ˈhæŋər/",
+    "level": "A2"
+  },
+  "hanger": {
+    "vietnamese": "chiếc móc áo",
+    "ipa": "/ˈhæŋər/",
+    "level": "A2"
+  },
+  "full length mirror": {
+    "vietnamese": "gương soi toàn thân",
+    "ipa": "/fʊl lɛŋθ ˈmɪrər/",
+    "level": "B1"
+  },
+  "vanity table": {
+    "vietnamese": "bàn trang điểm",
+    "ipa": "/ˈvænɪti ˈteɪbəl/",
+    "level": "B1"
+  },
+  "dressing table": {
+    "vietnamese": "bàn phấn trang điểm",
+    "ipa": "/ˈdrɛsɪŋ ˈteɪbəl/",
+    "level": "B1"
+  },
+  "vanity mirror": {
+    "vietnamese": "gương bàn trang điểm",
+    "ipa": "/ˈvænɪti ˈmɪrər/",
+    "level": "B1"
+  },
+  "jewelry box": {
+    "vietnamese": "hộp đựng trang sức",
+    "ipa": "/ˈʤuəlri bɑks/",
+    "level": "B1"
+  },
+  "shoe rack": {
+    "vietnamese": "giá kệ để giày dép",
+    "ipa": "/ʃu ræk/",
+    "level": "A2"
+  },
+  "laundry hamper": {
+    "vietnamese": "giỏ đựng đồ giặt",
+    "ipa": "/ˈlɔndri ˈhæmpər/",
+    "level": "A2"
+  },
+  "laundry basket": {
+    "vietnamese": "sọt đựng quần áo bẩn",
+    "ipa": "/ˈlɔndri ˈbæskət/",
+    "level": "A2"
+  },
+  "iron": {
+    "vietnamese": "bàn ủi bàn là",
+    "ipa": "/aɪərn/",
+    "level": "A2"
+  },
+  "ironing board": {
+    "vietnamese": "cầu là quần áo",
+    "ipa": "/ˈaɪərnɪŋ bɔrd/",
+    "level": "A2"
+  },
+  "garment steamer": {
+    "vietnamese": "bàn ủi hơi nước đứng",
+    "ipa": "/ˈgɑrmənt ˈstimər/",
+    "level": "B1"
+  },
+  "safe": {
+    "vietnamese": "két sắt an toàn",
+    "ipa": "/seɪf/",
+    "level": "B1"
+  },
+  "slippers": {
+    "vietnamese": "đôi dép đi trong nhà",
+    "ipa": "/sˈlɪpərz/",
+    "level": "A2"
+  },
+  "house slippers": {
+    "vietnamese": "dép lông đi trong nhà",
+    "ipa": "/haʊs sˈlɪpərz/",
+    "level": "A2"
+  },
+  "pajamas": {
+    "vietnamese": "bộ đồ ngủ pijama",
+    "ipa": "/pəˈʤɑməz/",
+    "level": "A2"
+  },
+  "nightgown": {
+    "vietnamese": "váy ngủ",
+    "ipa": "/nightgown/",
+    "level": "B1"
+  },
+  "bathrobe": {
+    "vietnamese": "áo choàng tắm",
+    "ipa": "/ˈbæθˌroʊb/",
+    "level": "A2"
+  },
+  "sleep mask": {
+    "vietnamese": "bịt mắt khi ngủ",
+    "ipa": "/slip mæsk/",
+    "level": "B1"
+  },
+  "earplugs": {
+    "vietnamese": "nút bịt tai chống ồn",
+    "ipa": "/ˈɪrˌpləgz/",
+    "level": "B1"
+  },
+  "hot water bottle": {
+    "vietnamese": "túi chườm nước nóng",
+    "ipa": "/hɑt ˈwɔtər ˈbɑtəl/",
+    "level": "B1"
+  },
+  "heating pad": {
+    "vietnamese": "tấm đệm sưởi điện",
+    "ipa": "/ˈhitɪŋ pæd/",
+    "level": "B2"
+  },
+  "mosquito net": {
+    "vietnamese": "màn chống muỗi",
+    "ipa": "/məˈskitoʊ nɛt/",
+    "level": "A2"
+  },
+  "canopy bed": {
+    "vietnamese": "giường có khung màn che",
+    "ipa": "/ˈkænəpi bɛd/",
+    "level": "B2"
+  },
+  "bunk bed": {
+    "vietnamese": "giường tầng trẻ em",
+    "ipa": "/bəŋk bɛd/",
+    "level": "A2"
+  },
+  "bathtub": {
+    "vietnamese": "bồn tắm nằm",
+    "ipa": "/ˈbæθtəb/",
+    "level": "A2"
+  },
+  "shower": {
+    "vietnamese": "vòi hoa sen phòng tắm",
+    "ipa": "/ʃaʊər/",
+    "level": "A1"
+  },
+  "shower head": {
+    "vietnamese": "bát sen tắm",
+    "ipa": "/ʃaʊər hɛd/",
+    "level": "B1"
+  },
+  "shower curtain": {
+    "vietnamese": "rèm che bồn tắm",
+    "ipa": "/ʃaʊər ˈkərtən/",
+    "level": "A2"
+  },
+  "shower stall": {
+    "vietnamese": "buồng tắm đứng kính",
+    "ipa": "/ʃaʊər stɔl/",
+    "level": "B1"
+  },
+  "bathroom sink": {
+    "vietnamese": "bồn rửa mặt lavabo",
+    "ipa": "/ˈbæθˌrum sɪŋk/",
+    "level": "A2"
+  },
+  "sink": {
+    "vietnamese": "bồn rửa",
+    "ipa": "/sɪŋk/",
+    "level": "A1"
+  },
+  "bathroom mirror": {
+    "vietnamese": "gương phòng tắm",
+    "ipa": "/ˈbæθˌrum ˈmɪrər/",
+    "level": "A2"
+  },
+  "medicine cabinet": {
+    "vietnamese": "tủ thuốc gắn tường",
+    "ipa": "/ˈmɛdəsən ˈkæbənət/",
+    "level": "B1"
+  },
+  "toilet": {
+    "vietnamese": "bồn cầu vệ sinh",
+    "ipa": "/ˈtɔɪlət/",
+    "level": "A1"
+  },
+  "toilet bowl": {
+    "vietnamese": "bệ ngồi bồn cầu",
+    "ipa": "/ˈtɔɪlət boʊl/",
+    "level": "A2"
+  },
+  "toilet lid": {
+    "vietnamese": "nắp đậy bồn cầu",
+    "ipa": "/ˈtɔɪlət lɪd/",
+    "level": "B1"
+  },
+  "toilet paper": {
+    "vietnamese": "giấy vệ sinh",
+    "ipa": "/ˈtɔɪlət ˈpeɪpər/",
+    "level": "A1"
+  },
+  "toilet paper holder": {
+    "vietnamese": "trục giữ giấy vệ sinh",
+    "ipa": "/ˈtɔɪlət ˈpeɪpər ˈhoʊldər/",
+    "level": "B1"
+  },
+  "toilet brush": {
+    "vietnamese": "chổi cọ bồn cầu",
+    "ipa": "/ˈtɔɪlət brəʃ/",
+    "level": "A2"
+  },
+  "bidet": {
+    "vietnamese": "vòi xịt vệ sinh vòi bidet",
+    "ipa": "/bidet/",
+    "level": "B1"
+  },
+  "towel": {
+    "vietnamese": "chiếc khăn tắm",
+    "ipa": "/taʊəl/",
+    "level": "A1"
+  },
+  "bath towel": {
+    "vietnamese": "khăn tắm cỡ lớn",
+    "ipa": "/bæθ taʊəl/",
+    "level": "A2"
+  },
+  "hand towel": {
+    "vietnamese": "khăn lau tay",
+    "ipa": "/hænd taʊəl/",
+    "level": "A2"
+  },
+  "washcloth": {
+    "vietnamese": "khăn mặt nhỏ",
+    "ipa": "/ˈwɑʃˌklɔθ/",
+    "level": "A2"
+  },
+  "towel rack": {
+    "vietnamese": "giá treo khăn",
+    "ipa": "/taʊəl ræk/",
+    "level": "A2"
+  },
+  "towel ring": {
+    "vietnamese": "vòng treo khăn lau tay",
+    "ipa": "/taʊəl rɪŋ/",
+    "level": "B1"
+  },
+  "bath mat": {
+    "vietnamese": "thảm chống trượt phòng tắm",
+    "ipa": "/bæθ mæt/",
+    "level": "A2"
+  },
+  "soap": {
+    "vietnamese": "bánh xà phòng",
+    "ipa": "/soʊp/",
+    "level": "A1"
+  },
+  "soap dish": {
+    "vietnamese": "khay để bánh xà phòng",
+    "ipa": "/soʊp dɪʃ/",
+    "level": "A2"
+  },
+  "soap dispenser": {
+    "vietnamese": "bình nhấn xà phòng",
+    "ipa": "/soʊp dɪˈspɛnsər/",
+    "level": "A2"
+  },
+  "liquid hand soap": {
+    "vietnamese": "nước rửa tay dạng lỏng",
+    "ipa": "/ˈlɪkwɪd hænd soʊp/",
+    "level": "A2"
+  },
+  "body wash": {
+    "vietnamese": "sữa tắm toàn thân",
+    "ipa": "/ˈbɑdi wɑʃ/",
+    "level": "A2"
+  },
+  "shower gel": {
+    "vietnamese": "gel tắm",
+    "ipa": "/ʃaʊər ʤɛl/",
+    "level": "A2"
+  },
+  "shampoo": {
+    "vietnamese": "dầu gội đầu",
+    "ipa": "/ʃæmˈpu/",
+    "level": "A1"
+  },
+  "shampoo bottle": {
+    "vietnamese": "chai dầu gội",
+    "ipa": "/ʃæmˈpu ˈbɑtəl/",
+    "level": "A2"
+  },
+  "conditioner": {
+    "vietnamese": "dầu xả tóc",
+    "ipa": "/kənˈdɪʃənər/",
+    "level": "A2"
+  },
+  "conditioner bottle": {
+    "vietnamese": "chai dầu xả tóc",
+    "ipa": "/kənˈdɪʃənər ˈbɑtəl/",
+    "level": "A2"
+  },
+  "hair mask": {
+    "vietnamese": "kem ủ tóc",
+    "ipa": "/hɛr mæsk/",
+    "level": "B1"
+  },
+  "toothbrush": {
+    "vietnamese": "bàn chải đánh răng",
+    "ipa": "/ˈtuθbrəʃ/",
+    "level": "A1"
+  },
+  "electric toothbrush": {
+    "vietnamese": "bàn chải điện",
+    "ipa": "/ɪˈlɛktrɪk ˈtuθbrəʃ/",
+    "level": "A2"
+  },
+  "toothbrush holder": {
+    "vietnamese": "ống cắm bàn chải",
+    "ipa": "/ˈtuθbrəʃ ˈhoʊldər/",
+    "level": "A2"
+  },
+  "toothpaste": {
+    "vietnamese": "kem đánh răng",
+    "ipa": "/ˈtuθˌpeɪst/",
+    "level": "A1"
+  },
+  "dental floss": {
+    "vietnamese": "chỉ nha khoa",
+    "ipa": "/ˈdɛntəl flɑs/",
+    "level": "A2"
+  },
+  "mouthwash": {
+    "vietnamese": "nước súc miệng",
+    "ipa": "/ˈmaʊθˌwɑʃ/",
+    "level": "A2"
+  },
+  "mouthwash bottle": {
+    "vietnamese": "chai nước súc miệng",
+    "ipa": "/ˈmaʊθˌwɑʃ ˈbɑtəl/",
+    "level": "A2"
+  },
+  "hair dryer": {
+    "vietnamese": "máy sấy tóc",
+    "ipa": "/hɛr draɪər/",
+    "level": "A2"
+  },
+  "hair straightener": {
+    "vietnamese": "máy ép là tóc",
+    "ipa": "/hɛr straightener/",
+    "level": "B1"
+  },
+  "curling iron": {
+    "vietnamese": "máy uốn tóc xoăn",
+    "ipa": "/ˈkərlɪŋ aɪərn/",
+    "level": "B1"
+  },
+  "comb": {
+    "vietnamese": "chiếc lược răng thưa",
+    "ipa": "/koʊm/",
+    "level": "A1"
+  },
+  "hairbrush": {
+    "vietnamese": "lược bàn chải chải tóc",
+    "ipa": "/hairbrush/",
+    "level": "A2"
+  },
+  "razor": {
+    "vietnamese": "dao cạo râu",
+    "ipa": "/ˈreɪzər/",
+    "level": "A2"
+  },
+  "electric shaver": {
+    "vietnamese": "máy cạo râu điện",
+    "ipa": "/ɪˈlɛktrɪk ˈʃeɪvər/",
+    "level": "A2"
+  },
+  "shaving cream": {
+    "vietnamese": "bọt cạo râu",
+    "ipa": "/ˈʃeɪvɪŋ krim/",
+    "level": "A2"
+  },
+  "shaving brush": {
+    "vietnamese": "chổi quét bọt cạo râu",
+    "ipa": "/ˈʃeɪvɪŋ brəʃ/",
+    "level": "B1"
+  },
+  "aftershave": {
+    "vietnamese": "nước dưỡng sau cạo râu",
+    "ipa": "/ˌæftərˈʃeɪv/",
+    "level": "B1"
+  },
+  "nail clipper": {
+    "vietnamese": "bấm móng tay",
+    "ipa": "/neɪl ˈklɪpər/",
+    "level": "A2"
+  },
+  "nail file": {
+    "vietnamese": "dũa móng tay",
+    "ipa": "/neɪl faɪl/",
+    "level": "A2"
+  },
+  "tweezers": {
+    "vietnamese": "cây nhíp nhổ lông",
+    "ipa": "/tˈwizərz/",
+    "level": "B1"
+  },
+  "cotton swab": {
+    "vietnamese": "tăm bông ngoáy tai",
+    "ipa": "/ˈkɔtən swɑb/",
+    "level": "A2"
+  },
+  "cotton ball": {
+    "vietnamese": "bông gòn viên",
+    "ipa": "/ˈkɔtən bɔl/",
+    "level": "A2"
+  },
+  "cotton pad": {
+    "vietnamese": "bông tẩy trang",
+    "ipa": "/ˈkɔtən pæd/",
+    "level": "A2"
+  },
+  "facial cleanser": {
+    "vietnamese": "sữa rửa mặt",
+    "ipa": "/ˈfeɪʃəl ˈklɛnzər/",
+    "level": "A2"
+  },
+  "face moisturizer": {
+    "vietnamese": "kem dưỡng ẩm da mặt",
+    "ipa": "/feɪs ˈmɔɪsʧərˌaɪzər/",
+    "level": "A2"
+  },
+  "sunscreen bottle": {
+    "vietnamese": "chai kem chống nắng",
+    "ipa": "/ˈsənskrin ˈbɑtəl/",
+    "level": "A2"
+  },
+  "lotion bottle": {
+    "vietnamese": "chai sữa dưỡng thể",
+    "ipa": "/ˈloʊʃən ˈbɑtəl/",
+    "level": "A2"
+  },
+  "perfume bottle": {
+    "vietnamese": "chai nước hoa",
+    "ipa": "/pərfˈjum ˈbɑtəl/",
+    "level": "A2"
+  },
+  "cologne bottle": {
+    "vietnamese": "chai nước hoa nam",
+    "ipa": "/kəˈloʊn ˈbɑtəl/",
+    "level": "B1"
+  },
+  "deodorant": {
+    "vietnamese": "lăn khử mùi",
+    "ipa": "/diˈoʊdərənt/",
+    "level": "A2"
+  },
+  "body spray": {
+    "vietnamese": "xịt thơm toàn thân",
+    "ipa": "/ˈbɑdi spreɪ/",
+    "level": "A2"
+  },
+  "t-shirt": {
+    "vietnamese": "áo thun áo phông",
+    "ipa": "/ˈtiˌsərt/",
+    "level": "A1"
+  },
+  "shirt": {
+    "vietnamese": "áo sơ mi",
+    "ipa": "/ʃərt/",
+    "level": "A1"
+  },
+  "polo shirt": {
+    "vietnamese": "áo polo có cổ",
+    "ipa": "/ˈpoʊloʊ ʃərt/",
+    "level": "A2"
+  },
+  "dress shirt": {
+    "vietnamese": "áo sơ mi công sở",
+    "ipa": "/drɛs ʃərt/",
+    "level": "B1"
+  },
+  "blouse": {
+    "vietnamese": "áo sơ mi nữ kiểu",
+    "ipa": "/blaʊs/",
+    "level": "A2"
+  },
+  "tank top": {
+    "vietnamese": "áo ba lỗ",
+    "ipa": "/tæŋk tɔp/",
+    "level": "A2"
+  },
+  "sleeveless shirt": {
+    "vietnamese": "áo không tay",
+    "ipa": "/sˈlivlɪs ʃərt/",
+    "level": "A2"
+  },
+  "crop top": {
+    "vietnamese": "áo lửng hở eo",
+    "ipa": "/krɑp tɔp/",
+    "level": "B1"
+  },
+  "sweater": {
+    "vietnamese": "áo len dài tay",
+    "ipa": "/sˈwɛtər/",
+    "level": "A1"
+  },
+  "pullover": {
+    "vietnamese": "áo len chui đầu",
+    "ipa": "/pullover/",
+    "level": "A2"
+  },
+  "cardigan": {
+    "vietnamese": "áo len cài cúc",
+    "ipa": "/ˈkɑrdɪgən/",
+    "level": "B1"
+  },
+  "hoodie": {
+    "vietnamese": "áo nỉ có mũ trùm",
+    "ipa": "/hoodie/",
+    "level": "A2"
+  },
+  "sweatshirt": {
+    "vietnamese": "áo nỉ chui đầu",
+    "ipa": "/sˈwɛtˌʃərt/",
+    "level": "A2"
+  },
+  "vest": {
+    "vietnamese": "áo gile",
+    "ipa": "/vɛst/",
+    "level": "A2"
+  },
+  "jacket": {
+    "vietnamese": "áo khoác ngắn",
+    "ipa": "/ˈʤækɪt/",
+    "level": "A1"
+  },
+  "leather jacket": {
+    "vietnamese": "áo khoác da",
+    "ipa": "/ˈlɛðər ˈʤækɪt/",
+    "level": "A2"
+  },
+  "denim jacket": {
+    "vietnamese": "áo khoác bò denim",
+    "ipa": "/ˈdɛnəm ˈʤækɪt/",
+    "level": "A2"
+  },
+  "bomber jacket": {
+    "vietnamese": "áo khoác bomber",
+    "ipa": "/ˈbɑmər ˈʤækɪt/",
+    "level": "B1"
+  },
+  "windbreaker": {
+    "vietnamese": "áo gió chống nước",
+    "ipa": "/windbreaker/",
+    "level": "B1"
+  },
+  "blazer": {
+    "vietnamese": "áo khoác blazer lịch sự",
+    "ipa": "/ˈbleɪzər/",
+    "level": "B1"
+  },
+  "coat": {
+    "vietnamese": "áo khoác măng tô dài",
+    "ipa": "/koʊt/",
+    "level": "A1"
+  },
+  "overcoat": {
+    "vietnamese": "áo khoác đại hàn bên ngoài",
+    "ipa": "/ˈoʊvərˌkoʊt/",
+    "level": "B1"
+  },
+  "trench coat": {
+    "vietnamese": "áo khoác măng tô thắt đai",
+    "ipa": "/trɛnʧ koʊt/",
+    "level": "B1"
+  },
+  "raincoat": {
+    "vietnamese": "áo mưa",
+    "ipa": "/ˈreɪnˌkoʊt/",
+    "level": "A2"
+  },
+  "suit": {
+    "vietnamese": "bộ vest âu phục",
+    "ipa": "/sut/",
+    "level": "A2"
+  },
+  "tuxedo": {
+    "vietnamese": "bộ lễ phục tuxedo dự tiệc",
+    "ipa": "/ˌtəkˈsidoʊ/",
+    "level": "B2"
+  },
+  "jeans": {
+    "vietnamese": "quần bò quần jean",
+    "ipa": "/ʤinz/",
+    "level": "A1"
+  },
+  "trousers": {
+    "vietnamese": "quần tây âu dài",
+    "ipa": "/ˈtraʊzərz/",
+    "level": "A1"
+  },
+  "pants": {
+    "vietnamese": "quần dài",
+    "ipa": "/pænts/",
+    "level": "A1"
+  },
+  "sweatpants": {
+    "vietnamese": "quần nỉ thể thao",
+    "ipa": "/sˈwɛtˌpænts/",
+    "level": "A2"
+  },
+  "joggers": {
+    "vietnamese": "quần thể thao jogger",
+    "ipa": "/ˈʤɑgərz/",
+    "level": "B1"
+  },
+  "khakis": {
+    "vietnamese": "quần vải kaki",
+    "ipa": "/ˈkækiz/",
+    "level": "B1"
+  },
+  "leggings": {
+    "vietnamese": "quần legging ôm sát",
+    "ipa": "/ˈlɛgɪŋz/",
+    "level": "A2"
+  },
+  "shorts": {
+    "vietnamese": "quần đùi quần soóc",
+    "ipa": "/ʃɔrts/",
+    "level": "A1"
+  },
+  "denim shorts": {
+    "vietnamese": "quần đùi bò",
+    "ipa": "/ˈdɛnəm ʃɔrts/",
+    "level": "A2"
+  },
+  "skirt": {
+    "vietnamese": "chiếc chân váy",
+    "ipa": "/skərt/",
+    "level": "A1"
+  },
+  "miniskirt": {
+    "vietnamese": "chân váy ngắn",
+    "ipa": "/ˈmɪniˌskərt/",
+    "level": "A2"
+  },
+  "maxi skirt": {
+    "vietnamese": "chân váy dài",
+    "ipa": "/ˈmæksi skərt/",
+    "level": "B1"
+  },
+  "dress": {
+    "vietnamese": "chiếc váy liền đầm",
+    "ipa": "/drɛs/",
+    "level": "A1"
+  },
+  "evening gown": {
+    "vietnamese": "váy dạ hội lộng lẫy",
+    "ipa": "/ˈivnɪŋ gaʊn/",
+    "level": "B2"
+  },
+  "cocktail dress": {
+    "vietnamese": "váy dự tiệc ngắn",
+    "ipa": "/ˈkɑkˌteɪl drɛs/",
+    "level": "B1"
+  },
+  "sundress": {
+    "vietnamese": "váy dạo phố mùa hè",
+    "ipa": "/sundress/",
+    "level": "A2"
+  },
+  "jumpsuit": {
+    "vietnamese": "bộ áo liền quần jumpsuit",
+    "ipa": "/ˈʤəmpˌsut/",
+    "level": "B1"
+  },
+  "overalls": {
+    "vietnamese": "quần yếm",
+    "ipa": "/ˈoʊvərˌɔlz/",
+    "level": "B1"
+  },
+  "swimsuit": {
+    "vietnamese": "bộ đồ bơi nữ",
+    "ipa": "/sˈwɪmˌsut/",
+    "level": "A2"
+  },
+  "bikini": {
+    "vietnamese": "đồ bơi hai mảnh bikini",
+    "ipa": "/bɪˈkini/",
+    "level": "A2"
+  },
+  "swimming trunks": {
+    "vietnamese": "quần đùi bơi nam",
+    "ipa": "/sˈwɪmɪŋ trəŋks/",
+    "level": "A2"
+  },
+  "underwear": {
+    "vietnamese": "quần áo lót",
+    "ipa": "/ˈəndərˌwɛr/",
+    "level": "A2"
+  },
+  "panties": {
+    "vietnamese": "quần lót nữ",
+    "ipa": "/ˈpæntiz/",
+    "level": "B1"
+  },
+  "boxers": {
+    "vietnamese": "quần lót đùi nam",
+    "ipa": "/ˈbɑksərz/",
+    "level": "B1"
+  },
+  "briefs": {
+    "vietnamese": "quần lót tam giác",
+    "ipa": "/brifs/",
+    "level": "B1"
+  },
+  "bra": {
+    "vietnamese": "áo lót áo ngực nữ",
+    "ipa": "/brɑ/",
+    "level": "A2"
+  },
+  "sports bra": {
+    "vietnamese": "áo lót thể thao",
+    "ipa": "/spɔrts brɑ/",
+    "level": "B1"
+  },
+  "socks": {
+    "vietnamese": "đôi tất vớ chân",
+    "ipa": "/sɑks/",
+    "level": "A1"
+  },
+  "ankle socks": {
+    "vietnamese": "tất ngắn cổ chân",
+    "ipa": "/ˈæŋkəl sɑks/",
+    "level": "A2"
+  },
+  "knee high socks": {
+    "vietnamese": "tất dài ngang gối",
+    "ipa": "/ni haɪ sɑks/",
+    "level": "B1"
+  },
+  "stockings": {
+    "vietnamese": "tất da chân dài",
+    "ipa": "/ˈstɑkɪŋz/",
+    "level": "B1"
+  },
+  "tights": {
+    "vietnamese": "quần tất da mỏng",
+    "ipa": "/taɪts/",
+    "level": "B1"
+  },
+  "sneakers": {
+    "vietnamese": "đôi giày thể thao",
+    "ipa": "/sˈnikərz/",
+    "level": "A2"
+  },
+  "running shoes": {
+    "vietnamese": "giày chạy bộ",
+    "ipa": "/ˈrənɪŋ ʃuz/",
+    "level": "A2"
+  },
+  "tennis shoes": {
+    "vietnamese": "giày chơi tennis",
+    "ipa": "/ˈtɛnɪs ʃuz/",
+    "level": "A2"
+  },
+  "leather shoes": {
+    "vietnamese": "đôi giày da",
+    "ipa": "/ˈlɛðər ʃuz/",
+    "level": "A2"
+  },
+  "dress shoes": {
+    "vietnamese": "giày tây âu công sở",
+    "ipa": "/drɛs ʃuz/",
+    "level": "B1"
+  },
+  "loafers": {
+    "vietnamese": "giày lười",
+    "ipa": "/ˈloʊfərz/",
+    "level": "B1"
+  },
+  "oxford shoes": {
+    "vietnamese": "giày tây oxford buộc dây",
+    "ipa": "/ˈɑksfərd ʃuz/",
+    "level": "B2"
+  },
+  "high heels": {
+    "vietnamese": "đôi giày cao gót",
+    "ipa": "/haɪ hilz/",
+    "level": "A2"
+  },
+  "pumps": {
+    "vietnamese": "giày cao gót bít mũi",
+    "ipa": "/pəmps/",
+    "level": "B1"
+  },
+  "stiletto heels": {
+    "vietnamese": "giày gót nhọn",
+    "ipa": "/stəˈlɛtoʊ hilz/",
+    "level": "B2"
+  },
+  "flats": {
+    "vietnamese": "giày búp bê bệt",
+    "ipa": "/flæts/",
+    "level": "A2"
+  },
+  "boots": {
+    "vietnamese": "đôi bốt ủng",
+    "ipa": "/buts/",
+    "level": "A1"
+  },
+  "ankle boots": {
+    "vietnamese": "bốt ngắn cổ",
+    "ipa": "/ˈæŋkəl buts/",
+    "level": "B1"
+  },
+  "combat boots": {
+    "vietnamese": "giày bốt quân đội hầm hố",
+    "ipa": "/ˈkɑmbæt buts/",
+    "level": "B2"
+  },
+  "rain boots": {
+    "vietnamese": "ủng cao su đi mưa",
+    "ipa": "/reɪn buts/",
+    "level": "A2"
+  },
+  "sandals": {
+    "vietnamese": "đôi dép quai hậu xăng đan",
+    "ipa": "/ˈsændəlz/",
+    "level": "A1"
+  },
+  "flip flops": {
+    "vietnamese": "dép tông xỏ ngón",
+    "ipa": "/flɪp flɑps/",
+    "level": "A1"
+  },
+  "clogs": {
+    "vietnamese": "guốc dép sục",
+    "ipa": "/klɑgz/",
+    "level": "B1"
+  },
+  "moccasins": {
+    "vietnamese": "giày da đanh moccasin",
+    "ipa": "/ˈmɑkəsɪnz/",
+    "level": "B2"
+  },
+  "shoelace": {
+    "vietnamese": "dây buộc giày",
+    "ipa": "/ˈʃuˌleɪs/",
+    "level": "A2"
+  },
+  "belt": {
+    "vietnamese": "thắt lưng dây nịt",
+    "ipa": "/bɛlt/",
+    "level": "A2"
+  },
+  "belt buckle": {
+    "vietnamese": "mặt khóa thắt lưng",
+    "ipa": "/bɛlt ˈbəkəl/",
+    "level": "B1"
+  },
+  "handbag": {
+    "vietnamese": "túi xách tay nữ",
+    "ipa": "/ˈhændˌbæg/",
+    "level": "A2"
+  },
+  "shoulder bag": {
+    "vietnamese": "túi đeo vai",
+    "ipa": "/ˈʃoʊldər bæg/",
+    "level": "A2"
+  },
+  "crossbody bag": {
+    "vietnamese": "túi đeo chéo",
+    "ipa": "/crossbody bæg/",
+    "level": "A2"
+  },
+  "tote bag": {
+    "vietnamese": "túi vải tote rộng",
+    "ipa": "/toʊt bæg/",
+    "level": "A2"
+  },
+  "clutch": {
+    "vietnamese": "ví cầm tay dự tiệc",
+    "ipa": "/kləʧ/",
+    "level": "B1"
+  },
+  "purse": {
+    "vietnamese": "ví tiền nữ",
+    "ipa": "/pərs/",
+    "level": "A2"
+  },
+  "wallet": {
+    "vietnamese": "ví da bỏ túi nam",
+    "ipa": "/ˈwɔlət/",
+    "level": "A2"
+  },
+  "coin purse": {
+    "vietnamese": "ví nhỏ đựng tiền xu",
+    "ipa": "/kɔɪn pərs/",
+    "level": "B1"
+  },
+  "money clip": {
+    "vietnamese": "kẹp kẹp giữ tiền mặt",
+    "ipa": "/ˈməni klɪp/",
+    "level": "B2"
+  },
+  "cardholder": {
+    "vietnamese": "ví nhỏ đựng thẻ ngân hàng",
+    "ipa": "/ˈkɑrˌdhoʊldər/",
+    "level": "A2"
+  },
+  "suitcase": {
+    "vietnamese": "vali kéo du lịch",
+    "ipa": "/ˈsutˌkeɪs/",
+    "level": "A2"
+  },
+  "luggage": {
+    "vietnamese": "hành lý vali",
+    "ipa": "/ˈləgɪʤ/",
+    "level": "A2"
+  },
+  "duffel bag": {
+    "vietnamese": "túi trống thể thao du lịch",
+    "ipa": "/ˈdəfəl bæg/",
+    "level": "B1"
+  },
+  "messenger bag": {
+    "vietnamese": "túi đưa thư quai chéo",
+    "ipa": "/ˈmɛsɪnʤər bæg/",
+    "level": "B1"
+  },
+  "fanny pack": {
+    "vietnamese": "túi đeo hông túi bao tử",
+    "ipa": "/ˈfæni pæk/",
+    "level": "B1"
+  },
+  "waist bag": {
+    "vietnamese": "túi đeo bụng",
+    "ipa": "/weɪst bæg/",
+    "level": "B1"
+  },
+  "drawstring bag": {
+    "vietnamese": "túi dây rút",
+    "ipa": "/drawstring bæg/",
+    "level": "A2"
+  },
+  "cosmetic bag": {
+    "vietnamese": "túi đựng mỹ phẩm",
+    "ipa": "/kɑzˈmɛtɪk bæg/",
+    "level": "A2"
+  },
+  "travel pouch": {
+    "vietnamese": "túi nhỏ đựng đồ du lịch",
+    "ipa": "/ˈtrævəl paʊʧ/",
+    "level": "B1"
+  },
+  "umbrella": {
+    "vietnamese": "chiếc ô chiếc dù",
+    "ipa": "/ˈəmˌbrɛlə/",
+    "level": "A1"
+  },
+  "folding umbrella": {
+    "vietnamese": "ô gập du lịch",
+    "ipa": "/ˈfoʊldɪŋ ˈəmˌbrɛlə/",
+    "level": "A2"
+  },
+  "parasol": {
+    "vietnamese": "ô che nắng điệu đà",
+    "ipa": "/parasol/",
+    "level": "B2"
+  },
+  "watch": {
+    "vietnamese": "đồng hồ đeo tay",
+    "ipa": "/wɔʧ/",
+    "level": "A1"
+  },
+  "wristwatch": {
+    "vietnamese": "đồng hồ cơ đeo tay",
+    "ipa": "/ˈrɪstˌwɑʧ/",
+    "level": "A2"
+  },
+  "smartwatch": {
+    "vietnamese": "đồng hồ thông minh",
+    "ipa": "/smartwatch/",
+    "level": "A2"
+  },
+  "pocket watch": {
+    "vietnamese": "đồng hồ quả quýt bỏ túi",
+    "ipa": "/ˈpɑkət wɔʧ/",
+    "level": "B2"
+  },
+  "watch strap": {
+    "vietnamese": "dây đeo đồng hồ",
+    "ipa": "/wɔʧ stræp/",
+    "level": "B1"
+  },
+  "eyeglasses": {
+    "vietnamese": "kính cận kính thuốc",
+    "ipa": "/ˈaɪˌglæsɪz/",
+    "level": "A1"
+  },
+  "glasses": {
+    "vietnamese": "chiếc kính mắt",
+    "ipa": "/ˈglæsɪz/",
+    "level": "A1"
+  },
+  "reading glasses": {
+    "vietnamese": "kính lão đọc sách",
+    "ipa": "/ˈrɛdɪŋ ˈglæsɪz/",
+    "level": "A2"
+  },
+  "sunglasses": {
+    "vietnamese": "kính râm kính mát",
+    "ipa": "/ˈsənˌglæsɪz/",
+    "level": "A1"
+  },
+  "glasses case": {
+    "vietnamese": "hộp đựng kính mắt",
+    "ipa": "/ˈglæsɪz keɪs/",
+    "level": "A2"
+  },
+  "contact lens case": {
+    "vietnamese": "khay đựng kính áp tròng",
+    "ipa": "/ˈkɑnˌtækt lɛnz keɪs/",
+    "level": "B1"
+  },
+  "key": {
+    "vietnamese": "chìa khóa",
+    "ipa": "/ki/",
+    "level": "A1"
+  },
+  "keychain": {
+    "vietnamese": "móc treo chìa khóa",
+    "ipa": "/keychain/",
+    "level": "A2"
+  },
+  "car key": {
+    "vietnamese": "chìa khóa ô tô",
+    "ipa": "/kɑr ki/",
+    "level": "A2"
+  },
+  "house key": {
+    "vietnamese": "chìa khóa nhà",
+    "ipa": "/haʊs ki/",
+    "level": "A1"
+  },
+  "padlock": {
+    "vietnamese": "ổ khóa móc",
+    "ipa": "/ˈpæˌdlɑk/",
+    "level": "A2"
+  },
+  "hair clip": {
+    "vietnamese": "kẹp tóc",
+    "ipa": "/hɛr klɪp/",
+    "level": "A2"
+  },
+  "hairpin": {
+    "vietnamese": "ghim cài tóc",
+    "ipa": "/hairpin/",
+    "level": "A2"
+  },
+  "bobby pin": {
+    "vietnamese": "ghim kẹp tăm đen",
+    "ipa": "/ˈbɑbi pɪn/",
+    "level": "B1"
+  },
+  "hair tie": {
+    "vietnamese": "dây chun buộc tóc",
+    "ipa": "/hɛr taɪ/",
+    "level": "A2"
+  },
+  "headband": {
+    "vietnamese": "băng đô cài tóc",
+    "ipa": "/ˈhɛdˌbænd/",
+    "level": "A2"
+  },
+  "scrunchie": {
+    "vietnamese": "chun buộc tóc vải phồng",
+    "ipa": "/scrunchie/",
+    "level": "B1"
+  },
+  "necklace": {
+    "vietnamese": "dây chuyền vòng cổ",
+    "ipa": "/ˈnɛkləs/",
+    "level": "A2"
+  },
+  "pendant": {
+    "vietnamese": "mặt dây chuyền",
+    "ipa": "/ˈpɛndənt/",
+    "level": "B1"
+  },
+  "choker": {
+    "vietnamese": "vòng cổ ôm sát choker",
+    "ipa": "/choker/",
+    "level": "B1"
+  },
+  "bracelet": {
+    "vietnamese": "vòng đeo tay lắc tay",
+    "ipa": "/ˈbreɪslət/",
+    "level": "A2"
+  },
+  "bangle": {
+    "vietnamese": "vòng tay bản cứng tròn",
+    "ipa": "/ˈbæŋgəl/",
+    "level": "B1"
+  },
+  "ring": {
+    "vietnamese": "chiếc nhẫn đeo tay",
+    "ipa": "/rɪŋ/",
+    "level": "A2"
+  },
+  "wedding ring": {
+    "vietnamese": "nhẫn cưới",
+    "ipa": "/ˈwɛdɪŋ rɪŋ/",
+    "level": "A2"
+  },
+  "engagement ring": {
+    "vietnamese": "nhẫn đính hôn",
+    "ipa": "/ɛnˈgeɪʤmənt rɪŋ/",
+    "level": "B1"
+  },
+  "earring": {
+    "vietnamese": "chiếc khuyên tai",
+    "ipa": "/ˈɪrɪŋ/",
+    "level": "A2"
+  },
+  "stud earrings": {
+    "vietnamese": "khuyên tai nụ hạt nhỏ",
+    "ipa": "/stəd ˈɪrɪŋz/",
+    "level": "B1"
+  },
+  "hoop earrings": {
+    "vietnamese": "khuyên tai hình tròn",
+    "ipa": "/hup ˈɪrɪŋz/",
+    "level": "B1"
+  },
+  "brooch": {
+    "vietnamese": "trâm cài áo",
+    "ipa": "/bruʧ/",
+    "level": "B2"
+  },
+  "cufflinks": {
+    "vietnamese": "khuy măng sét cài cổ tay áo",
+    "ipa": "/cufflinks/",
+    "level": "B2"
+  },
+  "pocket square": {
+    "vietnamese": "khăn lụa gài túi áo vest",
+    "ipa": "/ˈpɑkət skwɛr/",
+    "level": "B2"
+  },
+  "compact mirror": {
+    "vietnamese": "gương gập bỏ túi",
+    "ipa": "/ˈkɑmpækt ˈmɪrər/",
+    "level": "A2"
+  },
+  "lipstick": {
+    "vietnamese": "thỏi son môi",
+    "ipa": "/ˈlɪpˌstɪk/",
+    "level": "A2"
+  },
+  "lip balm": {
+    "vietnamese": "thỏi son dưỡng môi",
+    "ipa": "/lɪp bɑm/",
+    "level": "A2"
+  },
+  "lip gloss": {
+    "vietnamese": "son bóng",
+    "ipa": "/lɪp glɔs/",
+    "level": "B1"
+  },
+  "foundation bottle": {
+    "vietnamese": "lọ kem nền trang điểm",
+    "ipa": "/faʊnˈdeɪʃən ˈbɑtəl/",
+    "level": "B1"
+  },
+  "mascara": {
+    "vietnamese": "cây mascara chuốt mi",
+    "ipa": "/mæˈskɛrə/",
+    "level": "B1"
+  },
+  "eyeliner": {
+    "vietnamese": "bút kẻ viền mắt",
+    "ipa": "/ˈaɪˌlaɪnər/",
+    "level": "B1"
+  },
+  "smartphone": {
+    "vietnamese": "điện thoại thông minh",
+    "ipa": "/smartphone/",
+    "level": "A1"
+  },
+  "cell phone": {
+    "vietnamese": "điện thoại di động",
+    "ipa": "/sɛl foʊn/",
+    "level": "A1"
+  },
+  "phone case": {
+    "vietnamese": "ốp lưng điện thoại",
+    "ipa": "/foʊn keɪs/",
+    "level": "A2"
+  },
+  "screen protector": {
+    "vietnamese": "kính cường lực bảo vệ màn hình",
+    "ipa": "/skrin prəˈtɛktər/",
+    "level": "B1"
+  },
+  "tablet": {
+    "vietnamese": "máy tính bảng",
+    "ipa": "/ˈtæblət/",
+    "level": "A2"
+  },
+  "stylus pen": {
+    "vietnamese": "bút cảm ứng màn hình",
+    "ipa": "/ˈstaɪləs pɛn/",
+    "level": "B1"
+  },
+  "laptop charger": {
+    "vietnamese": "dây củ sạc laptop",
+    "ipa": "/ˈlæpˌtɑp ˈʧɑrʤər/",
+    "level": "A2"
+  },
+  "desktop computer": {
+    "vietnamese": "bộ máy tính để bàn",
+    "ipa": "/ˈdɛskˌtɑp kəmˈpjutər/",
+    "level": "A2"
+  },
+  "computer tower": {
+    "vietnamese": "thùng vỏ case máy tính",
+    "ipa": "/kəmˈpjutər taʊər/",
+    "level": "B1"
+  },
+  "mechanical keyboard": {
+    "vietnamese": "bàn phím cơ",
+    "ipa": "/məˈkænɪkəl ˈkiˌbɔrd/",
+    "level": "B1"
+  },
+  "wireless mouse": {
+    "vietnamese": "chuột không dây",
+    "ipa": "/ˈwaɪrlɪs maʊs/",
+    "level": "A2"
+  },
+  "trackpad": {
+    "vietnamese": "bàn rê cảm ứng trackpad",
+    "ipa": "/trackpad/",
+    "level": "B1"
+  },
+  "headphones": {
+    "vietnamese": "tai nghe trùm đầu lớn",
+    "ipa": "/ˈhɛdˌfoʊnz/",
+    "level": "A2"
+  },
+  "noise cancelling headphones": {
+    "vietnamese": "tai nghe chống ồn chủ động",
+    "ipa": "/nɔɪz ˈkænsəlɪŋ ˈhɛdˌfoʊnz/",
+    "level": "B2"
+  },
+  "earbuds": {
+    "vietnamese": "tai nghe hạt nhét tai",
+    "ipa": "/earbuds/",
+    "level": "A2"
+  },
+  "wireless earbuds": {
+    "vietnamese": "tai nghe bluetooth không dây",
+    "ipa": "/ˈwaɪrlɪs earbuds/",
+    "level": "A2"
+  },
+  "airpods": {
+    "vietnamese": "tai nghe tai nghe airpods",
+    "ipa": "/airpods/",
+    "level": "A2"
+  },
+  "charging case": {
+    "vietnamese": "hộp kén sạc tai nghe",
+    "ipa": "/ˈʧɑrʤɪŋ keɪs/",
+    "level": "B1"
+  },
+  "bluetooth speaker": {
+    "vietnamese": "loa bluetooth di động",
+    "ipa": "/ˈbluˌtuθ ˈspikər/",
+    "level": "A2"
+  },
+  "smart speaker": {
+    "vietnamese": "loa thông minh trợ lý ảo",
+    "ipa": "/smɑrt ˈspikər/",
+    "level": "B1"
+  },
+  "microphone": {
+    "vietnamese": "mic thu âm micro",
+    "ipa": "/ˈmaɪkrəˌfoʊn/",
+    "level": "A2"
+  },
+  "webcam": {
+    "vietnamese": "camera quay góc máy tính",
+    "ipa": "/webcam/",
+    "level": "A2"
+  },
+  "digital camera": {
+    "vietnamese": "máy ảnh kỹ thuật số",
+    "ipa": "/ˈdɪʤɪtəl ˈkæmərə/",
+    "level": "A2"
+  },
+  "dslr camera": {
+    "vietnamese": "máy ảnh cơ dslr chuyên nghiệp",
+    "ipa": "/dslr ˈkæmərə/",
+    "level": "B1"
+  },
+  "mirrorless camera": {
+    "vietnamese": "máy ảnh không gương lật",
+    "ipa": "/mirrorless ˈkæmərə/",
+    "level": "B2"
+  },
+  "camera lens": {
+    "vietnamese": "ống kính máy ảnh",
+    "ipa": "/ˈkæmərə lɛnz/",
+    "level": "B1"
+  },
+  "lens cap": {
+    "vietnamese": "nắp đậy ống kính",
+    "ipa": "/lɛnz kæp/",
+    "level": "B1"
+  },
+  "camera strap": {
+    "vietnamese": "dây đeo máy ảnh",
+    "ipa": "/ˈkæmərə stræp/",
+    "level": "B1"
+  },
+  "camera tripod": {
+    "vietnamese": "chân máy ảnh ba chân",
+    "ipa": "/ˈkæmərə ˈtraɪˌpɑd/",
+    "level": "A2"
+  },
+  "monopod": {
+    "vietnamese": "gậy đơn chụp ảnh",
+    "ipa": "/monopod/",
+    "level": "B1"
+  },
+  "selfie stick": {
+    "vietnamese": "gậy tự sướng selfie",
+    "ipa": "/ˈsɛlˌfi stɪk/",
+    "level": "A2"
+  },
+  "gimbal": {
+    "vietnamese": "tay cầm chống rung gimbal",
+    "ipa": "/gimbal/",
+    "level": "B2"
+  },
+  "action camera": {
+    "vietnamese": "camera hành trình nhỏ",
+    "ipa": "/ˈækʃən ˈkæmərə/",
+    "level": "B1"
+  },
+  "drone": {
+    "vietnamese": "máy bay flycam không người lái",
+    "ipa": "/droʊn/",
+    "level": "B1"
+  },
+  "drone remote": {
+    "vietnamese": "tay cầm điều khiển flycam",
+    "ipa": "/droʊn rɪˈmoʊt/",
+    "level": "B2"
+  },
+  "vr headset": {
+    "vietnamese": "kính thực tế ảo vr",
+    "ipa": "/vr ˈhɛdˌsɛt/",
+    "level": "B1"
+  },
+  "smart glasses": {
+    "vietnamese": "kính thông minh công nghệ",
+    "ipa": "/smɑrt ˈglæsɪz/",
+    "level": "B2"
+  },
+  "game console": {
+    "vietnamese": "máy chơi game gia đình",
+    "ipa": "/geɪm ˈkɑnsoʊl/",
+    "level": "A2"
+  },
+  "portable console": {
+    "vietnamese": "máy chơi game cầm tay",
+    "ipa": "/ˈpɔrtəbəl ˈkɑnsoʊl/",
+    "level": "B1"
+  },
+  "gamepad": {
+    "vietnamese": "tay cầm chơi game điều khiển",
+    "ipa": "/gamepad/",
+    "level": "A2"
+  },
+  "joystick": {
+    "vietnamese": "cần gạt điều khiển game",
+    "ipa": "/ˈʤɔɪˌstɪk/",
+    "level": "B1"
+  },
+  "gaming headset": {
+    "vietnamese": "tai nghe chơi game chuyên dụng",
+    "ipa": "/ˈgeɪmɪŋ ˈhɛdˌsɛt/",
+    "level": "B1"
+  },
+  "power bank": {
+    "vietnamese": "pin sạc dự phòng",
+    "ipa": "/paʊər bæŋk/",
+    "level": "A2"
+  },
+  "phone charger": {
+    "vietnamese": "củ sạc điện thoại",
+    "ipa": "/foʊn ˈʧɑrʤər/",
+    "level": "A2"
+  },
+  "usb cable": {
+    "vietnamese": "dây cáp usb kết nối",
+    "ipa": "/usb ˈkeɪbəl/",
+    "level": "A2"
+  },
+  "charging cable": {
+    "vietnamese": "dây cáp sạc",
+    "ipa": "/ˈʧɑrʤɪŋ ˈkeɪbəl/",
+    "level": "A2"
+  },
+  "lightning cable": {
+    "vietnamese": "cáp sạc iphone lightning",
+    "ipa": "/ˈlaɪtnɪŋ ˈkeɪbəl/",
+    "level": "B1"
+  },
+  "usb drive": {
+    "vietnamese": "chiếc usb lưu trữ dữ liệu",
+    "ipa": "/usb draɪv/",
+    "level": "A2"
+  },
+  "flash drive": {
+    "vietnamese": "ổ cứng flash usb",
+    "ipa": "/flæʃ draɪv/",
+    "level": "A2"
+  },
+  "external hard drive": {
+    "vietnamese": "ổ cứng di động ngoài",
+    "ipa": "/ɪkˈstərnəl hɑrd draɪv/",
+    "level": "B1"
+  },
+  "sd card": {
+    "vietnamese": "thẻ nhớ sd máy ảnh",
+    "ipa": "/sd kɑrd/",
+    "level": "A2"
+  },
+  "memory card reader": {
+    "vietnamese": "đầu đọc thẻ nhớ",
+    "ipa": "/ˈmɛməri kɑrd ˈridər/",
+    "level": "B1"
+  },
+  "usb hub": {
+    "vietnamese": "bộ chia nhiều cổng usb",
+    "ipa": "/usb həb/",
+    "level": "B1"
+  },
+  "power adapter": {
+    "vietnamese": "cục chuyển đổi nguồn điện",
+    "ipa": "/paʊər əˈdæptər/",
+    "level": "A2"
+  },
+  "power strip": {
+    "vietnamese": "ổ cắm điện nối dài",
+    "ipa": "/paʊər strɪp/",
+    "level": "A2"
+  },
+  "extension cord": {
+    "vietnamese": "dây cắm điện kéo dài",
+    "ipa": "/ɪkˈstɛnʃən kɔrd/",
+    "level": "A2"
+  },
+  "surge protector": {
+    "vietnamese": "ổ cắm chống sét quá tải",
+    "ipa": "/sərʤ prəˈtɛktər/",
+    "level": "B2"
+  },
+  "wifi router": {
+    "vietnamese": "cục phát sóng wifi router",
+    "ipa": "/ˈwiˌfi ˈrutər/",
+    "level": "A2"
+  },
+  "modem": {
+    "vietnamese": "thiết bị modem mạng",
+    "ipa": "/ˈmoʊdəm/",
+    "level": "B1"
+  },
+  "ethernet cable": {
+    "vietnamese": "dây cáp mạng lan",
+    "ipa": "/ˈiθərˌnɛt ˈkeɪbəl/",
+    "level": "B1"
+  },
+  "universal remote": {
+    "vietnamese": "điều khiển đa năng",
+    "ipa": "/ˌjunəˈvərsəl rɪˈmoʊt/",
+    "level": "B1"
+  },
+  "smart plug": {
+    "vietnamese": "ổ cắm điện thông minh hẹn giờ",
+    "ipa": "/smɑrt pləg/",
+    "level": "B2"
+  },
+  "smart bulb": {
+    "vietnamese": "bóng đèn thông minh đổi màu",
+    "ipa": "/smɑrt bəlb/",
+    "level": "B1"
+  },
+  "smart thermostat": {
+    "vietnamese": "bộ điều nhiệt thông minh",
+    "ipa": "/smɑrt ˈθərməˌstæt/",
+    "level": "B2"
+  },
+  "bicycle": {
+    "vietnamese": "xe đạp",
+    "ipa": "/ˈbaɪsɪkəl/",
+    "level": "A1"
+  },
+  "mountain bike": {
+    "vietnamese": "xe đạp leo núi",
+    "ipa": "/ˈmaʊntən baɪk/",
+    "level": "A2"
+  },
+  "road bike": {
+    "vietnamese": "xe đạp đua đường trường",
+    "ipa": "/roʊd baɪk/",
+    "level": "B1"
+  },
+  "electric bicycle": {
+    "vietnamese": "xe đạp điện",
+    "ipa": "/ɪˈlɛktrɪk ˈbaɪsɪkəl/",
+    "level": "A2"
+  },
+  "bicycle helmet": {
+    "vietnamese": "mũ bảo hiểm xe đạp",
+    "ipa": "/ˈbaɪsɪkəl ˈhɛlmət/",
+    "level": "A2"
+  },
+  "bicycle basket": {
+    "vietnamese": "giỏ xe đạp",
+    "ipa": "/ˈbaɪsɪkəl ˈbæskət/",
+    "level": "A2"
+  },
+  "bicycle bell": {
+    "vietnamese": "chuông xe đạp",
+    "ipa": "/ˈbaɪsɪkəl bɛl/",
+    "level": "A2"
+  },
+  "bicycle lock": {
+    "vietnamese": "khóa dây xe đạp",
+    "ipa": "/ˈbaɪsɪkəl lɑk/",
+    "level": "A2"
+  },
+  "bicycle pump": {
+    "vietnamese": "bơm lốp xe đạp",
+    "ipa": "/ˈbaɪsɪkəl pəmp/",
+    "level": "A2"
+  },
+  "motorcycle": {
+    "vietnamese": "xe mô tô phân khối lớn",
+    "ipa": "/ˈmoʊtərˌsaɪkəl/",
+    "level": "A1"
+  },
+  "motorbike": {
+    "vietnamese": "xe máy",
+    "ipa": "/ˈmoʊtərˌbaɪk/",
+    "level": "A1"
+  },
+  "scooter": {
+    "vietnamese": "xe máy tay ga xe ga",
+    "ipa": "/ˈskutər/",
+    "level": "A2"
+  },
+  "electric scooter": {
+    "vietnamese": "xe trượt scooter điện",
+    "ipa": "/ɪˈlɛktrɪk ˈskutər/",
+    "level": "A2"
+  },
+  "kick scooter": {
+    "vietnamese": "xe trượt chân scooter",
+    "ipa": "/kɪk ˈskutər/",
+    "level": "A2"
+  },
+  "motorcycle helmet": {
+    "vietnamese": "mũ bảo hiểm xe máy",
+    "ipa": "/ˈmoʊtərˌsaɪkəl ˈhɛlmət/",
+    "level": "A2"
+  },
+  "car": {
+    "vietnamese": "chiếc xe ô tô",
+    "ipa": "/kɑr/",
+    "level": "A1"
+  },
+  "sedan": {
+    "vietnamese": "xe ô tô 4 chỗ sedan",
+    "ipa": "/səˈdæn/",
+    "level": "B1"
+  },
+  "suv": {
+    "vietnamese": "xe ô tô thể thao gầm cao suv",
+    "ipa": "/ˌɛsˌjuˈvi/",
+    "level": "B1"
+  },
+  "hatchback": {
+    "vietnamese": "xe ô tô đuôi cụt hatchback",
+    "ipa": "/ˈhæʧˌbæk/",
+    "level": "B2"
+  },
+  "convertible": {
+    "vietnamese": "xe ô tô mui trần",
+    "ipa": "/kənˈvərtəbəl/",
+    "level": "B1"
+  },
+  "sports car": {
+    "vietnamese": "xe ô tô thể thao tốc độ",
+    "ipa": "/spɔrts kɑr/",
+    "level": "A2"
+  },
+  "electric car": {
+    "vietnamese": "xe ô tô chạy điện",
+    "ipa": "/ɪˈlɛktrɪk kɑr/",
+    "level": "A2"
+  },
+  "taxi": {
+    "vietnamese": "xe taxi",
+    "ipa": "/ˈtæksi/",
+    "level": "A1"
+  },
+  "police car": {
+    "vietnamese": "xe cảnh sát",
+    "ipa": "/pəˈlis kɑr/",
+    "level": "A2"
+  },
+  "ambulance": {
+    "vietnamese": "xe cứu thương cấp cứu",
+    "ipa": "/ˈæmbjələns/",
+    "level": "A2"
+  },
+  "fire truck": {
+    "vietnamese": "xe cứu hỏa chữa cháy",
+    "ipa": "/faɪər trək/",
+    "level": "A2"
+  },
+  "bus": {
+    "vietnamese": "xe buýt",
+    "ipa": "/bəs/",
+    "level": "A1"
+  },
+  "double decker bus": {
+    "vietnamese": "xe buýt hai tầng",
+    "ipa": "/ˈdəbəl ˈdɛkər bəs/",
+    "level": "B1"
+  },
+  "school bus": {
+    "vietnamese": "xe buýt đưa đón học sinh",
+    "ipa": "/skul bəs/",
+    "level": "A2"
+  },
+  "minibus": {
+    "vietnamese": "xe buýt mini 16 chỗ",
+    "ipa": "/ˈmɪniˌbəs/",
+    "level": "B1"
+  },
+  "van": {
+    "vietnamese": "xe tải van chở hàng nhỏ",
+    "ipa": "/væn/",
+    "level": "A2"
+  },
+  "pickup truck": {
+    "vietnamese": "xe bán tải pickup",
+    "ipa": "/ˈpɪˌkəp trək/",
+    "level": "B1"
+  },
+  "truck": {
+    "vietnamese": "xe tải lớn chở hàng",
+    "ipa": "/trək/",
+    "level": "A1"
+  },
+  "semi truck": {
+    "vietnamese": "xe đầu kéo container lớn",
+    "ipa": "/ˈsɛmi trək/",
+    "level": "B1"
+  },
+  "garbage truck": {
+    "vietnamese": "xe chở rác",
+    "ipa": "/ˈgɑrbɪʤ trək/",
+    "level": "A2"
+  },
+  "cement mixer": {
+    "vietnamese": "xe bồn trộn bê tông",
+    "ipa": "/sɪˈmɛnt ˈmɪksər/",
+    "level": "B1"
+  },
+  "bulldozer": {
+    "vietnamese": "xe ủi đất",
+    "ipa": "/ˈbʊlˌdoʊzər/",
+    "level": "B1"
+  },
+  "excavator": {
+    "vietnamese": "xe máy xúc đất",
+    "ipa": "/ˈɛkskəˌveɪtər/",
+    "level": "B1"
+  },
+  "forklift": {
+    "vietnamese": "xe nâng hàng trong kho",
+    "ipa": "/ˈfɔrˌklɪft/",
+    "level": "B1"
+  },
+  "tractor": {
+    "vietnamese": "máy kéo nông nghiệp",
+    "ipa": "/ˈtræktər/",
+    "level": "A2"
+  },
+  "train": {
+    "vietnamese": "đoàn tàu hỏa",
+    "ipa": "/treɪn/",
+    "level": "A1"
+  },
+  "subway train": {
+    "vietnamese": "tàu điện ngầm",
+    "ipa": "/ˈsəbˌweɪ treɪn/",
+    "level": "A2"
+  },
+  "tram": {
+    "vietnamese": "xe điện trên mặt đất",
+    "ipa": "/træm/",
+    "level": "A2"
+  },
+  "airplane": {
+    "vietnamese": "máy bay chở khách",
+    "ipa": "/ˈɛrˌpleɪn/",
+    "level": "A1"
+  },
+  "helicopter": {
+    "vietnamese": "máy bay trực thăng",
+    "ipa": "/ˈhɛlɪˌkɑptər/",
+    "level": "A2"
+  },
+  "boat": {
+    "vietnamese": "chiếc thuyền nhỏ",
+    "ipa": "/boʊt/",
+    "level": "A1"
+  },
+  "sailboat": {
+    "vietnamese": "thuyền buồm",
+    "ipa": "/ˈseɪlˌboʊt/",
+    "level": "A2"
+  },
+  "speedboat": {
+    "vietnamese": "thuyền máy chạy nhanh",
+    "ipa": "/ˈspidˌboʊt/",
+    "level": "B1"
+  },
+  "ferry": {
+    "vietnamese": "chuyến phà chở khách",
+    "ipa": "/ˈfɛri/",
+    "level": "A2"
+  },
+  "yacht": {
+    "vietnamese": "du thuyền sang trọng",
+    "ipa": "/jɑt/",
+    "level": "B1"
+  },
+  "cruise ship": {
+    "vietnamese": "tàu du lịch biển khổng lồ",
+    "ipa": "/kruz ʃɪp/",
+    "level": "B1"
+  },
+  "canoe": {
+    "vietnamese": "thuyền ca-nô chèo tay",
+    "ipa": "/kəˈnu/",
+    "level": "A2"
+  },
+  "kayak": {
+    "vietnamese": "thuyền kayak",
+    "ipa": "/kaɪæk/",
+    "level": "A2"
+  },
+  "skateboard": {
+    "vietnamese": "ván trượt skateboard",
+    "ipa": "/ˈskeɪtˌbɔrd/",
+    "level": "A2"
+  },
+  "longboard": {
+    "vietnamese": "ván trượt dài",
+    "ipa": "/longboard/",
+    "level": "B1"
+  },
+  "roller skates": {
+    "vietnamese": "giày trượt patin bánh 4 góc",
+    "ipa": "/ˈroʊlər skeɪts/",
+    "level": "A2"
+  },
+  "rollerblades": {
+    "vietnamese": "giày trượt patin bánh dọc",
+    "ipa": "/ˈroʊlərˌbleɪdz/",
+    "level": "A2"
+  },
+  "hoverboard": {
+    "vietnamese": "xe cân bằng hai bánh",
+    "ipa": "/hoverboard/",
+    "level": "B1"
+  },
+  "traffic light": {
+    "vietnamese": "đèn tín hiệu giao thông",
+    "ipa": "/ˈtræfɪk laɪt/",
+    "level": "A1"
+  },
+  "stop sign": {
+    "vietnamese": "biển báo dừng lại",
+    "ipa": "/stɑp saɪn/",
+    "level": "A1"
+  },
+  "traffic sign": {
+    "vietnamese": "biển báo chỉ dẫn giao thông",
+    "ipa": "/ˈtræfɪk saɪn/",
+    "level": "A2"
+  },
+  "street sign": {
+    "vietnamese": "biển ghi tên đường",
+    "ipa": "/strit saɪn/",
+    "level": "A2"
+  },
+  "billboard": {
+    "vietnamese": "biển quảng cáo tấm lớn ngoài trời",
+    "ipa": "/ˈbɪlˌbɔrd/",
+    "level": "B1"
+  },
+  "bench": {
+    "vietnamese": "ghế dài, ghế công viên",
+    "ipa": "/bentʃ/",
+    "level": "A2"
+  },
+  "park bench": {
+    "vietnamese": "ghế dài công viên",
+    "ipa": "/pɑːrk bentʃ/",
+    "level": "A2"
+  },
+  "street light": {
+    "vietnamese": "cột đèn chiếu sáng đường",
+    "ipa": "/strit laɪt/",
+    "level": "A2"
+  },
+  "lamp post": {
+    "vietnamese": "cột đèn đường phố",
+    "ipa": "/læmp poʊst/",
+    "level": "A2"
+  },
+  "fire hydrant": {
+    "vietnamese": "trụ nước chữa cháy đường phố",
+    "ipa": "/faɪər ˈhaɪdrənt/",
+    "level": "A2"
+  },
+  "mailbox": {
+    "vietnamese": "hộp thư bưu điện ven đường",
+    "ipa": "/ˈmeɪlˌbɑks/",
+    "level": "A2"
+  },
+  "trash can": {
+    "vietnamese": "thùng rác công cộng",
+    "ipa": "/træʃ kən/",
+    "level": "A1"
+  },
+  "recycling bin": {
+    "vietnamese": "thùng thu gom rác tái chế",
+    "ipa": "/riˈsaɪkəlɪŋ bɪn/",
+    "level": "A2"
+  },
+  "crosswalk": {
+    "vietnamese": "vạch kẻ vôi qua đường",
+    "ipa": "/ˈkrɑsˌwɑk/",
+    "level": "A2"
+  },
+  "sidewalk": {
+    "vietnamese": "vỉa hè đi bộ",
+    "ipa": "/ˈsaɪdˌwɔk/",
+    "level": "A2"
+  },
+  "pavement": {
+    "vietnamese": "vỉa hè lát gạch",
+    "ipa": "/ˈpeɪvmənt/",
+    "level": "A2"
+  },
+  "curb": {
+    "vietnamese": "gờ vỉa hè mép đường",
+    "ipa": "/kərb/",
+    "level": "B1"
+  },
+  "manhole cover": {
+    "vietnamese": "nắp cống ga trên đường",
+    "ipa": "/ˈmænˌhoʊl ˈkəvər/",
+    "level": "B2"
+  },
+  "traffic cone": {
+    "vietnamese": "cọc tiêu hình nón giao thông",
+    "ipa": "/ˈtræfɪk koʊn/",
+    "level": "A2"
+  },
+  "guardrail": {
+    "vietnamese": "lan can chắn bảo vệ ven đường",
+    "ipa": "/ˈgɑrˌdreɪl/",
+    "level": "B2"
+  },
+  "bus stop shelter": {
+    "vietnamese": "nhà chờ xe buýt có mái che",
+    "ipa": "/bəs stɑp ˈʃɛltər/",
+    "level": "A2"
+  },
+  "parking meter": {
+    "vietnamese": "cột thu phí đỗ xe tự động",
+    "ipa": "/ˈpɑrkɪŋ ˈmitər/",
+    "level": "B1"
+  },
+  "dog": {
+    "vietnamese": "chú chó",
+    "ipa": "/dɔg/",
+    "level": "A1"
+  },
+  "puppy": {
+    "vietnamese": "chó con đáng yêu",
+    "ipa": "/ˈpəpi/",
+    "level": "A1"
+  },
+  "cat": {
+    "vietnamese": "chú mèo",
+    "ipa": "/kæt/",
+    "level": "A1"
+  },
+  "kitten": {
+    "vietnamese": "mèo con",
+    "ipa": "/ˈkɪtən/",
+    "level": "A1"
+  },
+  "bird": {
+    "vietnamese": "chú chim",
+    "ipa": "/bərd/",
+    "level": "A1"
+  },
+  "parrot": {
+    "vietnamese": "con vẹt sặc sỡ",
+    "ipa": "/ˈpɛrət/",
+    "level": "A2"
+  },
+  "pigeon": {
+    "vietnamese": "chim bồ câu",
+    "ipa": "/ˈpɪʤɪn/",
+    "level": "A2"
+  },
+  "sparrow": {
+    "vietnamese": "chim sẻ nhỏ",
+    "ipa": "/ˈspɛroʊ/",
+    "level": "A2"
+  },
+  "eagle": {
+    "vietnamese": "chim đại bàng",
+    "ipa": "/ˈigəl/",
+    "level": "B1"
+  },
+  "owl": {
+    "vietnamese": "chim cú mèo",
+    "ipa": "/aʊl/",
+    "level": "A2"
+  },
+  "duck": {
+    "vietnamese": "con vịt",
+    "ipa": "/dək/",
+    "level": "A1"
+  },
+  "goose": {
+    "vietnamese": "con ngỗng",
+    "ipa": "/gus/",
+    "level": "A2"
+  },
+  "swan": {
+    "vietnamese": "chim thiên nga",
+    "ipa": "/swɔn/",
+    "level": "A2"
+  },
+  "chicken": {
+    "vietnamese": "con gà",
+    "ipa": "/ˈʧɪkən/",
+    "level": "A1"
+  },
+  "rooster": {
+    "vietnamese": "con gà trống",
+    "ipa": "/ˈrustər/",
+    "level": "A2"
+  },
+  "hen": {
+    "vietnamese": "con gà mái",
+    "ipa": "/hɛn/",
+    "level": "A2"
+  },
+  "turkey": {
+    "vietnamese": "con gà tây",
+    "ipa": "/ˈtərki/",
+    "level": "A2"
+  },
+  "rabbit": {
+    "vietnamese": "chú thỏ trắng",
+    "ipa": "/ˈræbɪt/",
+    "level": "A1"
+  },
+  "bunny": {
+    "vietnamese": "thỏ con",
+    "ipa": "/ˈbəni/",
+    "level": "A1"
+  },
+  "hamster": {
+    "vietnamese": "chú chuột hamster",
+    "ipa": "/ˈhæmstər/",
+    "level": "A2"
+  },
+  "guinea pig": {
+    "vietnamese": "chuột lang cảnh",
+    "ipa": "/ˈgɪni pɪg/",
+    "level": "B1"
+  },
+  "squirrel": {
+    "vietnamese": "chú sóc đuôi xù",
+    "ipa": "/skwərəl/",
+    "level": "A2"
+  },
+  "fish": {
+    "vietnamese": "chú cá bơi",
+    "ipa": "/fɪʃ/",
+    "level": "A1"
+  },
+  "goldfish": {
+    "vietnamese": "chú cá vàng",
+    "ipa": "/ˈgoʊldˌfɪʃ/",
+    "level": "A1"
+  },
+  "turtle": {
+    "vietnamese": "chú rùa nước rùa cạn",
+    "ipa": "/ˈtərtəl/",
+    "level": "A2"
+  },
+  "tortoise": {
+    "vietnamese": "con rùa núi mai gồ",
+    "ipa": "/ˈtɔrtəs/",
+    "level": "B1"
+  },
+  "frog": {
+    "vietnamese": "chú ếch xanh",
+    "ipa": "/frɑg/",
+    "level": "A2"
+  },
+  "toad": {
+    "vietnamese": "con cóc sần sùi",
+    "ipa": "/toʊd/",
+    "level": "B1"
+  },
+  "lizard": {
+    "vietnamese": "con thằn lằn",
+    "ipa": "/ˈlɪzərd/",
+    "level": "A2"
+  },
+  "gecko": {
+    "vietnamese": "con tắc kè thạch sùng",
+    "ipa": "/ˈgɛkoʊ/",
+    "level": "B1"
+  },
+  "snake": {
+    "vietnamese": "con rắn",
+    "ipa": "/sneɪk/",
+    "level": "A2"
+  },
+  "horse": {
+    "vietnamese": "con ngựa",
+    "ipa": "/hɔrs/",
+    "level": "A1"
+  },
+  "pony": {
+    "vietnamese": "ngựa con ngựa lùn",
+    "ipa": "/ˈpoʊˌni/",
+    "level": "A2"
+  },
+  "cow": {
+    "vietnamese": "con bò sữa",
+    "ipa": "/kaʊ/",
+    "level": "A1"
+  },
+  "bull": {
+    "vietnamese": "con bò tót đực",
+    "ipa": "/bʊl/",
+    "level": "A2"
+  },
+  "calf": {
+    "vietnamese": "con bê con bò non",
+    "ipa": "/kæf/",
+    "level": "B1"
+  },
+  "sheep": {
+    "vietnamese": "con cừu lông trắng",
+    "ipa": "/ʃip/",
+    "level": "A1"
+  },
+  "lamb": {
+    "vietnamese": "chú cừu non",
+    "ipa": "/læm/",
+    "level": "A2"
+  },
+  "goat": {
+    "vietnamese": "con dê",
+    "ipa": "/goʊt/",
+    "level": "A1"
+  },
+  "pig": {
+    "vietnamese": "con lợn con heo",
+    "ipa": "/pɪg/",
+    "level": "A1"
+  },
+  "piglet": {
+    "vietnamese": "chú heo con",
+    "ipa": "/ˈpɪglɪt/",
+    "level": "A2"
+  },
+  "donkey": {
+    "vietnamese": "con lừa",
+    "ipa": "/ˈdɔŋki/",
+    "level": "A2"
+  },
+  "deer": {
+    "vietnamese": "con hươu con nai",
+    "ipa": "/dɪr/",
+    "level": "A2"
+  },
+  "fawn": {
+    "vietnamese": "chú hươu non",
+    "ipa": "/fɔn/",
+    "level": "B1"
+  },
+  "elephant": {
+    "vietnamese": "chú voi khổng lồ",
+    "ipa": "/ˈɛləfənt/",
+    "level": "A1"
+  },
+  "lion": {
+    "vietnamese": "sư tử chúa sơn lâm",
+    "ipa": "/laɪən/",
+    "level": "A1"
+  },
+  "tiger": {
+    "vietnamese": "chú hổ vằn",
+    "ipa": "/ˈtaɪgər/",
+    "level": "A1"
+  },
+  "bear": {
+    "vietnamese": "chú gấu lớn",
+    "ipa": "/bɛr/",
+    "level": "A1"
+  },
+  "monkey": {
+    "vietnamese": "chú khỉ tinh nghịch",
+    "ipa": "/ˈməŋki/",
+    "level": "A1"
+  },
+  "chimpanzee": {
+    "vietnamese": "con tinh tinh",
+    "ipa": "/ʧɪmˈpænzi/",
+    "level": "B1"
+  },
+  "giraffe": {
+    "vietnamese": "chú hươu cao cổ",
+    "ipa": "/ʤəræf/",
+    "level": "A1"
+  },
+  "zebra": {
+    "vietnamese": "chú ngựa vằn",
+    "ipa": "/ˈzibrə/",
+    "level": "A1"
+  },
+  "kangaroo": {
+    "vietnamese": "chú chuột túi",
+    "ipa": "/ˌkæŋgərˈu/",
+    "level": "A2"
+  },
+  "koala": {
+    "vietnamese": "gấu túi koala",
+    "ipa": "/koʊˈɑlə/",
+    "level": "A2"
+  },
+  "panda": {
+    "vietnamese": "chú gấu trúc",
+    "ipa": "/ˈpændə/",
+    "level": "A1"
+  },
+  "penguin": {
+    "vietnamese": "chú chim cánh cụt",
+    "ipa": "/ˈpɛŋgwən/",
+    "level": "A1"
+  },
+  "dolphin": {
+    "vietnamese": "chú cá heo thông minh",
+    "ipa": "/ˈdɑlfən/",
+    "level": "A2"
+  },
+  "whale": {
+    "vietnamese": "cá voi khổng lồ",
+    "ipa": "/weɪl/",
+    "level": "A2"
+  },
+  "shark": {
+    "vietnamese": "con cá mập hung hãn",
+    "ipa": "/ʃɑrk/",
+    "level": "A2"
+  },
+  "octopus": {
+    "vietnamese": "con bạch tuộc",
+    "ipa": "/ˈɑktəˌpʊs/",
+    "level": "A2"
+  },
+  "squid": {
+    "vietnamese": "con mực biển",
+    "ipa": "/skwɪd/",
+    "level": "A2"
+  },
+  "jellyfish": {
+    "vietnamese": "con sứa biển",
+    "ipa": "/ˈʤɛliˌfɪʃ/",
+    "level": "A2"
+  },
+  "crab": {
+    "vietnamese": "con cua biển",
+    "ipa": "/kræb/",
+    "level": "A2"
+  },
+  "lobster": {
+    "vietnamese": "con tôm hùm",
+    "ipa": "/ˈlɑbstər/",
+    "level": "B1"
+  },
+  "starfish": {
+    "vietnamese": "con sao biển",
+    "ipa": "/ˈstɑrˌfɪʃ/",
+    "level": "A2"
+  },
+  "butterfly": {
+    "vietnamese": "con bướm xinh đẹp",
+    "ipa": "/ˈbətərˌflaɪ/",
+    "level": "A1"
+  },
+  "moth": {
+    "vietnamese": "con bướm đêm con ngài",
+    "ipa": "/mɔθ/",
+    "level": "B1"
+  },
+  "bee": {
+    "vietnamese": "chú ong chăm chỉ",
+    "ipa": "/bi/",
+    "level": "A1"
+  },
+  "wasp": {
+    "vietnamese": "con ong bắp cày",
+    "ipa": "/wɑsp/",
+    "level": "B1"
+  },
+  "ladybug": {
+    "vietnamese": "con bọ rùa đỏ chấm đen",
+    "ipa": "/ˈleɪdiˌbəg/",
+    "level": "A2"
+  },
+  "dragonfly": {
+    "vietnamese": "chú chuồn chuồn",
+    "ipa": "/dragonfly/",
+    "level": "A2"
+  },
+  "ant": {
+    "vietnamese": "chú kiến nhỏ",
+    "ipa": "/ænt/",
+    "level": "A1"
+  },
+  "grasshopper": {
+    "vietnamese": "con châu chấu",
+    "ipa": "/ˈgræsˌhɑpər/",
+    "level": "A2"
+  },
+  "cricket": {
+    "vietnamese": "chú dế mèn",
+    "ipa": "/ˈkrɪkɪt/",
+    "level": "A2"
+  },
+  "beetle": {
+    "vietnamese": "con bọ cánh cứng",
+    "ipa": "/ˈbitəl/",
+    "level": "A2"
+  },
+  "snail": {
+    "vietnamese": "chú ốc sên",
+    "ipa": "/sneɪl/",
+    "level": "A2"
+  },
+  "worm": {
+    "vietnamese": "con giun đất",
+    "ipa": "/wərm/",
+    "level": "A2"
+  },
+  "spider": {
+    "vietnamese": "con nhện giăng tơ",
+    "ipa": "/ˈspaɪdər/",
+    "level": "A1"
+  },
+  "flower": {
+    "vietnamese": "bông hoa tươi",
+    "ipa": "/flaʊər/",
+    "level": "A1"
+  },
+  "rose": {
+    "vietnamese": "bông hoa hồng",
+    "ipa": "/roʊz/",
+    "level": "A1"
+  },
+  "sunflower": {
+    "vietnamese": "bông hoa hướng dương",
+    "ipa": "/ˈsənˌflaʊər/",
+    "level": "A2"
+  },
+  "tulip": {
+    "vietnamese": "hoa tulip",
+    "ipa": "/ˈtulɪp/",
+    "level": "A2"
+  },
+  "daisy": {
+    "vietnamese": "bông hoa cúc dại",
+    "ipa": "/ˈdeɪzi/",
+    "level": "A2"
+  },
+  "orchid": {
+    "vietnamese": "nhành hoa phong lan",
+    "ipa": "/ˈɔrkəd/",
+    "level": "B1"
+  },
+  "lily": {
+    "vietnamese": "bông hoa loa kèn hoa ly",
+    "ipa": "/ˈlɪli/",
+    "level": "A2"
+  },
+  "soccer ball": {
+    "vietnamese": "quả bóng đá",
+    "ipa": "/ˈsɑkər bɔl/",
+    "level": "A1"
+  },
+  "football": {
+    "vietnamese": "quả bóng bầu dục",
+    "ipa": "/ˈfʊtˌbɔl/",
+    "level": "A1"
+  },
+  "basketball": {
+    "vietnamese": "quả bóng rổ",
+    "ipa": "/ˈbæskətˌbɔl/",
+    "level": "A1"
+  },
+  "volleyball": {
+    "vietnamese": "quả bóng chuyền",
+    "ipa": "/ˈvɑliˌbɔl/",
+    "level": "A2"
+  },
+  "baseball": {
+    "vietnamese": "quả bóng chày",
+    "ipa": "/ˈbeɪsˈbɔl/",
+    "level": "A2"
+  },
+  "baseball bat": {
+    "vietnamese": "gậy đánh bóng chày",
+    "ipa": "/ˈbeɪsˈbɔl bæt/",
+    "level": "A2"
+  },
+  "baseball glove": {
+    "vietnamese": "găng tay bắt bóng chày",
+    "ipa": "/ˈbeɪsˈbɔl gləv/",
+    "level": "A2"
+  },
+  "tennis ball": {
+    "vietnamese": "quả bóng tennis",
+    "ipa": "/ˈtɛnɪs bɔl/",
+    "level": "A2"
+  },
+  "tennis racket": {
+    "vietnamese": "vợt chơi tennis",
+    "ipa": "/ˈtɛnɪs ˈrækɪt/",
+    "level": "A2"
+  },
+  "badminton racket": {
+    "vietnamese": "vợt cầu lông",
+    "ipa": "/ˈbædˌmɪntən ˈrækɪt/",
+    "level": "A2"
+  },
+  "shuttlecock": {
+    "vietnamese": "quả cầu lông",
+    "ipa": "/shuttlecock/",
+    "level": "A2"
+  },
+  "ping pong paddle": {
+    "vietnamese": "vợt bóng bàn",
+    "ipa": "/pɪŋ pɔŋ ˈpædəl/",
+    "level": "A2"
+  },
+  "table tennis paddle": {
+    "vietnamese": "vợt bóng bàn mặt mút",
+    "ipa": "/ˈteɪbəl ˈtɛnɪs ˈpædəl/",
+    "level": "A2"
+  },
+  "ping pong ball": {
+    "vietnamese": "quả bóng bàn",
+    "ipa": "/pɪŋ pɔŋ bɔl/",
+    "level": "A2"
+  },
+  "table tennis table": {
+    "vietnamese": "bàn chơi bóng bàn",
+    "ipa": "/ˈteɪbəl ˈtɛnɪs ˈteɪbəl/",
+    "level": "A2"
+  },
+  "golf ball": {
+    "vietnamese": "quả bóng golf",
+    "ipa": "/gɔlf bɔl/",
+    "level": "A2"
+  },
+  "golf club": {
+    "vietnamese": "gậy đánh golf",
+    "ipa": "/gɔlf kləb/",
+    "level": "A2"
+  },
+  "golf bag": {
+    "vietnamese": "túi đựng gậy golf",
+    "ipa": "/gɔlf bæg/",
+    "level": "B1"
+  },
+  "bowling ball": {
+    "vietnamese": "quả bóng bowling",
+    "ipa": "/ˈboʊlɪŋ bɔl/",
+    "level": "A2"
+  },
+  "bowling pin": {
+    "vietnamese": "ki bowling cọc gỗ",
+    "ipa": "/ˈboʊlɪŋ pɪn/",
+    "level": "A2"
+  },
+  "billiard ball": {
+    "vietnamese": "viên bi-a",
+    "ipa": "/ˈbɪljərd bɔl/",
+    "level": "A2"
+  },
+  "pool cue": {
+    "vietnamese": "gậy cơ đánh bi-a",
+    "ipa": "/pul kju/",
+    "level": "A2"
+  },
+  "pool table": {
+    "vietnamese": "bàn chơi bi-a",
+    "ipa": "/pul ˈteɪbəl/",
+    "level": "A2"
+  },
+  "dumbbell": {
+    "vietnamese": "quả tạ tay",
+    "ipa": "/ˈdəmˌbɛl/",
+    "level": "A2"
+  },
+  "barbell": {
+    "vietnamese": "thanh tạ đòn dài",
+    "ipa": "/ˈbɑrˌbɛl/",
+    "level": "B1"
+  },
+  "weight plate": {
+    "vietnamese": "bánh tạ tròn bằng sắt",
+    "ipa": "/weɪt pleɪt/",
+    "level": "B1"
+  },
+  "kettlebell": {
+    "vietnamese": "tạ bình vôi tạ ấm",
+    "ipa": "/kettlebell/",
+    "level": "B1"
+  },
+  "weight bench": {
+    "vietnamese": "ghế nằm đẩy tạ",
+    "ipa": "/weɪt bɛnʧ/",
+    "level": "B1"
+  },
+  "treadmill": {
+    "vietnamese": "máy chạy bộ điện",
+    "ipa": "/ˈtrɛdˌmɪl/",
+    "level": "A2"
+  },
+  "stationary bike": {
+    "vietnamese": "xe đạp tập thể dục tại chỗ",
+    "ipa": "/ˈsteɪʃəˌnɛri baɪk/",
+    "level": "A2"
+  },
+  "elliptical machine": {
+    "vietnamese": "máy tập đi bộ trên không",
+    "ipa": "/ɪˈlɪptɪkəl məˈʃin/",
+    "level": "B1"
+  },
+  "rowing machine": {
+    "vietnamese": "máy tập chèo thuyền",
+    "ipa": "/roʊɪŋ məˈʃin/",
+    "level": "B1"
+  },
+  "yoga mat": {
+    "vietnamese": "thảm tập yoga",
+    "ipa": "/ˈjoʊgə mæt/",
+    "level": "A2"
+  },
+  "foam roller": {
+    "vietnamese": "ống lăn massage giãn cơ",
+    "ipa": "/foʊm ˈroʊlər/",
+    "level": "B1"
+  },
+  "jump rope": {
+    "vietnamese": "dây nhảy thể dục",
+    "ipa": "/ʤəmp roʊp/",
+    "level": "A2"
+  },
+  "resistance band": {
+    "vietnamese": "dây kháng lực tập cơ",
+    "ipa": "/rɪˈzɪstəns bænd/",
+    "level": "B1"
+  },
+  "exercise ball": {
+    "vietnamese": "bóng tập thể dục lớn",
+    "ipa": "/ˈɛksərˌsaɪz bɔl/",
+    "level": "A2"
+  },
+  "punching bag": {
+    "vietnamese": "bao cát đấm bốc",
+    "ipa": "/ˈpənʧɪŋ bæg/",
+    "level": "A2"
+  },
+  "boxing gloves": {
+    "vietnamese": "găng tay đấm bốc",
+    "ipa": "/ˈbɑksɪŋ gləvz/",
+    "level": "A2"
+  },
+  "helmet": {
+    "vietnamese": "mũ bảo hộ thể thao",
+    "ipa": "/ˈhɛlmət/",
+    "level": "A1"
+  },
+  "knee pads": {
+    "vietnamese": "miếng bảo vệ đầu gối",
+    "ipa": "/ni pædz/",
+    "level": "A2"
+  },
+  "elbow pads": {
+    "vietnamese": "miếng bảo vệ khuỷu tay",
+    "ipa": "/ˈɛlˌboʊ pædz/",
+    "level": "A2"
+  },
+  "swimming goggles": {
+    "vietnamese": "kính bơi lặn",
+    "ipa": "/sˈwɪmɪŋ ˈgɑgəlz/",
+    "level": "A2"
+  },
+  "snorkel": {
+    "vietnamese": "ống thở lặn biển",
+    "ipa": "/sˈnɔrkəl/",
+    "level": "A2"
+  },
+  "flippers": {
+    "vietnamese": "chân vịt bơi lặn",
+    "ipa": "/ˈflɪpərz/",
+    "level": "A2"
+  },
+  "surfboard": {
+    "vietnamese": "ván lướt sóng biển",
+    "ipa": "/ˈsərfˌbɔrd/",
+    "level": "A2"
+  },
+  "paddleboard": {
+    "vietnamese": "ván chèo sup",
+    "ipa": "/paddleboard/",
+    "level": "B1"
+  },
+  "canoe paddle": {
+    "vietnamese": "mái chèo thuyền",
+    "ipa": "/kəˈnu ˈpædəl/",
+    "level": "A2"
+  },
+  "life jacket": {
+    "vietnamese": "áo phao cứu sinh",
+    "ipa": "/laɪf ˈʤækɪt/",
+    "level": "A2"
+  },
+  "skis": {
+    "vietnamese": "đôi ván trượt tuyết",
+    "ipa": "/skiz/",
+    "level": "A2"
+  },
+  "ski poles": {
+    "vietnamese": "gậy chống trượt tuyết",
+    "ipa": "/ski poʊlz/",
+    "level": "B1"
+  },
+  "snowboard": {
+    "vietnamese": "ván trượt tuyết đơn",
+    "ipa": "/sˈnoʊˌbɔrd/",
+    "level": "A2"
+  },
+  "ice skates": {
+    "vietnamese": "giày trượt băng có lưỡi kim loại",
+    "ipa": "/aɪs skeɪts/",
+    "level": "A2"
+  },
+  "hockey stick": {
+    "vietnamese": "gậy đánh khúc côn cầu",
+    "ipa": "/ˈhɑki stɪk/",
+    "level": "A2"
+  },
+  "puck": {
+    "vietnamese": "đĩa cao su khúc côn cầu",
+    "ipa": "/pək/",
+    "level": "B1"
+  },
+  "fishing rod": {
+    "vietnamese": "cần câu cá",
+    "ipa": "/ˈfɪʃɪŋ rɑd/",
+    "level": "A2"
+  },
+  "fishing reel": {
+    "vietnamese": "máy cuộn dây câu cá",
+    "ipa": "/ˈfɪʃɪŋ ril/",
+    "level": "B1"
+  },
+  "tackle box": {
+    "vietnamese": "hộp đựng mồi câu cá",
+    "ipa": "/ˈtækəl bɑks/",
+    "level": "B1"
+  },
+  "tent": {
+    "vietnamese": "chiếc lều cắm trại",
+    "ipa": "/tɛnt/",
+    "level": "A2"
+  },
+  "sleeping bag": {
+    "vietnamese": "túi ngủ dã ngoại",
+    "ipa": "/sˈlipɪŋ bæg/",
+    "level": "A2"
+  },
+  "camp stove": {
+    "vietnamese": "bếp gas du lịch cắm trại",
+    "ipa": "/kæmp stoʊv/",
+    "level": "B1"
+  },
+  "flashlight": {
+    "vietnamese": "đèn pin cầm tay",
+    "ipa": "/ˈflæʃˌlaɪt/",
+    "level": "A2"
+  },
+  "lantern": {
+    "vietnamese": "đèn măng-sông đèn bão cắm trại",
+    "ipa": "/ˈlæntərn/",
+    "level": "A2"
+  },
+  "pocket knife": {
+    "vietnamese": "dao gấp bỏ túi đa năng",
+    "ipa": "/ˈpɑkət naɪf/",
+    "level": "A2"
+  },
+  "binoculars": {
+    "vietnamese": "ống nhòm hai mắt",
+    "ipa": "/bəˈnɑkjələrz/",
+    "level": "A2"
+  },
+  "telescope": {
+    "vietnamese": "kính viễn vọng thiên văn",
+    "ipa": "/ˈtɛləˌskoʊp/",
+    "level": "B1"
+  },
+  "trophy": {
+    "vietnamese": "chiếc cúp vô địch",
+    "ipa": "/ˈtroʊfi/",
+    "level": "A2"
+  },
+  "medal": {
+    "vietnamese": "huy chương giải thưởng",
+    "ipa": "/ˈmɛdəl/",
+    "level": "A2"
+  },
+  "ribbon": {
+    "vietnamese": "ruy băng giải thưởng",
+    "ipa": "/ˈrɪbən/",
+    "level": "A2"
+  },
+  "whistle": {
+    "vietnamese": "chiếc còi trọng tài",
+    "ipa": "/ˈwɪsəl/",
+    "level": "A2"
+  },
+  "stopwatch": {
+    "vietnamese": "đồng hồ bấm giây thể thao",
+    "ipa": "/ˈstɑpˌwɑʧ/",
+    "level": "A2"
+  },
+  "kite": {
+    "vietnamese": "con diều bay trên trời",
+    "ipa": "/kaɪt/",
+    "level": "A1"
+  },
+  "frisbee": {
+    "vietnamese": "chiếc đĩa bay ném nhựa",
+    "ipa": "/ˈfrɪsbi/",
+    "level": "A2"
+  },
+  "yo-yo": {
+    "vietnamese": "đồ chơi yo-yo",
+    "ipa": "/yo-yo/",
+    "level": "A2"
+  },
+  "face mask": {
+    "vietnamese": "khẩu trang y tế",
+    "ipa": "/feɪs mæsk/",
+    "level": "A1"
+  },
+  "medical mask": {
+    "vietnamese": "khẩu trang phẫu thuật",
+    "ipa": "/ˈmɛdɪkəl mæsk/",
+    "level": "A2"
+  },
+  "thermometer": {
+    "vietnamese": "nhiệt kế đo nhiệt độ",
+    "ipa": "/θərˈmɑmətər/",
+    "level": "A2"
+  },
+  "digital thermometer": {
+    "vietnamese": "nhiệt kế điện tử",
+    "ipa": "/ˈdɪʤɪtəl θərˈmɑmətər/",
+    "level": "B1"
+  },
+  "band-aid": {
+    "vietnamese": "băng dán cá nhân vết thương",
+    "ipa": "/band-aid/",
+    "level": "A1"
+  },
+  "bandage": {
+    "vietnamese": "cuộn băng gạc y tế",
+    "ipa": "/ˈbændɪʤ/",
+    "level": "A2"
+  },
+  "gauze pad": {
+    "vietnamese": "miếng gạc tiệt trùng",
+    "ipa": "/gɔz pæd/",
+    "level": "B1"
+  },
+  "adhesive tape": {
+    "vietnamese": "băng dính y tế",
+    "ipa": "/əˈdhisɪv teɪp/",
+    "level": "A2"
+  },
+  "antiseptic bottle": {
+    "vietnamese": "chai cồn sát khuẩn cồn đỏ",
+    "ipa": "/ˌæntəˈsɛptɪk ˈbɑtəl/",
+    "level": "B1"
+  },
+  "hand sanitizer": {
+    "vietnamese": "nước rửa tay sát khuẩn khô",
+    "ipa": "/hænd sanitizer/",
+    "level": "A2"
+  },
+  "sanitizer bottle": {
+    "vietnamese": "chai nước rửa tay sát khuẩn",
+    "ipa": "/sanitizer ˈbɑtəl/",
+    "level": "A2"
+  },
+  "stethoscope": {
+    "vietnamese": "ống nghe bác sĩ",
+    "ipa": "/ˈstɛθəˌskoʊp/",
+    "level": "A2"
+  },
+  "blood pressure monitor": {
+    "vietnamese": "máy đo huyết áp",
+    "ipa": "/bləd ˈprɛʃər ˈmɑnətər/",
+    "level": "B1"
+  },
+  "pill bottle": {
+    "vietnamese": "lọ đựng thuốc viên",
+    "ipa": "/pɪl ˈbɑtəl/",
+    "level": "A2"
+  },
+  "medicine bottle": {
+    "vietnamese": "chai siro thuốc",
+    "ipa": "/ˈmɛdəsən ˈbɑtəl/",
+    "level": "A2"
+  },
+  "pill blister pack": {
+    "vietnamese": "vỉ thuốc viên",
+    "ipa": "/pɪl ˈblɪstər pæk/",
+    "level": "A2"
+  },
+  "capsule": {
+    "vietnamese": "viên thuốc con nhộng",
+    "ipa": "/ˈkæpsəl/",
+    "level": "A2"
+  },
+  "tablet pill": {
+    "vietnamese": "viên nén thuốc",
+    "ipa": "/ˈtæblət pɪl/",
+    "level": "A2"
+  },
+  "syringe": {
+    "vietnamese": "ống kim tiêm",
+    "ipa": "/ˈsɪrɪnʤ/",
+    "level": "A2"
+  },
+  "first aid kit": {
+    "vietnamese": "hộp sơ cứu cứu thương khẩn cấp",
+    "ipa": "/fərst eɪd kɪt/",
+    "level": "A2"
+  },
+  "cotton balls": {
+    "vietnamese": "bông gòn y tế",
+    "ipa": "/ˈkɔtən bɔlz/",
+    "level": "A2"
+  },
+  "ice pack": {
+    "vietnamese": "túi chườm đá lạnh giảm đau",
+    "ipa": "/aɪs pæk/",
+    "level": "A2"
+  },
+  "crutches": {
+    "vietnamese": "đôi nạng chống nách",
+    "ipa": "/ˈkrəʧɪz/",
+    "level": "B1"
+  },
+  "wheelchair": {
+    "vietnamese": "chiếc xe lăn y tế",
+    "ipa": "/ˈwiˌlʧɛr/",
+    "level": "A2"
+  },
+  "walker": {
+    "vietnamese": "khung tập đi cho người bệnh",
+    "ipa": "/ˈwɔkər/",
+    "level": "B1"
+  },
+  "cane": {
+    "vietnamese": "cây gậy chống tay",
+    "ipa": "/keɪn/",
+    "level": "A2"
+  },
+  "walking stick": {
+    "vietnamese": "gậy đi bộ gậy chống",
+    "ipa": "/ˈwɔkɪŋ stɪk/",
+    "level": "A2"
+  },
+  "eye drops bottle": {
+    "vietnamese": "lọ thuốc nhỏ mắt",
+    "ipa": "/aɪ drɑps ˈbɑtəl/",
+    "level": "A2"
+  },
+  "inhaler": {
+    "vietnamese": "ống hít hen suyễn",
+    "ipa": "/ˌɪnˈheɪlər/",
+    "level": "B1"
+  },
+  "pulse oximeter": {
+    "vietnamese": "máy kẹp ngón tay đo nồng độ oxy spo2",
+    "ipa": "/pəls oximeter/",
+    "level": "B2"
+  },
+  "shopping cart": {
+    "vietnamese": "xe đẩy mua hàng siêu thị",
+    "ipa": "/ˈʃɑpɪŋ kɑrt/",
+    "level": "A1"
+  },
+  "shopping basket": {
+    "vietnamese": "giỏ xách mua hàng siêu thị",
+    "ipa": "/ˈʃɑpɪŋ ˈbæskət/",
+    "level": "A2"
+  },
+  "shopping bag": {
+    "vietnamese": "túi đựng đồ mua sắm",
+    "ipa": "/ˈʃɑpɪŋ bæg/",
+    "level": "A1"
+  },
+  "paper bag": {
+    "vietnamese": "túi giấy đựng quà hoặc bánh",
+    "ipa": "/ˈpeɪpər bæg/",
+    "level": "A2"
+  },
+  "plastic bag": {
+    "vietnamese": "túi ni lông bọc đồ",
+    "ipa": "/ˈplæstɪk bæg/",
+    "level": "A1"
+  },
+  "reusable bag": {
+    "vietnamese": "túi vải môi trường dùng nhiều lần",
+    "ipa": "/riˈuzəbəl bæg/",
+    "level": "A2"
+  },
+  "cash register": {
+    "vietnamese": "máy tính tiền thu ngân",
+    "ipa": "/kæʃ ˈrɛʤɪstər/",
+    "level": "A2"
+  },
+  "pos terminal": {
+    "vietnamese": "máy quẹt thẻ ngân hàng pos",
+    "ipa": "/ˈpiˈoʊˈɛs ˈtərmənəl/",
+    "level": "B1"
+  },
+  "barcode scanner": {
+    "vietnamese": "máy quét mã vạch",
+    "ipa": "/barcode ˈskænər/",
+    "level": "A2"
+  },
+  "receipt": {
+    "vietnamese": "tờ hóa đơn mua hàng",
+    "ipa": "/rɪˈsit/",
+    "level": "A2"
+  },
+  "price tag": {
+    "vietnamese": "tem nhãn ghi giá tiền",
+    "ipa": "/praɪs tæg/",
+    "level": "A2"
+  },
+  "barcode label": {
+    "vietnamese": "tem nhãn mã vạch",
+    "ipa": "/barcode ˈleɪbəl/",
+    "level": "B1"
+  },
+  "conveyor belt": {
+    "vietnamese": "băng chuyền quầy thu ngân",
+    "ipa": "/kənˈveɪər bɛlt/",
+    "level": "B1"
+  },
+  "grocery shelf": {
+    "vietnamese": "kệ để hàng hóa siêu thị",
+    "ipa": "/ˈgroʊsəri ʃɛlf/",
+    "level": "A2"
+  },
+  "display rack": {
+    "vietnamese": "giá kệ trưng bày sản phẩm",
+    "ipa": "/dɪˈspleɪ ræk/",
+    "level": "B1"
+  },
+  "atm machine": {
+    "vietnamese": "cây rút tiền atm tự động",
+    "ipa": "/ˈeɪˌtiˈɛm məˈʃin/",
+    "level": "A2"
+  },
+  "vending machine": {
+    "vietnamese": "máy bán hàng nước tự động",
+    "ipa": "/ˈvɛndɪŋ məˈʃin/",
+    "level": "A2"
+  },
+  "coin": {
+    "vietnamese": "đồng tiền xu kim loại",
+    "ipa": "/kɔɪn/",
+    "level": "A1"
+  },
+  "glue stick": {
+    "vietnamese": "keo dán khô",
+    "ipa": "/glu stɪk/",
+    "level": "A2"
+  },
+  "liquid glue": {
+    "vietnamese": "keo dán lỏng",
+    "ipa": "/ˈlɪkwɪd glu/",
+    "level": "A2"
+  },
+  "tape dispenser": {
+    "vietnamese": "đế cắt băng dính",
+    "ipa": "/teɪp dɪˈspɛnsər/",
+    "level": "B1"
+  },
+  "correction tape": {
+    "vietnamese": "bút xóa kéo",
+    "ipa": "/kərˈɛkʃən teɪp/",
+    "level": "A2"
+  },
+  "hole punch": {
+    "vietnamese": "kìm bấm lỗ giấy",
+    "ipa": "/hoʊl pənʧ/",
+    "level": "B1"
+  },
+  "index card": {
+    "vietnamese": "thẻ ghi chú index",
+    "ipa": "/ˈɪndɛks kɑrd/",
+    "level": "B1"
+  },
+  "flashcard": {
+    "vietnamese": "thẻ từ vựng flashcard",
+    "ipa": "/ˈflæʃˌkɑrd/",
+    "level": "A2"
+  },
+  "laminator": {
+    "vietnamese": "máy ép nhựa tài liệu",
+    "ipa": "/laminator/",
+    "level": "B2"
+  },
+  "cubicle": {
+    "vietnamese": "vách ngăn văn phòng",
+    "ipa": "/ˈkjubɪkəl/",
+    "level": "B2"
+  },
+  "printer": {
+    "vietnamese": "máy in",
+    "ipa": "/ˈprɪnər/",
+    "level": "A2"
+  },
+  "scanner": {
+    "vietnamese": "máy scan",
+    "ipa": "/ˈskænər/",
+    "level": "B1"
+  },
+  "photocopier": {
+    "vietnamese": "máy photocopy",
+    "ipa": "/ˈfoʊtoʊˌkɑpiər/",
+    "level": "B1"
+  },
+  "projector": {
+    "vietnamese": "máy chiếu",
+    "ipa": "/prɑˈʤɛktər/",
+    "level": "B1"
+  },
+  "projection screen": {
+    "vietnamese": "màn chiếu",
+    "ipa": "/prɑˈʤɛkʃən skrin/",
+    "level": "B1"
+  },
+  "tree": {
+    "vietnamese": "cây cối, cái cây",
+    "ipa": "/triː/",
+    "level": "A1"
+  },
+  "grass": {
+    "vietnamese": "bãi cỏ, thảm cỏ",
+    "ipa": "/ɡræs/",
+    "level": "A1"
+  },
+  "plant": {
+    "vietnamese": "cây xanh, thực vật",
+    "ipa": "/plænt/",
+    "level": "A1"
+  },
+  "bush": {
+    "vietnamese": "bụi cây",
+    "ipa": "/bʊʃ/",
+    "level": "A2"
+  },
+  "shrub": {
+    "vietnamese": "bụi cây nhỏ",
+    "ipa": "/ʃrʌb/",
+    "level": "B1"
+  },
+  "lawn": {
+    "vietnamese": "thảm cỏ, bãi cỏ xén",
+    "ipa": "/lɔːn/",
+    "level": "A2"
+  },
+  "leaf": {
+    "vietnamese": "chiếc lá",
+    "ipa": "/liːf/",
+    "level": "A1"
+  },
+  "branch": {
+    "vietnamese": "cành cây",
+    "ipa": "/bræntʃ/",
+    "level": "A2"
+  },
+  "garden": {
+    "vietnamese": "khu vườn",
+    "ipa": "/ˈɡɑːr.dən/",
+    "level": "A1"
+  },
+  "flowerbed": {
+    "vietnamese": "bồn hoa, luống hoa",
+    "ipa": "/ˈflaʊ.ɚ.bed/",
+    "level": "B1"
+  },
+  "pathway": {
+    "vietnamese": "lối đi bộ, con đường nhỏ",
+    "ipa": "/ˈpæθ.weɪ/",
+    "level": "A2"
+  },
+  "footpath": {
+    "vietnamese": "đường đi bộ, lối đi",
+    "ipa": "/ˈfʊt.pæθ/",
+    "level": "A2"
+  },
+  "fence": {
+    "vietnamese": "hàng rào",
+    "ipa": "/fens/",
+    "level": "A2"
+  },
+  "house": {
+    "vietnamese": "ngôi nhà",
+    "ipa": "/haʊs/",
+    "level": "A1"
+  },
+  "roof": {
+    "vietnamese": "mái nhà",
+    "ipa": "/ruːf/",
+    "level": "A2"
+  },
+  "wall": {
+    "vietnamese": "bức tường",
+    "ipa": "/wɔːl/",
+    "level": "A1"
+  },
+  "stone": {
+    "vietnamese": "hòn đá, tảng đá",
+    "ipa": "/stoʊn/",
+    "level": "A2"
+  },
+  "rock": {
+    "vietnamese": "tảng đá lớn",
+    "ipa": "/rɑːk/",
+    "level": "A2"
+  },
+  "pond": {
+    "vietnamese": "ao nước, hồ nhỏ",
+    "ipa": "/pɑːnd/",
+    "level": "A2"
+  },
+  "lake": {
+    "vietnamese": "hồ nước",
+    "ipa": "/leɪk/",
+    "level": "A1"
+  },
+  "sky": {
+    "vietnamese": "bầu trời",
+    "ipa": "/skaɪ/",
+    "level": "A1"
+  },
+  "cloud": {
+    "vietnamese": "đám mây",
+    "ipa": "/klaʊd/",
+    "level": "A1"
+  },
+  "lamp": {
+    "vietnamese": "đèn",
+    "ipa": "/læmp/",
+    "level": "A2"
+  },
+  "box": {
+    "vietnamese": "hộp",
+    "ipa": "/bɑks/",
+    "level": "A1"
+  },
+  "bottle": {
+    "vietnamese": "cái chai",
+    "ipa": "/ˈbɑtəl/",
+    "level": "A1"
+  },
+  "shelf": {
+    "vietnamese": "kệ",
+    "ipa": "/ʃɛlf/",
+    "level": "A1"
+  },
+  "person": {
+    "vietnamese": "con người",
+    "ipa": "/ˈpərsən/",
+    "level": "A1"
+  },
+  "sports shoes": {
+    "vietnamese": "giày thể thao",
+    "ipa": "/spɔrts ʃuz/",
+    "level": "A1"
+  },
+  "table": {
+    "vietnamese": "bàn",
+    "ipa": "/ˈteɪbəl/",
+    "level": "A1"
+  },
+  "library": {
+    "vietnamese": "thư viện",
+    "ipa": "/ˈlaɪbrɛˌri/",
+    "level": "A1"
+  },
+  "menu": {
+    "vietnamese": "thực đơn",
+    "ipa": "/ˈmɛnju/",
+    "level": "A2"
+  },
+  "sand": {
+    "vietnamese": "cát",
+    "ipa": "/sænd/",
+    "level": "B1"
+  },
+  "ocean": {
+    "vietnamese": "biển",
+    "ipa": "/ˈoʊʃən/",
+    "level": "B1"
+  },
+  "collar": {
+    "vietnamese": "cổ áo",
+    "ipa": "/ˈkɑlər/",
+    "level": "B1"
+  },
+  "clothes rack": {
+    "vietnamese": "giá treo quần áo",
+    "ipa": "/kloʊðz ræk/",
+    "level": "B2"
+  },
+  "counter": {
+    "vietnamese": "bàn bếp",
+    "ipa": "/ˈkaʊntər/",
+    "level": "B2"
+  },
+  "tray": {
+    "vietnamese": "chiếc khay",
+    "ipa": "/treɪ/",
+    "level": "B2"
+  }
+}
