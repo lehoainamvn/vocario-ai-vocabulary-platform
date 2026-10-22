@@ -5207,7 +5207,7 @@ import { environment } from '../../../environments/environment';
                 </span>
               </div>
 
-              <!-- Overlay Bounding Boxes của các đồ vật ĐƯỢC CHỌN -->
+              <!-- Overlay Bounding Boxes của các đồ vật ĐƯỢC CHỌN (Chuẩn xác 100% theo Mô hình AI Vision) -->
               <ng-container *ngFor="let w of stageFormWords; let i = index">
                 <div 
                   *ngIf="w.selected !== false"
@@ -5219,49 +5219,56 @@ import { environment } from '../../../environments/environment';
                   [style.width.%]="w.widthPercent"
                   [style.height.%]="w.heightPercent"
                   [class.border-amber-400]="hoveredWordIndex() === i || activeDragIndex === i"
-                  [class.bg-amber-400\/25]="hoveredWordIndex() === i || activeDragIndex === i"
+                  [class.bg-amber-400\/20]="hoveredWordIndex() === i || activeDragIndex === i"
                   [class.z-25]="hoveredWordIndex() === i || activeDragIndex === i"
-                  [class.border-emerald-400\/90]="hoveredWordIndex() !== i && activeDragIndex !== i"
-                  [class.bg-emerald-500\/15]="hoveredWordIndex() !== i && activeDragIndex !== i"
-                  class="absolute border-2 rounded-[2px] select-none flex flex-col justify-between p-1 pointer-events-auto cursor-move transition-[border-color,background-color] duration-150"
+                  [class.border-white\/95]="hoveredWordIndex() !== i && activeDragIndex !== i"
+                  [class.bg-transparent]="hoveredWordIndex() !== i && activeDragIndex !== i"
+                  class="absolute border-[1.5px] rounded-[2px] select-none pointer-events-auto cursor-move transition-[border-color,background-color] duration-150 group"
                 >
-                  <!-- Hàng trên: STT + tên từ + nút xóa ✕ -->
-                  <div class="flex items-center justify-between w-full pointer-events-none gap-1">
+                  <!-- Nhãn Tag tên từ + % tin cậy nằm BÊN TRÊN hộp bao (chuẩn xác như mô hình AI ở Ảnh 2) -->
+                  <div 
+                    class="absolute -top-5 left-0 flex items-center gap-1 z-30 pointer-events-auto select-none transition-all"
+                  >
                     <span 
                       [class.bg-amber-400]="hoveredWordIndex() === i || activeDragIndex === i"
                       [class.text-stone-950]="hoveredWordIndex() === i || activeDragIndex === i"
-                      [class.bg-stone-900\/80]="hoveredWordIndex() !== i && activeDragIndex !== i"
+                      [class.bg-stone-950\/90]="hoveredWordIndex() !== i && activeDragIndex !== i"
                       [class.text-white]="hoveredWordIndex() !== i && activeDragIndex !== i"
-                      class="px-1.5 py-0.2 rounded-[2px] font-sans text-[10px] font-semibold backdrop-blur-xs shadow-xs truncate max-w-[85%]"
+                      class="px-1.5 py-0.5 rounded-[2px] text-[10px] font-bold shadow-xs whitespace-nowrap flex items-center gap-1 border border-white/10"
                     >
-                      {{ i + 1 }}. {{ w.word || 'Vật thể ' + (i + 1) }}
+                      <span>{{ w.word || 'Vật thể ' + (i + 1) }}</span>
+                      <span *ngIf="w.confidence" class="text-[9px] font-mono opacity-80">
+                        {{ (w.confidence * 100).toFixed(0) }}%
+                      </span>
                     </span>
+
                     <button
                       *ngIf="hoveredWordIndex() === i || activeDragIndex === i"
                       type="button"
                       (click)="removeWordFromStageForm(i); $event.stopPropagation()"
                       title="Xóa đồ vật này"
-                      class="w-4 h-4 rounded-[2px] bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center text-[10px] font-semibold border-0 cursor-pointer pointer-events-auto shadow-xs leading-none shrink-0"
+                      class="w-4 h-4 rounded-[2px] bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center text-[10px] font-semibold border-0 cursor-pointer shadow-xs leading-none shrink-0"
                     >
                       ✕
                     </button>
                   </div>
 
-                  <!-- Hàng dưới: Nghĩa tiếng Việt + Resize Handle góc dưới-phải -->
-                  <div class="flex items-end justify-between w-full pointer-events-none gap-1 mt-auto">
-                    <span *ngIf="hoveredWordIndex() === i || activeDragIndex === i" class="text-[9px] font-medium bg-stone-900\/90 text-amber-200 px-1 py-0.2 rounded-[2px] backdrop-blur-xs truncate max-w-[80%]">
-                      {{ w.vietnamese || 'Chưa có nghĩa' }} ({{ w.leftPercent }}%, {{ w.topPercent }}%)
-                    </span>
-                    <div *ngIf="hoveredWordIndex() !== i && activeDragIndex !== i"></div>
+                  <!-- Thông tin tọa độ và nghĩa tiếng Việt (Chỉ hiện khi hover hoặc kéo) -->
+                  <div 
+                    *ngIf="hoveredWordIndex() === i || activeDragIndex === i" 
+                    class="absolute -bottom-4 left-0 text-[9px] font-medium bg-stone-900/90 text-amber-200 px-1 py-0.2 rounded-[2px] backdrop-blur-xs whitespace-nowrap pointer-events-none z-20 border border-white/10"
+                  >
+                    {{ w.vietnamese || 'Chưa có nghĩa' }} ({{ w.leftPercent }}%, {{ w.topPercent }}%)
+                  </div>
 
-                    <!-- Nút kéo thay đổi kích thước (Resize Anchor Handle) -->
-                    <div 
-                      (mousedown)="startResizeBox($event, i, previewContainer)"
-                      title="Kéo góc để co giãn kích thước khung"
-                      class="w-3.5 h-3.5 bg-amber-400 hover:bg-amber-300 border border-stone-950 rounded-[2px] cursor-nwse-resize shadow-xs flex items-center justify-center pointer-events-auto shrink-0"
-                    >
-                      <div class="w-1.5 h-1.5 border-r border-b border-stone-950"></div>
-                    </div>
+                  <!-- Nút kéo thay đổi kích thước (Chỉ hiện khi hover hoặc kéo, không che mất đồ vật) -->
+                  <div 
+                    *ngIf="hoveredWordIndex() === i || activeDragIndex === i"
+                    (mousedown)="startResizeBox($event, i, previewContainer)"
+                    title="Kéo góc để co giãn kích thước khung"
+                    class="absolute -bottom-1 -right-1 w-3 h-3 bg-amber-400 hover:bg-amber-300 border border-stone-950 rounded-[1px] cursor-nwse-resize shadow-xs flex items-center justify-center pointer-events-auto z-30"
+                  >
+                    <div class="w-1 h-1 border-r border-b border-stone-950"></div>
                   </div>
                 </div>
               </ng-container>
@@ -8886,10 +8893,10 @@ headphone,Tai nghe trùm đầu,/ˈhed.fəʊn/,A2,Noun,Put on your headphones to
           vietnamese: item.vietnamese || item.meaning || 'Đồ vật đời sống',
           partOfSpeech: item.partOfSpeech || 'noun',
           level: item.level || 'A2',
-          topPercent: Math.max(2, Math.min(top, 85)),
-          leftPercent: Math.max(2, Math.min(left, 85)),
-          widthPercent: Math.max(8, Math.min(width, 70)),
-          heightPercent: Math.max(6, Math.min(height, 50)),
+          topPercent: Math.max(0, Math.min(top, 99)),
+          leftPercent: Math.max(0, Math.min(left, 99)),
+          widthPercent: Math.max(0.5, Math.min(width, 100)),
+          heightPercent: Math.max(0.5, Math.min(height, 100)),
           confidence: item.confidence || 0.88,
           exampleEn: item.exampleEn || `I see a ${item.word || 'object'} in my room.`,
           exampleVi: item.exampleVi || `Tôi nhìn thấy một ${item.vietnamese || item.meaning || 'vật'} trong phòng.`,
@@ -9202,15 +9209,16 @@ headphone,Tai nghe trùm đầu,/ˈhed.fəʊn/,A2,Noun,Put on your headphones to
           vietnamese: obj.vietnamese || obj.meaning || 'Đồ vật',
           partOfSpeech: obj.partOfSpeech || 'noun',
           level: obj.level || 'A2',
+          confidence: obj.confidence || 0.88,
           colorBg: obj.colorBg || 'bg-[#FAF8F5]',
           colorBorder: obj.colorBorder || 'border-[#E5DED3]',
           colorText: obj.colorText || 'text-[#2D2823]',
           exampleEn: obj.exampleEn || `I can see a ${obj.word} here.`,
           exampleVi: obj.exampleVi || `Tôi có thể thấy một ${obj.vietnamese || obj.word} ở đây.`,
-          topPercent: Math.max(2, Math.min(Number(obj.topPercent ?? 20), 85)),
-          leftPercent: Math.max(2, Math.min(Number(obj.leftPercent ?? 20), 85)),
-          widthPercent: Math.max(8, Math.min(Number(obj.widthPercent ?? 25), 70)),
-          heightPercent: Math.max(6, Math.min(Number(obj.heightPercent ?? 20), 50)),
+          topPercent: Math.max(0, Math.min(Number(obj.topPercent ?? 0), 99)),
+          leftPercent: Math.max(0, Math.min(Number(obj.leftPercent ?? 0), 99)),
+          widthPercent: Math.max(0.5, Math.min(Number(obj.widthPercent ?? 20), 100)),
+          heightPercent: Math.max(0.5, Math.min(Number(obj.heightPercent ?? 20), 100)),
           selected: true,
           showCoords: false
         }));
