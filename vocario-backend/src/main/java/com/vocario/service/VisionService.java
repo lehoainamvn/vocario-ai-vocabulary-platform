@@ -77,15 +77,18 @@ public class VisionService {
             log.info("📁 Đã tự động tạo thư mục lưu trữ ảnh: {}", uploadPath.toAbsolutePath());
         }
 
-        // Lưu file ảnh
         String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
         Path filePath = uploadPath.resolve(filename);
         Files.copy(file.getInputStream(), filePath);
         log.info("💾 Đã lưu file ảnh vào đĩa: {}", filePath.toAbsolutePath());
 
-        String imageUrl = "/uploads/" + filename;
+        // Chuyển ảnh thành chuỗi Base64 Data URL để lưu vĩnh viễn vào Supabase PostgreSQL
+        // Giúp ảnh không bao giờ bị xóa mất khi máy chủ Render khởi động lại (Ephemeral disk)!
+        byte[] fileBytes = Files.readAllBytes(filePath);
+        String mimeType = file.getContentType() != null && !file.getContentType().isBlank() ? file.getContentType() : "image/jpeg";
+        String base64ImageUrl = "data:" + mimeType + ";base64," + java.util.Base64.getEncoder().encodeToString(fileBytes);
 
-        Capture capture = new Capture(user, imageUrl, sceneTheme, detectedObjectsJson);
+        Capture capture = new Capture(user, base64ImageUrl, sceneTheme, detectedObjectsJson);
         Capture saved = captureRepository.save(capture);
 
         log.info("✅ [VISION SERVICE] Lưu phiên chụp ảnh THÀNH CÔNG! Capture ID: {}", saved.getId());

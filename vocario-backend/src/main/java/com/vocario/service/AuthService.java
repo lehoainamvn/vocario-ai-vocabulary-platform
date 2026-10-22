@@ -79,9 +79,6 @@ public class AuthService {
         String cleanIdentifier = request.usernameOrEmail != null ? request.usernameOrEmail.trim() : "";
         log.info("🔑 [LOGIN REQUEST] Yêu cầu đăng nhập cho tài khoản: '{}'", cleanIdentifier);
 
-        // Đảm bảo các tài khoản mẫu sẵn sàng trước khi đăng nhập
-        initDefaultUsers();
-
         User user = userRepository.findByUsername(cleanIdentifier)
                 .or(() -> userRepository.findByEmail(cleanIdentifier.toLowerCase()))
                 .orElse(null);

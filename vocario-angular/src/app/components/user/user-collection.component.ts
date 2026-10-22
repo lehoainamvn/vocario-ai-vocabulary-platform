@@ -174,7 +174,7 @@ export interface Album {
               <div *ngIf="activeAlbum()?.id === album.id" class="absolute left-0 top-[10px] bottom-[10px] w-[2px] bg-[#7D6853]"></div>
 
               <!-- Thumbnail Image -->
-              <img [src]="album.image" [alt]="album.imageAlt || album.title" class="w-[106px] h-20 rounded-[4px] object-cover bg-[#EBE5DA] shrink-0" />
+              <img [src]="album.image" (error)="onImgError($event)" [alt]="album.imageAlt || album.title" class="w-[106px] h-20 rounded-[4px] object-cover bg-[#EBE5DA] shrink-0" />
 
               <!-- Details -->
               <div class="flex flex-col min-w-0 pr-1">
@@ -272,11 +272,12 @@ export interface Album {
           </div>
 
           <!-- Scene Preview with Interactive Bounding Boxes & Bottom Caption -->
-          <figure class="relative bg-[#1E1B18] rounded-[4px] overflow-hidden select-none m-0 shadow-sm flex items-center justify-center">
+          <figure class="relative bg-[#1E1B18] rounded-[4px] overflow-hidden select-none m-0 shadow-sm flex items-center justify-center min-h-[360px] w-full">
             <!-- Exact Natural Image Frame (Khung ôm sát tỉ lệ ảnh thực tế, loại bỏ crop làm lệch bounding box) -->
             <div class="relative inline-block max-w-full leading-none">
               <img 
                 [src]="current.image" 
+                (error)="onImgError($event)"
                 [alt]="current.imageAlt || current.title" 
                 class="block max-w-full max-h-[480px] sm:max-h-[520px] w-auto h-auto select-none pointer-events-none" 
               />
@@ -675,6 +676,13 @@ export class UserCollectionComponent {
     });
   }
 
+  onImgError(event: Event) {
+    const target = event.target as HTMLImageElement;
+    if (target && !target.src.includes('/study_desk.png')) {
+      target.src = '/study_desk.png';
+    }
+  }
+
   // Toàn bộ dữ liệu bối cảnh lấy 100% từ CSDL qua studyService.scenes()
   get allAlbums(): Album[] {
     const realScenes = this.studyService.scenes();
@@ -684,7 +692,7 @@ export class UserCollectionComponent {
       id: s.id,
       category: s.category || 'Đời Sống Thực Tế',
       date: s.createdAt || 'Gần đây',
-      image: s.imageUrl || 'assets/placeholder.jpg',
+      image: s.imageUrl || '/study_desk.png',
       imageAlt: s.title,
       title: s.title || `Bối cảnh #${idx + 1}`,
       words: (s.words || []).map((w, wIdx) => {
