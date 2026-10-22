@@ -166,7 +166,7 @@ import { IconComponent } from '../common/icon.component';
 
               <!-- Trạng thái Ảnh vừa chụp Preview kèm Bounding Boxes -->
               <div *ngIf="capturedImagePreview()" class="relative w-full h-full min-h-[440px] sm:min-h-[480px] flex items-center justify-center p-4">
-                <div class="relative inline-block max-w-full leading-none">
+                <div class="relative w-fit leading-none">
                   <img [src]="capturedImagePreview()" alt="Ảnh vừa chụp" class="block max-h-[440px] sm:max-h-[480px] w-auto max-w-full rounded-[4px] border border-white/10 select-none pointer-events-none" />
 
                   <!-- Bounding boxes overlay on top of image -->
@@ -235,7 +235,7 @@ import { IconComponent } from '../common/icon.component';
 
               <!-- Preview ảnh vừa tải lên -->
               <div *ngIf="uploadedImagePreview()" class="relative w-full h-full min-h-[440px] sm:min-h-[480px] flex items-center justify-center p-4">
-                <div class="relative inline-block max-w-full leading-none">
+                <div class="relative w-fit leading-none">
                   <img [src]="uploadedImagePreview()" alt="Ảnh vừa tải" class="block max-h-[440px] sm:max-h-[480px] w-auto max-w-full rounded-[4px] border border-white/10 select-none pointer-events-none" />
 
                   <!-- Bounding boxes overlay on top of uploaded image -->
