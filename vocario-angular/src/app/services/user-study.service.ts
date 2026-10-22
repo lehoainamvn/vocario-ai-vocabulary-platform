@@ -775,13 +775,14 @@ export class UserStudyService {
 
   /**
    * Gọi trực tiếp mô hình AI YOLO-World v2 (Ultralytics PyTorch) qua FastAPI port 8001
+   * skipDialogue: Mặc định true để trả về vật thể siêu tốc (<0.8s), hội thoại sẽ nạp bất đồng bộ
    */
-  detectRealObjectsWithYolo(file: File, theme: string = 'Bàn Học & Góc Làm Việc', confidence: number = 0.15): Observable<any> {
+  detectRealObjectsWithYolo(file: File, theme: string = 'Bàn Học & Góc Làm Việc', confidence: number = 0.15, skipDialogue: boolean = true): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
     const targetLevel = this.api.currentUser()?.targetLevel || 'A2';
     return this.http.post<any>(
-      `${environment.aiServiceUrl}/detect?conf=${confidence}&theme=${encodeURIComponent(theme)}&target_level=${encodeURIComponent(targetLevel)}`,
+      `${environment.aiServiceUrl}/detect?conf=${confidence}&theme=${encodeURIComponent(theme)}&target_level=${encodeURIComponent(targetLevel)}&skip_dialogue=${skipDialogue}`,
       formData
     );
   }

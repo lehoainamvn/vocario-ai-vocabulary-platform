@@ -217,7 +217,7 @@ interface DictationQuestion {
             >
               <app-icon *ngIf="!isExtracting()" name="sparkles" [size]="16" svgClass="text-white"></app-icon>
               <span *ngIf="isExtracting()" class="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
-              <span>{{ isExtracting() ? 'Đang trích xuất từ vựng...' : 'Trích Xuất Từ Vựng' }}</span>
+              <span>{{ isExtracting() ? aiLoadingStep() || 'Đang trích xuất từ vựng...' : 'Trích Xuất Từ Vựng' }}</span>
             </button>
 
           </div>
@@ -228,13 +228,33 @@ interface DictationQuestion {
       <!-- =========================================================================
            3. CẢNH BÁO GIỚI HẠN VĂN BẢN (NẾU BÀI ĐỌC KHÔNG ĐỦ SỐ TỪ YÊU CẦU)
            ========================================================================= -->
+      <!-- AI Progress Steps (hiển thị khi đang trích xuất) -->
       <div 
-        *ngIf="warningNote"
+        *ngIf="isExtracting()"
+        class="bg-white border border-[#E5DED3] rounded-xl p-4 flex items-center gap-4 animate-fade-in shadow-2xs"
+      >
+        <div class="shrink-0 w-10 h-10 rounded-full bg-[#FAF8F5] border border-[#E5DED3] flex items-center justify-center">
+          <span class="animate-spin inline-block w-5 h-5 border-2 border-[#7D6853] border-t-transparent rounded-full"></span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-semibold text-[#29251F] mb-1">{{ aiLoadingStep() || 'Đang phân tích văn bản...' }}</p>
+          <div class="w-full h-1.5 bg-[#F0EAE0] rounded-full overflow-hidden">
+            <div 
+              class="h-full bg-[#7D6853] rounded-full transition-all duration-700"
+              [style.width]="aiLoadingStep().includes('Bước 3') ? '95%' : aiLoadingStep().includes('Bước 2') ? '60%' : '25%'"
+            ></div>
+          </div>
+          <p class="text-[10px] text-[#8C827A] mt-1">Groq LLM đang phân tích nội dung — thường mất 5–15 giây</p>
+        </div>
+      </div>
+
+      <div 
+        *ngIf="warningNote && !isExtracting()"
         class="bg-[#FBF7F0] border-l-4 border-amber-600 border-y border-r border-[#E8DFC9] p-4 rounded-r-lg flex items-start gap-3 text-xs text-[#6B5024] animate-fade-in"
       >
         <app-icon name="info" [size]="18" svgClass="text-amber-700 shrink-0 mt-0.5"></app-icon>
         <div class="space-y-1">
-          <p class="font-bold text-[#573F17]">Giới hạn trích xuất thực tế:</p>
+          <p class="font-bold text-[#573F17]">Thông báo từ AI:</p>
           <p class="leading-relaxed">{{ warningNote }}</p>
         </div>
       </div>
@@ -815,6 +835,8 @@ export class UserTextExtractorComponent implements OnInit {
   targetCount: number = 10;
   targetLevel: string = 'B2';
   isExtracting = signal<boolean>(false);
+  aiLoadingStep = signal<string>('');
+  private extractingTimer: ReturnType<typeof setTimeout> | null = null;
   warningNote: string = '';
 
   // Extracted words
@@ -998,9 +1020,18 @@ export class UserTextExtractorComponent implements OnInit {
         }
         input.value = '';
       },
-      error: (err) => {
+      error: (err: any) => {
         this.isParsingDoc.set(false);
-        this.toast.error('Không thể đọc tệp: ' + (err.error?.detail || err.message), 'Lỗi tệp');
+        const detail: string = err?.error?.error || err?.error?.detail || err?.message || '';
+        let friendlyMsg = 'Không thể đọc tệp này. Vui lòng thử lại hoặc dán nội dung trực tiếp vào ô văn bản.';
+        if (detail.includes('Selectable Text Layer') || detail.includes('không chứa lớp văn bản')) {
+          friendlyMsg = 'Tệp PDF này là ảnh scan, không có lớp chữ số. Hãy mở PDF và thử bôi đen copy được chữ không? Nếu không được, hãy dán trực tiếp nội dung vào ô văn bản. Nếu xuất từ Canva, chọn "PDF Tiêu chuẩn (Standard)" khi tải xuống.';
+        } else if (detail.includes('Word rỗng') || detail.includes('doc')) {
+          friendlyMsg = 'Tệp Word này không có nội dung văn bản. Vui lòng kiểm tra lại tệp.';
+        } else if (detail.includes('không được hỗ trợ') || detail.includes('định dạng')) {
+          friendlyMsg = 'Định dạng tệp chưa được hỗ trợ. Vui lòng dùng tệp PDF, Word (.docx) hoặc văn bản thuần (.txt).';
+        }
+        this.toast.error(friendlyMsg, 'Không đọc được tệp', 8000);
         input.value = '';
       }
     });
@@ -1014,10 +1045,23 @@ export class UserTextExtractorComponent implements OnInit {
 
     this.isExtracting.set(true);
     this.warningNote = '';
+    this.extractedWords = [];
+
+    // Cập nhật progress steps giúp người dùng biết AI đang làm gì
+    this.aiLoadingStep.set('Bước 1 / 3 — Đang gửi văn bản đến AI phân tích...');
+    if (this.extractingTimer) clearTimeout(this.extractingTimer);
+    this.extractingTimer = setTimeout(() => {
+      if (this.isExtracting()) this.aiLoadingStep.set('Bước 2 / 3 — Groq LLM đang trích xuất từ vựng từ nội dung gốc...');
+    }, 4000);
+    setTimeout(() => {
+      if (this.isExtracting()) this.aiLoadingStep.set('Bước 3 / 3 — Đang tổng hợp kết quả, sắp xong rồi...');
+    }, 10000);
 
     this.classroomService.extractVocabFromText(this.inputText, this.targetCount, this.targetLevel).subscribe({
       next: (res: any) => {
+        if (this.extractingTimer) clearTimeout(this.extractingTimer);
         this.isExtracting.set(false);
+        this.aiLoadingStep.set('');
         this.currentPage = 1;
         const rawWords: any[] = res.words || [];
         this.extractedWords = rawWords.map(w => ({
@@ -1036,11 +1080,23 @@ export class UserTextExtractorComponent implements OnInit {
         if (note) {
           this.warningNote = note;
         } else if (rawWords.length === 0) {
-          this.warningNote = 'Văn bản không chứa đủ từ vựng học thuật hoặc bị lỗi định dạng ký tự. Vui lòng tải lại tệp qua nút tải tệp hoặc dán trực tiếp đoạn văn tiếng Anh.';
+          this.warningNote = 'AI không trích xuất được từ vựng từ đoạn văn này. Có thể do văn bản không phải tiếng Anh học thuật, hoặc quá ngắn. Vui lòng thử dán trực tiếp một đoạn bài đọc IELTS tiếng Anh rõ hơn.';
+        } else {
+          this.toast.success(`Trích xuất xong! Tìm thấy ${rawWords.length} từ vựng từ văn bản.`, 'Hoàn tất', 3000);
         }
       },
-      error: () => {
+      error: (err: any) => {
+        if (this.extractingTimer) clearTimeout(this.extractingTimer);
         this.isExtracting.set(false);
+        this.aiLoadingStep.set('');
+        const errMsg = err?.error?.error || err?.error?.detail || err?.message || '';
+        if (errMsg.toLowerCase().includes('timeout') || errMsg.toLowerCase().includes('timed out')) {
+          this.toast.error('AI phản hồi quá chậm (timeout). Vui lòng thử rút ngắn văn bản hoặc giảm số từ cần trích xuất rồi thử lại.', 'Quá thời gian chờ', 6000);
+        } else if (errMsg.toLowerCase().includes('api key') || errMsg.toLowerCase().includes('groq')) {
+          this.toast.error('Dịch vụ AI Groq đang gặp sự cố. Vui lòng thử lại sau vài phút.', 'Lỗi dịch vụ AI', 5000);
+        } else {
+          this.toast.error('Không thể trích xuất từ vựng lúc này. Vui lòng thử lại hoặc kiểm tra kết nối mạng.', 'Lỗi trích xuất');
+        }
       }
     });
   }

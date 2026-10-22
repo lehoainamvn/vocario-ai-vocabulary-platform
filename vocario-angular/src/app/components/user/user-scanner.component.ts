@@ -536,10 +536,11 @@ import { IconComponent } from '../common/icon.component';
                 </div>
 
                 <!-- Luyện hội thoại ngữ cảnh Groq AI -->
-                <div *ngIf="studyService.activeScene()?.dialogue?.length" class="pt-3 border-t border-[#E5DED3] space-y-2.5">
+                <div *ngIf="studyService.activeScene()?.detectedObjects?.length || studyService.activeScene()?.dialogue?.length || isDialogueLoading()" class="pt-3 border-t border-[#E5DED3] space-y-2.5">
                   <div class="flex items-center justify-between">
                     <span class="text-xs font-bold text-[#2D2823]">Hội thoại ngữ cảnh thực tế</span>
                     <button
+                      *ngIf="!isDialogueLoading() && studyService.activeScene()?.dialogue?.length"
                       type="button"
                       (click)="regenerateDialogue()"
                       [disabled]="isRegeneratingDialogue()"
@@ -548,9 +549,25 @@ import { IconComponent } from '../common/icon.component';
                       <app-icon *ngIf="!isRegeneratingDialogue()" name="rotate-cw" [size]="11"></app-icon>
                       <span>{{ isRegeneratingDialogue() ? 'Đang tạo...' : 'Đổi ngữ cảnh' }}</span>
                     </button>
+                    <span *ngIf="isDialogueLoading()" class="text-[11px] text-[#7D6853] flex items-center gap-1.5 font-medium">
+                      <span class="animate-spin inline-block w-3 h-3 border border-[#7D6853] border-t-transparent rounded-full"></span>
+                      <span>AI đang kết nối từ vựng...</span>
+                    </span>
                   </div>
 
-                  <div class="space-y-2 max-h-[220px] overflow-y-auto pr-1">
+                  <!-- Khung trạng thái xoay loading khi AI đang dệt hội thoại trong nền -->
+                  <div *ngIf="isDialogueLoading()" class="p-3.5 rounded-[4px] bg-[#FAF8F5] border border-[#E5DED3] flex items-center gap-3 animate-fade-in shadow-2xs">
+                    <div class="w-8 h-8 rounded-full bg-white border border-[#E5DED3] flex items-center justify-center shrink-0 shadow-2xs">
+                      <span class="animate-spin inline-block w-4 h-4 border-2 border-[#7D6853] border-t-transparent rounded-full"></span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-xs font-semibold text-[#2D2823] truncate">Đang kiến tạo hội thoại ngữ cảnh...</p>
+                      <p class="text-[10px] text-[#8C827A]">Vật thể đã sẵn sàng! Bạn có thể nhấn vào các từ bên trên để học ngay.</p>
+                    </div>
+                  </div>
+
+                  <!-- Danh sách hội thoại khi đã sẵn sàng -->
+                  <div *ngIf="!isDialogueLoading() && studyService.activeScene()?.dialogue?.length" class="space-y-2 max-h-[220px] overflow-y-auto pr-1 animate-fade-in">
                     <div 
                       *ngFor="let turn of studyService.activeScene()!.dialogue"
                       class="p-2.5 rounded-[4px] bg-[#FAF8F5] border border-[#E5DED3] text-xs"
@@ -618,6 +635,7 @@ export class UserScannerComponent implements OnDestroy, AfterViewInit {
 
   // Scan State
   isScanning = signal(false);
+  isDialogueLoading = signal(false);
   selectedTheme = 'auto';
   autoScene = signal<any | null>(null);
   contextSource = signal<'groq' | 'fallback'>('groq');
@@ -899,12 +917,9 @@ export class UserScannerComponent implements OnDestroy, AfterViewInit {
         }
 
         if (isRealAi) {
-          const isGroq = this.contextSource() === 'groq';
           this.toast.success(
-            isGroq
-              ? `Two-Stage AI (YOLO-World + Deep Verifier & Groq) đã thẩm định và bóc tách ${detectedWords.length} vật thể chuẩn xác!`
-              : `Mô hình Two-Stage AI đã thẩm định và bóc tách chính xác ${detectedWords.length} đồ vật từ ảnh!`,
-            isGroq ? 'Two-Stage AI & LLM Hoàn Tất' : 'Two-Stage AI Hoàn Tất'
+            `Two-Stage AI (YOLO-World + Deep Verifier) đã bóc tách ${detectedWords.length} vật thể siêu tốc!`,
+            'Nhận Diện Thành Công'
           );
         } else {
           this.toast.info(
@@ -913,6 +928,11 @@ export class UserScannerComponent implements OnDestroy, AfterViewInit {
           );
         }
         this.cdr.detectChanges();
+
+        // Nếu hội thoại chưa có (do chạy chế độ siêu tốc Decoupled UX), kích hoạt sinh ngầm trong nền
+        if (!aiDialogue || aiDialogue.length === 0) {
+          this.loadDialogueInBackground(detectedWords, theme);
+        }
       },
       error: (err) => {
         console.warn('Lỗi kết nối API lưu ảnh backend, lưu trữ tạm để tiếp tục phiên học:', err);
@@ -935,6 +955,33 @@ export class UserScannerComponent implements OnDestroy, AfterViewInit {
           `Đã quét ảnh và phát hiện ${detectedWords.length} từ vựng mới!`,
           'AI Vision Hoàn Tất'
         );
+        this.cdr.detectChanges();
+
+        // Kích hoạt sinh ngầm hội thoại
+        if (!aiDialogue || aiDialogue.length === 0) {
+          this.loadDialogueInBackground(detectedWords, theme);
+        }
+      }
+    });
+  }
+
+  loadDialogueInBackground(words: ContextWord[], theme: string) {
+    if (!words || words.length === 0) return;
+    this.isDialogueLoading.set(true);
+    this.cdr.detectChanges();
+
+    this.studyService.regenerateDialogueWithAi(words, theme).subscribe({
+      next: (res) => {
+        this.isDialogueLoading.set(false);
+        if (res && Array.isArray(res.dialogue) && res.dialogue.length > 0) {
+          this.studyService.updateActiveSceneDialogue(res.dialogue);
+          this.contextSource.set(res.contextSource === 'groq' ? 'groq' : 'fallback');
+        }
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.isDialogueLoading.set(false);
+        console.warn('[Decoupled AI] Lỗi sinh hội thoại ngầm:', err);
         this.cdr.detectChanges();
       }
     });

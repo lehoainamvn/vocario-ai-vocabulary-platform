@@ -124,6 +124,9 @@ QUY TẮC CỐT LÕI (TUÂN THỦ NGHIÊM NGẶT):
     raw_response = None
     used_model = None
 
+    # Tính max_tokens thông minh: ~150 token/từ, tối thiểu 1500, tối đa 6000
+    smart_max_tokens = min(6000, max(1500, effective_count * 150))
+
     for m in models_to_try:
         if not m:
             continue
@@ -135,7 +138,8 @@ QUY TẮC CỐT LÕI (TUÂN THỦ NGHIÊM NGẶT):
                 ],
                 model=m,
                 temperature=0.2,  # Thấp để đảm bảo bám sát văn bản, không ảo giác
-                max_tokens=6500,  # Đủ lớn để chứa đến 50 từ vựng kèm ngữ cảnh đầy đủ
+                max_tokens=smart_max_tokens,
+                timeout=30.0,     # Timeout cứng 30 giây/model tránh chờ vô tận
                 response_format={"type": "json_object"}
             )
             raw_response = chat_completion.choices[0].message.content
@@ -144,7 +148,11 @@ QUY TẮC CỐT LÕI (TUÂN THỦ NGHIÊM NGẶT):
                 break
         except Exception as e:
             try:
-                print(f"[TextExtractor] Thử model {m} thất bại: {e}")
+                err_str = str(e).lower()
+                if "timeout" in err_str or "timed out" in err_str:
+                    print(f"[TextExtractor] Model {m} timeout sau 30s, chuyển model tiếp...")
+                else:
+                    print(f"[TextExtractor] Thử model {m} thất bại: {e}")
             except Exception:
                 pass
             continue

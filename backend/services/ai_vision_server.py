@@ -287,7 +287,8 @@ async def detect_objects(
     file: UploadFile = File(...),
     conf: float = Query(0.18, description="Ngưỡng tin cậy nhận diện (Confidence Threshold)"),
     theme: Optional[str] = Query("general", description="Chủ đề bối cảnh"),
-    target_level: Optional[str] = Query("A2", description="Trình độ mục tiêu CEFR của học viên (A1, A2, B1, B2, C1)")
+    target_level: Optional[str] = Query("A2", description="Trình độ mục tiêu CEFR của học viên (A1, A2, B1, B2, C1)"),
+    skip_dialogue: bool = Query(False, description="Nếu True, bỏ qua bước sinh hội thoại LLM để trả về vật thể siêu tốc (<0.8s)")
 ):
     """
     Điểm cuối nhận file ảnh từ Web Camera hoặc tải file lên,
@@ -450,18 +451,24 @@ async def detect_objects(
                 effective_theme = dominant_theme_name
 
         # Sinh ngữ cảnh thông minh bằng Groq LLM thích ứng theo cấp độ CEFR của học viên
-        context_res = generate_context(filtered, effective_theme or "Bối cảnh thực tế đời sống", target_level=target_level or "A2")
-        scene_title = context_res.get("sceneTitle", effective_theme or "Bối cảnh thực tế đời sống")
-        context_source = context_res.get("contextSource", "fallback")
-        examples_map = context_res.get("examples", {})
-        dialogue = context_res.get("dialogue", [])
+        if skip_dialogue:
+            # Chế độ siêu tốc (Decoupled UX): Trả về vật thể ngay lập tức (<0.8s), hội thoại sẽ được sinh nền qua /regenerate-dialogue
+            scene_title = effective_theme or "Bối cảnh thực tế đời sống"
+            context_source = "pending"
+            dialogue = []
+        else:
+            context_res = generate_context(filtered, effective_theme or "Bối cảnh thực tế đời sống", target_level=target_level or "A2")
+            scene_title = context_res.get("sceneTitle", effective_theme or "Bối cảnh thực tế đời sống")
+            context_source = context_res.get("contextSource", "fallback")
+            examples_map = context_res.get("examples", {})
+            dialogue = context_res.get("dialogue", [])
 
-        # Cập nhật câu ví dụ ngữ cảnh độc nhất cho từng đồ vật
-        for item in filtered:
-            w = item["word"]
-            if w in examples_map and isinstance(examples_map[w], dict):
-                item["exampleEn"] = examples_map[w].get("exampleEn", item["exampleEn"])
-                item["exampleVi"] = examples_map[w].get("exampleVi", item["exampleVi"])
+            # Cập nhật câu ví dụ ngữ cảnh độc nhất cho từng đồ vật
+            for item in filtered:
+                w = item["word"]
+                if w in examples_map and isinstance(examples_map[w], dict):
+                    item["exampleEn"] = examples_map[w].get("exampleEn", item["exampleEn"])
+                    item["exampleVi"] = examples_map[w].get("exampleVi", item["exampleVi"])
 
         # Chuẩn bị thông điệp chẩn đoán nếu không tìm thấy vật thể
         diag_msg = None
