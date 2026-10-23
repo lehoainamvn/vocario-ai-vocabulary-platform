@@ -92,6 +92,30 @@ PLACES_TO_THEME_MAP = {
     "food_fruits_groceries": [
         "supermarket", "grocery_store", "market/outdoor", "market/indoor",
         "bakery/shop", "delicatessen", "butchers_shop", "candy_store"
+    ],
+    # 15. Gym, Thể Hình & Rèn Luyện Thể Lực
+    "gym_fitness": [
+        "fitness_center", "gymnasium/indoor"
+    ],
+    # 16. Nhà Hàng, Quán Cafe & Trà
+    "restaurant_cafe": [
+        "coffee_shop", "tea_room", "cafeteria", "restaurant", "diner/indoor"
+    ],
+    # 17. Bệnh Viện, Y Tế & Chăm Sóc Sức Khỏe
+    "hospital_healthcare": [
+        "hospital", "hospital_room", "doctors_office", "operating_room", "pharmacy"
+    ],
+    # 18. Mỹ Thuật, Hội Họa & Thủ Công
+    "art_craft_hobbies": [
+        "art_studio", "art_school"
+    ],
+    # 19. Dụng Cụ Lao Động, Xây Dựng & Sửa Chữa
+    "construction_tools": [
+        "construction_site", "repair_shop", "garage/indoor"
+    ],
+    # 20. Đồ Chơi, Trẻ Em & Đồ Dùng Sơ Sinh
+    "baby_toys_kids": [
+        "childs_room", "nursery", "kindergarten_classroom"
     ]
 }
 
@@ -109,7 +133,13 @@ THEME_NAMES_VI = {
     "nature_animals_plants": "Tự Nhiên, Động Vật & Cây Cối",
     "sports_recreation": "Thể Thao & Hoạt Động Ngoài Trời",
     "medical_store_services": "Y Tế, Cửa Hàng & Dịch Vụ Đời Sống",
-    "food_fruits_groceries": "Thực Phẩm, Trái Cây & Bách Hóa"
+    "food_fruits_groceries": "Thực Phẩm, Trái Cây & Bách Hóa",
+    "gym_fitness": "Gym, Thể Hình & Rèn Luyện Thể Lực",
+    "restaurant_cafe": "Nhà Hàng, Quán Cafe & Trà",
+    "hospital_healthcare": "Bệnh Viện, Y Tế & Chăm Sóc Sức Khỏe",
+    "art_craft_hobbies": "Mỹ Thuật, Hội Họa & Thủ Công",
+    "construction_tools": "Dụng Cụ Lao Động, Xây Dựng & Sửa Chữa",
+    "baby_toys_kids": "Đồ Chơi, Trẻ Em & Đồ Dùng Sơ Sinh"
 }
 
 class SceneClassifierService:

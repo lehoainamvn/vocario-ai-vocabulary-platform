@@ -154,6 +154,18 @@ def apply_theme_classes(theme_name: Optional[str]):
             matched_key = "nature_animals_plants"
         elif any(k in clean for k in ["thể thao", "sport", "fitness", "vận động"]):
             matched_key = "sports_recreation"
+        elif any(k in clean for k in ["gym", "thể hình", "workout", "tạ"]):
+            matched_key = "gym_fitness"
+        elif any(k in clean for k in ["nhà hàng", "restaurant", "quán cà phê", "quán ăn"]):
+            matched_key = "restaurant_cafe"
+        elif any(k in clean for k in ["bệnh viện", "bác sĩ", "y tá", "hospital", "clinic"]):
+            matched_key = "hospital_healthcare"
+        elif any(k in clean for k in ["mỹ thuật", "hội họa", "thủ công", "art", "craft", "vẽ"]):
+            matched_key = "art_craft_hobbies"
+        elif any(k in clean for k in ["công cụ", "xây dựng", "sửa chữa", "tools", "hardware"]):
+            matched_key = "construction_tools"
+        elif any(k in clean for k in ["đồ chơi", "trẻ em", "em bé", "toys", "baby", "kid"]):
+            matched_key = "baby_toys_kids"
         elif any(k in clean for k in ["y tế", "medical", "thuốc", "siêu thị", "store", "shop"]):
             matched_key = "medical_store_services"
 

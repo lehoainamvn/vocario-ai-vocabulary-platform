@@ -29,26 +29,47 @@ GEOMETRY_CONSTRAINTS = {
     # Tỉ lệ khung hình (width / height) tối đa cho phép
     "aspect_ratios": {
         "bottle": (0.15, 1.2),     # Thường cao hơn rộng
+        "hourglass": (0.25, 1.3),  # Đồng hồ cát đứng
         "laptop": (0.6, 2.5),      # Thường rộng hơn cao
         "sofa": (0.8, 4.0),        # Rộng hơn cao
         "bus": (0.8, 4.0),         # Xe dài
         "refrigerator": (0.3, 1.5),# Tủ lạnh đứng
-        "person": (0.15, 1.2)      # Người đứng/ngồi
+        "person": (0.15, 1.2),     # Người đứng/ngồi
+        "document organizer": (0.3, 2.5),
+        "phone stand": (0.3, 1.8)
     }
 }
 
 # Ma trận đồng xuất hiện giữa Bối cảnh (Tầng 1) và Vật thể (Tầng 2)
 # Dùng để hiệu chuẩn độ tin cậy và ngăn chặn việc nhận nhầm vô lý
 THEME_COOCCURRENCE_BOOST = {
-    "study_office": ["desk", "chair", "laptop", "book", "bookshelf", "cup", "coffee cup", "mug", "bottle", "vase", "potted plant", "plant", "computer mouse", "lamp", "shelf", "photo frame", "picture frame", "clock", "alarm clock", "headphones", "smartphone"],
-    "living_room_decor": ["sofa", "couch", "coffee table", "pillow", "cushion", "carpet", "lamp", "television", "potted plant", "book", "shelf"],
-    "kitchen_appliances": ["refrigerator", "microwave", "sink", "kitchen counter", "bottle", "bowl", "plate", "cup", "dish rack"],
-    "dining_tableware": ["dining table", "chair", "cup", "coffee cup", "glass", "fork", "knife", "plate", "bowl", "bottle"],
-    "bedroom_personal_space": ["bed", "pillow", "blanket", "nightstand", "wardrobe", "lamp", "carpet", "mirror"],
-    "outdoor_vehicles_street": ["bus", "car", "person", "road", "street lamp", "traffic light", "motorcycle", "bicycle", "tree"],
-    "nature_animals_plants": ["bench", "park bench", "tree", "grass", "flower", "potted plant", "dog", "cat", "bird"],
-    "sports_recreation": ["basketball", "sports ball", "court", "fence", "sports shoes", "bicycle"],
-    "food_fruits_groceries": ["apple", "banana", "orange", "fruit", "shelf", "shopping cart", "box", "bottle"]
+    "study_office": [
+        "desk", "chair", "laptop", "book", "bookshelf", "cup", "coffee cup", "mug", "bottle",
+        "vase", "potted plant", "plant", "computer mouse", "lamp", "shelf", "photo frame",
+        "picture frame", "clock", "alarm clock", "headphones", "smartphone", "hourglass",
+        "document organizer", "file organizer", "paper organizer", "desk organizer", "phone stand",
+        "tablet stand", "laptop stand", "desk pad", "pen holder", "pencil pot", "stationery",
+        "calculator", "sticky notes", "whiteboard marker", "bookstand"
+    ],
+    "living_room_decor": ["sofa", "couch", "coffee table", "pillow", "cushion", "carpet", "lamp", "television", "potted plant", "book", "shelf", "vase", "floor lamp", "curtain", "wall art"],
+    "kitchen_appliances": ["refrigerator", "microwave", "sink", "kitchen counter", "bottle", "bowl", "plate", "cup", "dish rack", "air fryer", "pan", "pot", "blender", "kettle", "knife", "cutting board"],
+    "dining_tableware": ["dining table", "chair", "cup", "coffee cup", "glass", "fork", "knife", "plate", "bowl", "bottle", "wine glass", "teapot", "napkin", "chopsticks"],
+    "bedroom_personal_space": ["bed", "pillow", "blanket", "nightstand", "wardrobe", "lamp", "carpet", "mirror", "duvet", "alarm clock", "laundry basket"],
+    "outdoor_vehicles_street": ["bus", "car", "person", "road", "street lamp", "traffic light", "motorcycle", "bicycle", "tree", "truck", "scooter", "fire hydrant", "sidewalk", "bench"],
+    "nature_animals_plants": ["bench", "park bench", "tree", "grass", "flower", "potted plant", "dog", "cat", "bird", "cactus", "fern", "turtle", "lizard", "duck", "swan", "squirrel"],
+    "sports_recreation": ["basketball", "sports ball", "court", "fence", "sports shoes", "bicycle", "dumbbell", "barbell", "yoga mat", "treadmill", "racket", "helmet"],
+    "food_fruits_groceries": ["apple", "banana", "orange", "fruit", "shelf", "shopping cart", "box", "bottle", "bread", "cheese", "vegetable", "tomato", "pizza", "burger"],
+    "bathroom_toiletries": ["bathtub", "shower", "sink", "faucet", "towel", "toilet", "mirror", "shampoo", "soap", "toothbrush", "hair dryer"],
+    "clothing_footwear": ["shirt", "t-shirt", "pants", "jeans", "jacket", "coat", "hoodie", "shoes", "sneakers", "boots", "dress", "skirt"],
+    "accessories_personal": ["hat", "cap", "sunglasses", "watch", "smartwatch", "backpack", "handbag", "wallet", "belt", "necklace", "ring"],
+    "digital_tech_gadgets": ["laptop", "smartphone", "tablet", "monitor", "keyboard", "mouse", "headphones", "earbuds", "speaker", "camera", "tripod", "ring light"],
+    "medical_store_services": ["medicine", "pill", "stethoscope", "syringe", "first aid kit", "thermometer", "mask", "gloves", "crutches", "wheelchair"],
+    "gym_fitness": ["dumbbell", "barbell", "kettlebell", "treadmill", "exercise bike", "yoga mat", "pull-up bar", "bench press", "gym bag", "shaker bottle", "water bottle", "weight plate"],
+    "restaurant_cafe": ["coffee machine", "espresso machine", "coffee grinder", "takeout cup", "paper cup", "coffee cup", "saucer", "teacup", "teapot", "menu", "cash register", "serving tray", "straw", "blender", "bar stool"],
+    "hospital_healthcare": ["stethoscope", "syringe", "needle", "thermometer", "wheelchair", "hospital bed", "iv drip", "surgical mask", "medical gloves", "medicine bottle", "first aid kit", "bandage", "crutches"],
+    "art_craft_hobbies": ["canvas", "easel", "palette", "paintbrush", "acrylic paint", "watercolor paint", "sketchpad", "sculpture", "clay", "sewing machine", "yarn", "scissors", "craft knife"],
+    "construction_tools": ["hammer", "screwdriver", "wrench", "pliers", "drill", "tape measure", "spirit level", "handsaw", "ladder", "toolbox", "safety helmet", "safety glasses", "work gloves", "nail", "screw"],
+    "baby_toys_kids": ["teddy bear", "stuffed animal", "doll", "toy car", "building blocks", "lego bricks", "baby stroller", "baby crib", "high chair", "baby bottle", "pacifier", "baby rattle", "tricycle"]
 }
 
 class TwoStageVerifier:
@@ -255,6 +276,21 @@ class TwoStageVerifier:
                     if overlap_ratio > 0.85 and (cur_w == acc_w or iou > 0.6):
                         keep = False
                         break
+
+            # 4c. Giới hạn số lượng đối tượng tối đa cho từng lớp dễ bị nhiễu nền (Class-Instance Count NMS)
+            if keep:
+                cur_w = (current.get("word") or current.get("label") or "").strip().lower()
+                MAX_CLASS_INSTANCES = {
+                    "photo frame": 2,
+                    "picture frame": 2,
+                    "hourglass": 1,
+                    "alarm clock": 1,
+                    "wall clock": 2
+                }
+                max_allowed = MAX_CLASS_INSTANCES.get(cur_w, 999)
+                existing_count = sum(1 for a in final_list if (a.get("word") or a.get("label") or "").strip().lower() == cur_w)
+                if existing_count >= max_allowed:
+                    keep = False
 
             if keep:
                 final_list.append(current)
