@@ -40,7 +40,7 @@ GEOMETRY_CONSTRAINTS = {
 # Ma trận đồng xuất hiện giữa Bối cảnh (Tầng 1) và Vật thể (Tầng 2)
 # Dùng để hiệu chuẩn độ tin cậy và ngăn chặn việc nhận nhầm vô lý
 THEME_COOCCURRENCE_BOOST = {
-    "study_office": ["desk", "chair", "laptop", "book", "bookshelf", "cup", "potted plant", "computer mouse", "lamp", "shelf"],
+    "study_office": ["desk", "chair", "laptop", "book", "bookshelf", "cup", "coffee cup", "mug", "bottle", "vase", "potted plant", "plant", "computer mouse", "lamp", "shelf", "photo frame", "picture frame", "clock", "alarm clock", "headphones", "smartphone"],
     "living_room_decor": ["sofa", "couch", "coffee table", "pillow", "cushion", "carpet", "lamp", "television", "potted plant", "book", "shelf"],
     "kitchen_appliances": ["refrigerator", "microwave", "sink", "kitchen counter", "bottle", "bowl", "plate", "cup", "dish rack"],
     "dining_tableware": ["dining table", "chair", "cup", "coffee cup", "glass", "fork", "knife", "plate", "bowl", "bottle"],

@@ -104,7 +104,19 @@
       "scanner",
       "photocopier",
       "projector",
-      "projection screen"
+      "projection screen",
+      "photo frame",
+      "picture frame",
+      "potted plant",
+      "plant",
+      "cup",
+      "coffee cup",
+      "mug",
+      "bottle",
+      "vase",
+      "alarm clock",
+      "headphones",
+      "smartphone"
     ]
   },
   "kitchen_appliances": {
