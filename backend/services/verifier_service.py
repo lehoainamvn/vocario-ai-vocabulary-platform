@@ -90,10 +90,11 @@ class TwoStageVerifier:
                 # Tính phương sai đặc trưng không gian (Spatial feature variance)
                 # Vùng ảnh rỗng, đơn sắc hoặc nhiễu mờ sẽ có variance rất thấp
                 feat_std = torch.std(feats).item()
-                coherence = min(1.0, max(0.4, feat_std * 1.8))
+                # Tăng min từ 0.4 -> 0.5 để vật thể thật sự không bị đánh giá thấp quá
+                coherence = min(1.0, max(0.5, feat_std * 1.8))
                 return round(coherence, 3)
         except Exception:
-            return 1.0
+            return 0.85  # Fallback cao hơn (trước là 1.0 nhưng để có sự phân biệt)
 
     def verify_and_refine(
         self,
@@ -177,11 +178,16 @@ class TwoStageVerifier:
                     score *= 0.7  # Giảm điểm khi hình dạng méo mó bất thường
 
             # --- TIÊU CHÍ 2: DEEP FEATURE VERIFICATION (CROP VÙNG ẢNH) ---
-            if box_w >= 10 and box_h >= 10:
+            # Cải tiến: xử lý tốt hơn với crop vật thể nhỏ (< 40px)
+            if box_w >= 20 and box_h >= 20:
                 crop = full_image.crop((x1, y1, x2, y2))
                 coherence = self._compute_visual_coherence(crop)
+            elif box_w >= 10 and box_h >= 10:
+                # Vật thể cực nhỏ: giả định coherence trung bình, không loại bỏ
+                coherence = 0.70
             else:
-                coherence = 0.5
+                # Vật thể quá nhỏ (< 10px): điểm coherence thấp nhưng vẫn giữ
+                coherence = 0.55
 
             # --- TIÊU CHÍ 3: ĐỒNG XUẤT HIỆN BỐI CẢNH (SCENE CONSISTENCY) ---
             boost_factor = 1.0
@@ -189,17 +195,20 @@ class TwoStageVerifier:
                 expected_items = THEME_COOCCURRENCE_BOOST[clean_scene]
                 if any(exp in label or label in exp for exp in expected_items):
                     # Vật thể cực kỳ phù hợp với bối cảnh nhận diện -> Tăng điểm tin cậy
-                    boost_factor = 1.25
+                    boost_factor = 1.20
                 else:
-                    # Vật thể lạ không thuộc bối cảnh -> Kiểm tra gắt gao hơn
-                    boost_factor = 0.90
+                    # Vật thể lạ không thuộc bối cảnh -> Kiểm tra nhẹ nhàng hơn để không bỏ sót
+                    boost_factor = 0.95
 
             # Hiệu chuẩn điểm số cuối cùng (Calibrated Final Score)
-            calibrated_score = score * (0.65 + 0.35 * coherence) * boost_factor
+            # Công thức được tối ưu để cân bằng giữa Precision và Recall:
+            # - Trọng số coherence giảm từ 0.35 -> 0.25 để ít phụ thuộc vào MobileNetV3 hơn
+            # - Đảm bảo vật thể nhỏ hoặc mờ không bị loại oan
+            calibrated_score = score * (0.75 + 0.25 * coherence) * boost_factor
             calibrated_score = round(min(0.98, max(0.05, calibrated_score)), 2)
 
-            # Chỉ giữ lại các ứng viên đạt ngưỡng sau thẩm định
-            if calibrated_score >= 0.20:
+            # Chỉ giữ lại các ứng viên đạt ngưỡng sau thẩm định (hạ từ 0.20 -> 0.15 để tăng recall)
+            if calibrated_score >= 0.15:
                 cand_copy = dict(cand)
                 cand_copy["confidence"] = calibrated_score
                 cand_copy["is_verified"] = True

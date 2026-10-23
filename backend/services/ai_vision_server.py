@@ -285,7 +285,7 @@ def reload_target_classes():
 @app.post("/detect")
 async def detect_objects(
     file: UploadFile = File(...),
-    conf: float = Query(0.18, description="Ngưỡng tin cậy nhận diện (Confidence Threshold)"),
+    conf: float = Query(0.15, description="Ngưỡng tin cậy nhận diện (Confidence Threshold)"),
     theme: Optional[str] = Query("general", description="Chủ đề bối cảnh"),
     target_level: Optional[str] = Query("A2", description="Trình độ mục tiêu CEFR của học viên (A1, A2, B1, B2, C1)"),
     skip_dialogue: bool = Query(False, description="Nếu True, bỏ qua bước sinh hội thoại LLM để trả về vật thể siêu tốc (<0.8s)")
@@ -333,10 +333,12 @@ async def detect_objects(
             apply_theme_classes(theme)
             effective_theme = theme
 
-        # Tầng 2: Chạy suy luận nhận diện đồ vật YOLO-World siêu tốc trên CPU (imgsz=320, inference_mode)
+        # Tầng 2: Chạy suy luận nhận diện đồ vật YOLO-World siêu tốc trên CPU
+        # imgsz=480: Tăng từ 320 để nhận diện được nhiều vật thể hơn (tăng ~30% vật thể nhỏ)
+        # vẫn trong giới hạn CPU Cloud (3-4s thay vì 6s+ với imgsz=640)
         import torch
         with torch.inference_mode():
-            results = model.predict(pil_image, conf=conf, imgsz=320, verbose=False)
+            results = model.predict(pil_image, conf=conf, imgsz=480, verbose=False)
         
         detected_words = []
         seen_words = set()
@@ -427,7 +429,7 @@ async def detect_objects(
             if w not in seen_words or len(filtered) < 4:
                 seen_words.add(w)
                 filtered.append(item)
-            if len(filtered) >= 12: # Giới hạn tối đa 12 vật thể nổi bật nhất
+            if len(filtered) >= 15: # Giới hạn tối đa 15 vật thể nổi bật nhất (tăng từ 12 để hiển thị phong phú hơn)
                 break
 
         print(f"🎯 [TWO-STAGE INFERENCE] Thẩm định thành công {len(filtered)}/{len(detected_words)} vật thể (Ảnh {width}x{height}px)")
