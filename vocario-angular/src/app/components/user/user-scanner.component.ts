@@ -536,7 +536,7 @@ import { IconComponent } from '../common/icon.component';
                 </div>
 
                 <!-- Luyện hội thoại ngữ cảnh Groq AI -->
-                <div *ngIf="studyService.activeScene()?.detectedObjects?.length || studyService.activeScene()?.dialogue?.length || isDialogueLoading()" class="pt-3 border-t border-[#E5DED3] space-y-2.5">
+                <div *ngIf="studyService.activeScene()?.words?.length || studyService.activeScene()?.dialogue?.length || isDialogueLoading()" class="pt-3 border-t border-[#E5DED3] space-y-2.5">
                   <div class="flex items-center justify-between">
                     <span class="text-xs font-bold text-[#2D2823]">Hội thoại ngữ cảnh thực tế</span>
                     <button

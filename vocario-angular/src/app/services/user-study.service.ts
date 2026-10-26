@@ -49,6 +49,7 @@ export interface ContextScene {
   masteredCount: number;
   createdAt: string;
   words: ContextWord[];
+  detectedObjects?: ContextWord[];
   dialogueTitle: string;
   dialogueDesc: string;
   dialogue: ConversationTurn[];
