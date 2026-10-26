@@ -228,11 +228,11 @@ interface ClickFeedback {
                   <button 
                     type="button"
                     (click)="openStageLeaderboard(stage, $event)"
-                    class="absolute bottom-2.5 right-2.5 px-2 py-1 rounded-[3px] bg-stone-900/85 hover:bg-[#7D6853] text-white font-mono text-[10px] font-semibold flex items-center gap-1.5 shadow-md transition-all cursor-pointer backdrop-blur-xs border border-white/20 z-10 hover:scale-105 active:scale-95"
+                    class="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-[3px] bg-stone-900/85 hover:bg-[#7D6853] text-white font-mono text-[10px] font-semibold flex items-center gap-1.5 shadow-md transition-all cursor-pointer backdrop-blur-xs border border-white/20 z-10 hover:scale-105 active:scale-95"
                     title="Xem Bảng Xếp Hạng riêng của đấu trường này"
                   >
-                    <app-icon name="trophy" [size]="11" class="text-amber-400"></app-icon>
-                    <span>BXH Kỷ lục</span>
+                    <app-icon name="crown" [size]="11" svgClass="text-amber-400"></app-icon>
+                    <span>BXH Phòng</span>
                   </button>
                 </div>
 
@@ -251,7 +251,8 @@ interface ClickFeedback {
                   <!-- Mini Speedrun Leaderboard Snapshot on Card -->
                   <div class="flex items-center justify-between bg-[#FAF8F5] border border-[#E5DED3] rounded px-3 py-1.5 text-[11px] mt-2 shadow-2xs">
                     <div class="flex items-center gap-1.5 truncate">
-                      <span class="text-amber-600 font-bold shrink-0">👑 Kỷ lục:</span>
+                      <app-icon name="crown" [size]="12" svgClass="text-amber-600 shrink-0"></app-icon>
+                      <span class="text-[#7D6853] font-semibold shrink-0">Kỷ lục:</span>
                       <span class="text-[#746B60] truncate font-medium">
                         {{ arenaLeaderboard.getStageSummary(stage.id).recordHolderName ? (arenaLeaderboard.formatTime(arenaLeaderboard.getStageSummary(stage.id).bestTimeMs) + ' · ' + arenaLeaderboard.getStageSummary(stage.id).recordHolderName) : 'Chưa có kỷ lục' }}
                       </span>
@@ -262,7 +263,7 @@ interface ClickFeedback {
                       class="shrink-0 text-[10px] font-bold text-[#7D6853] hover:text-white bg-white hover:bg-[#7D6853] border border-[#E5DED3] hover:border-[#7D6853] px-2.5 py-1 rounded-[3px] transition-all cursor-pointer shadow-2xs flex items-center gap-1"
                       title="Xem Bảng Xếp Hạng riêng của đấu trường này"
                     >
-                      <app-icon name="trophy" [size]="10"></app-icon>
+                      <app-icon name="crown" [size]="10"></app-icon>
                       <span>Xem BXH</span>
                     </button>
                   </div>
@@ -271,10 +272,10 @@ interface ClickFeedback {
                     <button 
                       type="button"
                       (click)="openStageLeaderboard(stage, $event)"
-                      class="text-[11px] font-bold text-[#7D6853] hover:text-[#29251F] flex items-center gap-1 cursor-pointer transition-colors hover:underline p-0 bg-transparent border-0"
+                      class="text-[11px] font-bold text-[#7D6853] hover:text-[#29251F] flex items-center gap-1.5 cursor-pointer transition-colors hover:underline p-0 bg-transparent border-0"
                       title="Mở Bảng Xếp Hạng Speedrun của đấu trường này"
                     >
-                      <app-icon name="trophy" [size]="11" class="text-amber-600"></app-icon>
+                      <app-icon name="crown" [size]="11" svgClass="text-amber-600"></app-icon>
                       <span>Top 10 phản xạ</span>
                     </button>
                     <div class="flex items-center gap-1 font-semibold text-[#29251F] group-hover:text-[#7D6853] transition-colors">
@@ -469,7 +470,7 @@ interface ClickFeedback {
 
               <!-- Live Speedrun Stopwatch -->
               <div class="px-2.5 py-1 rounded-[8px] bg-[#FAF8F5] border border-[#E5DED3] text-[#29251F] text-xs font-mono font-bold flex items-center gap-1.5 shadow-2xs" title="Tổng thời gian phản xạ (gồm tiền phạt)">
-                <span class="text-[#7D6853]">⏱️</span>
+                <app-icon name="clock" [size]="12" svgClass="text-[#7D6853]"></app-icon>
                 <span>{{ arenaLeaderboard.formatTime(gameElapsedTimeMs() + penaltyTimeMs()) }}</span>
                 <span *ngIf="mistakeCount() > 0" class="text-rose-600 text-[10px] font-bold" title="Thời gian phạt do chạm sai">+{{ mistakeCount() * 2 }}s</span>
               </div>
@@ -742,12 +743,14 @@ interface ClickFeedback {
             [class.border-[#E5DED3]]="!lastRunResult()?.isNewPB"
           >
             <div class="flex items-center gap-3.5 min-w-0">
-              <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0 shadow-2xs"
+              <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-2xs"
                 [class.bg-amber-400]="lastRunResult()?.isNewPB"
                 [class.text-amber-950]="lastRunResult()?.isNewPB"
                 [class.bg-[#EAE5DC]]="!lastRunResult()?.isNewPB"
+                [class.text-[#7D6853]]="!lastRunResult()?.isNewPB"
               >
-                {{ lastRunResult()?.isNewPB ? '👑' : '⚡' }}
+                <app-icon *ngIf="lastRunResult()?.isNewPB" name="crown" [size]="22"></app-icon>
+                <app-icon *ngIf="!lastRunResult()?.isNewPB" name="zap" [size]="22"></app-icon>
               </div>
               <div class="min-w-0">
                 <div class="flex items-center gap-2 flex-wrap">
@@ -765,15 +768,6 @@ interface ClickFeedback {
                 </p>
               </div>
             </div>
-
-            <button 
-              type="button"
-              (click)="openCurrentStageLeaderboard()"
-              class="px-4 py-2.5 rounded-xl bg-white border border-[#E5DED3] hover:border-[#7D6853] text-[#7D6853] text-xs font-semibold flex items-center gap-2 cursor-pointer shadow-2xs transition-all shrink-0 hover:bg-[#FAF8F5]"
-            >
-              <app-icon name="trophy" [size]="14"></app-icon>
-              <span>Xem BXH Phòng</span>
-            </button>
           </div>
 
           <!-- 4 KPI Blocks -->
@@ -819,7 +813,7 @@ interface ClickFeedback {
             </div>
           </div>
 
-          <!-- Action Buttons -->
+          <!-- Action Buttons: Duy nhất 1 nút BXH Đấu Trường Phòng -->
           <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
             <button 
               type="button" 
@@ -830,12 +824,13 @@ interface ClickFeedback {
               <span>Chơi lại bối cảnh này</span>
             </button>
 
+            <!-- DUY NHẤT 1 NÚT BXH ĐẤU TRƯỜNG PHÒNG -->
             <button 
               type="button"
               (click)="openCurrentStageLeaderboard()"
               class="h-[43px] px-5 rounded-[10px] bg-amber-50 border border-amber-300 hover:bg-amber-100 text-amber-900 font-semibold text-xs flex items-center gap-2 cursor-pointer transition-colors shadow-2xs"
             >
-              <app-icon name="award" [size]="14"></app-icon>
+              <app-icon name="crown" [size]="14" svgClass="text-amber-800"></app-icon>
               <span>BXH Đấu Trường Này</span>
             </button>
 
@@ -846,14 +841,6 @@ interface ClickFeedback {
             >
               <span>Chọn bối cảnh khác</span>
             </button>
-
-            <a 
-              routerLink="/leaderboard"
-              class="h-[43px] px-5 rounded-[10px] bg-[#F1ECE3] border border-[#E5DED3] hover:bg-[#EAE5DC] text-[#7D6853] font-semibold text-xs flex items-center gap-2 cursor-pointer transition-colors no-underline shadow-2xs"
-            >
-              <app-icon name="trophy" [size]="14"></app-icon>
-              <span>Bảng xếp hạng chung</span>
-            </a>
           </div>
 
         </div>
@@ -920,8 +907,9 @@ interface ClickFeedback {
               </button>
             </div>
 
-            <span class="text-[10px] text-[#A89E91] font-mono">
-              Xếp theo: Giây ⏱️
+            <span class="text-[10px] text-[#A89E91] font-mono flex items-center gap-1">
+              <app-icon name="clock" [size]="11"></app-icon>
+              <span>Xếp theo: Giây</span>
             </span>
           </div>
 
@@ -950,18 +938,23 @@ interface ClickFeedback {
             >
               <!-- Rank & User Info -->
               <div class="flex items-center gap-3 min-w-0">
-                <!-- Rank Badge -->
-                <div class="w-7 h-7 rounded-full flex items-center justify-center font-serif text-xs font-bold shrink-0"
+                <!-- Rank Badge: Scandinavian editorial typography + Crown vector icon -->
+                <div class="w-7 h-7 rounded-[4px] border flex items-center justify-center font-serif text-xs font-bold shrink-0"
                   [class.bg-amber-400]="rec.rank === 1"
                   [class.text-amber-950]="rec.rank === 1"
-                  [class.bg-slate-200]="rec.rank === 2"
-                  [class.text-slate-800]="rec.rank === 2"
-                  [class.bg-amber-700\/20]="rec.rank === 3"
-                  [class.text-amber-900]="rec.rank === 3"
-                  [class.bg-[#EAE5DC]]="(rec.rank || 4) > 3"
+                  [class.border-amber-400]="rec.rank === 1"
+                  [class.bg-stone-200]="rec.rank === 2"
+                  [class.text-stone-800]="rec.rank === 2"
+                  [class.border-stone-300]="rec.rank === 2"
+                  [class.bg-[#EAE5DC]]="rec.rank === 3"
+                  [class.text-[#7D6853]]="rec.rank === 3"
+                  [class.border-[#E5DED3]]="rec.rank === 3"
+                  [class.bg-[#FAF8F5]]="(rec.rank || 4) > 3"
                   [class.text-[#746B60]]="(rec.rank || 4) > 3"
+                  [class.border-[#E5DED3]]="(rec.rank || 4) > 3"
                 >
-                  {{ rec.rank === 1 ? '🥇' : (rec.rank === 2 ? '🥈' : (rec.rank === 3 ? '🥉' : rec.rank)) }}
+                  <app-icon *ngIf="rec.rank === 1" name="crown" [size]="13" svgClass="text-amber-950"></app-icon>
+                  <span *ngIf="rec.rank !== 1">{{ rec.rank }}</span>
                 </div>
 
                 <!-- Avatar & Name -->
@@ -969,7 +962,7 @@ interface ClickFeedback {
                   <div class="flex items-center gap-1.5 flex-wrap">
                     <strong class="text-xs font-semibold text-[#29251F] truncate block">{{ rec.userName }}</strong>
                     <span *ngIf="rec.isCurrentUser" class="text-[9px] font-mono font-bold bg-[#7D6853] text-white px-1 rounded">BẠN</span>
-                    <span *ngIf="rec.isPerfectRun" class="text-[10px] text-emerald-600 font-bold" title="100% không chạm sai">✨ Clean</span>
+                    <span *ngIf="rec.isPerfectRun" class="text-[9px] font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded font-semibold" title="100% không chạm sai">Clean Run</span>
                   </div>
                   <div class="flex items-center gap-2 text-[10px] text-[#746B60] mt-0.5">
                     <span>Độ chính xác: {{ rec.accuracyPct }}%</span>
@@ -1608,7 +1601,7 @@ export class UserQuizComponent implements OnInit, OnDestroy {
       const timeStr = this.arenaLeaderboard.formatTime(totalMs);
       if (runRes.isNewPB) {
         this.toast.success(
-          `🎉 KỶ LỤC CÁ NHÂN MỚI! ${timeStr} (Hạng #${runRes.rank} trong phòng này)!`,
+          `KỶ LỤC CÁ NHÂN MỚI! ${timeStr} (Hạng #${runRes.rank} trong phòng này)!`,
           'Kỷ Lục Mới!'
         );
       } else {
