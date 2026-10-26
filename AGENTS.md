@@ -19,7 +19,10 @@ Mỗi khi thực hiện bất kỳ chỉnh sửa nào (sửa lỗi, phát triể
      git merge <type>/<ten-nhanh>
      git push origin main
      ```
-3. **Ngoại lệ duy nhất:** Khi người dùng yêu cầu chỉ sửa local để xem thử nghiệm và không push.
+3. **QUY TẮC PUSH REMOTE NGHIÊM NGẶT (TUYỆT ĐỐI TUÂN THỦ):**
+   - **Tuyệt đối KHÔNG tự ý chạy `git push` lên remote (kể cả push nhánh phụ hay push `main`) trong bất kỳ tình huống nào.**
+   - Chỉ được phép đẩy code lên GitHub khi và chỉ khi **người dùng ra lệnh rõ ràng bằng văn bản** (Ví dụ: "hãy push lên đi", "đẩy code lên git", "ok push đi").
+   - Mọi thao tác checkout, sửa code, commit đều được thực hiện hoàn toàn ở local cho đến khi có lệnh push từ người dùng.
 
 ---
 
