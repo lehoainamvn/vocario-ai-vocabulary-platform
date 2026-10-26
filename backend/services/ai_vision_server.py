@@ -108,66 +108,103 @@ except Exception as e:
     print(f"❌ [AI SERVICE] Lỗi khi nạp mô hình: {e}")
 
 
-def apply_theme_classes(theme_name: Optional[str]):
-    """Nạp danh sách từ vựng thông minh theo bối cảnh với cache tránh set_classes lặp lại"""
+def _resolve_theme_key(clean: str) -> Optional[str]:
+    """Nhận diện mã bối cảnh phù hợp dựa trên từ khóa cấu hình trong themes_classes.json"""
+    for key, data in themes_map.items():
+        kws = data.get("keywords", [])
+        if any(kw in clean for kw in kws):
+            return key
+            
+    # Quy tắc tương thích ngược với các tên cũ
+    if any(k in clean for k in ["bàn học", "desk", "văn phòng", "office", "study", "làm việc"]):
+        return "study_office"
+    elif any(k in clean for k in ["bếp", "kitchen", "nấu"]):
+        return "kitchen_appliances"
+    elif any(k in clean for k in ["bàn ăn", "dining", "thưởng thức"]):
+        return "dining_tableware"
+    elif any(k in clean for k in ["món ăn", "thực phẩm", "food", "trái cây", "fruit", "rau củ"]):
+        return "food_fruits_groceries"
+    elif any(k in clean for k in ["khách", "living"]):
+        return "living_room_decor"
+    elif any(k in clean for k in ["ngủ", "bedroom"]):
+        return "bedroom_personal_space"
+    elif any(k in clean for k in ["tắm", "bath", "toilet", "vệ sinh"]):
+        return "bathroom_toiletries"
+    elif any(k in clean for k in ["quần áo", "giày", "thời trang", "clothing", "fashion"]):
+        return "clothing_footwear"
+    elif any(k in clean for k in ["cá nhân", "personal", "phụ kiện", "túi xách"]):
+        return "accessories_personal"
+    elif any(k in clean for k in ["công nghệ", "tech", "điện tử", "gadget"]):
+        return "digital_tech_gadgets"
+    elif any(k in clean for k in ["ngoài trời", "outdoor", "xe", "giao thông", "đường phố", "cà phê", "cafe"]):
+        return "outdoor_vehicles_street"
+    elif any(k in clean for k in ["tự nhiên", "động vật", "animal", "pet", "thú cưng", "hoa", "cây"]):
+        return "nature_animals_plants"
+    elif any(k in clean for k in ["thể thao", "sport", "fitness", "vận động"]):
+        return "sports_recreation"
+    elif any(k in clean for k in ["gym", "thể hình", "workout", "tạ"]):
+        return "gym_fitness"
+    elif any(k in clean for k in ["nhà hàng", "restaurant", "quán cà phê", "quán ăn"]):
+        return "restaurant_cafe"
+    elif any(k in clean for k in ["bệnh viện", "bác sĩ", "y tá", "hospital", "clinic"]):
+        return "hospital_healthcare"
+    elif any(k in clean for k in ["mỹ thuật", "hội họa", "thủ công", "art", "craft", "vẽ"]):
+        return "art_craft_hobbies"
+    elif any(k in clean for k in ["công cụ", "xây dựng", "sửa chữa", "tools", "hardware"]):
+        return "construction_tools"
+    elif any(k in clean for k in ["đồ chơi", "trẻ em", "em bé", "toys", "baby", "kid"]):
+        return "baby_toys_kids"
+    elif any(k in clean for k in ["y tế", "medical", "thuốc", "siêu thị", "store", "shop"]):
+        return "medical_store_services"
+    return None
+
+
+def apply_theme_classes(theme_name: Optional[str], secondary_theme: Optional[str] = None):
+    """Nạp danh sách từ vựng thông minh theo bối cảnh với cache tránh set_classes lặp lại.
+    Hỗ trợ cơ chế Soft-Gating hợp nhất 2 bối cảnh khi độ tin cậy Top-1 < 80%."""
     global current_active_theme, model, master_txt_feats, word_to_master_idx, cached_classes
     if model is None:
         return
 
     clean = (theme_name or "general").strip().lower()
+    matched_key = _resolve_theme_key(clean)
+    secondary_key = _resolve_theme_key(secondary_theme.strip().lower()) if secondary_theme else None
 
-    # Nhận diện mã bối cảnh phù hợp dựa trên từ khóa cấu hình trong themes_classes.json
-    matched_key = None
-    
-    # 1. Quét qua từ khóa của từng bối cảnh trong themes_map
-    for key, data in themes_map.items():
-        kws = data.get("keywords", [])
-        if any(kw in clean for kw in kws):
-            matched_key = key
-            break
-            
-    # 2. Quy tắc tương thích ngược với các tên cũ
-    if not matched_key:
-        if any(k in clean for k in ["bàn học", "desk", "văn phòng", "office", "study", "làm việc"]):
-            matched_key = "study_office"
-        elif any(k in clean for k in ["bếp", "kitchen", "nấu"]):
-            matched_key = "kitchen_appliances"
-        elif any(k in clean for k in ["bàn ăn", "dining", "thưởng thức"]):
-            matched_key = "dining_tableware"
-        elif any(k in clean for k in ["món ăn", "thực phẩm", "food", "trái cây", "fruit", "rau củ"]):
-            matched_key = "food_fruits_groceries"
-        elif any(k in clean for k in ["khách", "living"]):
-            matched_key = "living_room_decor"
-        elif any(k in clean for k in ["ngủ", "bedroom"]):
-            matched_key = "bedroom_personal_space"
-        elif any(k in clean for k in ["tắm", "bath", "toilet", "vệ sinh"]):
-            matched_key = "bathroom_toiletries"
-        elif any(k in clean for k in ["quần áo", "giày", "thời trang", "clothing", "fashion"]):
-            matched_key = "clothing_footwear"
-        elif any(k in clean for k in ["cá nhân", "personal", "phụ kiện", "túi xách"]):
-            matched_key = "accessories_personal"
-        elif any(k in clean for k in ["công nghệ", "tech", "điện tử", "gadget"]):
-            matched_key = "digital_tech_gadgets"
-        elif any(k in clean for k in ["ngoài trời", "outdoor", "xe", "giao thông", "đường phố", "cà phê", "cafe"]):
-            matched_key = "outdoor_vehicles_street"
-        elif any(k in clean for k in ["tự nhiên", "động vật", "animal", "pet", "thú cưng", "hoa", "cây"]):
-            matched_key = "nature_animals_plants"
-        elif any(k in clean for k in ["thể thao", "sport", "fitness", "vận động"]):
-            matched_key = "sports_recreation"
-        elif any(k in clean for k in ["gym", "thể hình", "workout", "tạ"]):
-            matched_key = "gym_fitness"
-        elif any(k in clean for k in ["nhà hàng", "restaurant", "quán cà phê", "quán ăn"]):
-            matched_key = "restaurant_cafe"
-        elif any(k in clean for k in ["bệnh viện", "bác sĩ", "y tá", "hospital", "clinic"]):
-            matched_key = "hospital_healthcare"
-        elif any(k in clean for k in ["mỹ thuật", "hội họa", "thủ công", "art", "craft", "vẽ"]):
-            matched_key = "art_craft_hobbies"
-        elif any(k in clean for k in ["công cụ", "xây dựng", "sửa chữa", "tools", "hardware"]):
-            matched_key = "construction_tools"
-        elif any(k in clean for k in ["đồ chơi", "trẻ em", "em bé", "toys", "baby", "kid"]):
-            matched_key = "baby_toys_kids"
-        elif any(k in clean for k in ["y tế", "medical", "thuốc", "siêu thị", "store", "shop"]):
-            matched_key = "medical_store_services"
+    # Nếu có secondary_theme khác primary_theme, kích hoạt chế độ hợp nhất Soft-Gating Top-2
+    if secondary_key and secondary_key != matched_key and secondary_key in themes_map and matched_key in themes_map:
+        active_key = f"{matched_key}+{secondary_key}"
+        if current_active_theme == active_key:
+            return
+
+        classes_1 = themes_map[matched_key].get("classes", [])
+        classes_2 = themes_map[secondary_key].get("classes", [])
+        
+        seen_words = set()
+        combined_classes = []
+        for w in (classes_1 + classes_2):
+            if w not in seen_words:
+                seen_words.add(w)
+                combined_classes.append(w)
+
+        if master_txt_feats is not None and word_to_master_idx:
+            import torch
+            indices = [word_to_master_idx[w] for w in combined_classes if w in word_to_master_idx]
+            if indices:
+                idx_tensor = torch.tensor(indices, dtype=torch.long)
+                model.model.txt_feats = master_txt_feats[:, idx_tensor, :]
+                model.model.model[-1].nc = len(indices)
+                model.model.names = {i: cached_classes[idx] for i, idx in enumerate(indices)}
+                model.predictor = None
+                current_active_theme = active_key
+                name1 = themes_map[matched_key].get("nameVi")
+                name2 = themes_map[secondary_key].get("nameVi")
+                print(f"🎯 [AI SERVICE] Kích hoạt Soft-Gating hợp nhất 2 bối cảnh '{name1}' + '{name2}' ({len(indices)} từ) tức thời qua Vector Cache!")
+                return
+
+        model.set_classes(combined_classes)
+        model.predictor = None
+        current_active_theme = active_key
+        return
 
     target_key = matched_key or "all"
 
@@ -197,7 +234,7 @@ def apply_theme_classes(theme_name: Optional[str]):
             print(f"🎯 [AI SERVICE] Kích hoạt bối cảnh '{themes_map[matched_key].get('nameVi')}' ({len(theme_classes)} từ) - Tối ưu độ chính xác và giảm nhiễu!")
             return
 
-    # Fallback nạp toàn bộ danh sách 1000 từ
+    # Fallback nạp toàn bộ danh sách 3615 từ
     if master_txt_feats is not None:
         model.model.txt_feats = master_txt_feats
         model.model.model[-1].nc = len(cached_classes)
@@ -323,34 +360,47 @@ async def detect_objects(
 
         # Tầng 1: Tự động phân tích bối cảnh tham khảo bằng ResNet-18 (Places365)
         auto_scene_info = None
+        active_scene_key = "general"
         clean_theme = (theme or "auto").strip().lower()
         if clean_theme in ["auto", "general", "toàn cảnh", "all"]:
             scene_res = scene_service.predict_scene(pil_image)
+            should_merge_top2 = scene_res.get("should_merge_top2", False)
+            detected_theme = scene_res.get("theme_key", "study_office")
+            sec_theme = scene_res.get("secondary_theme_key") if should_merge_top2 else None
+
             auto_scene_info = {
                 "enabled": True,
-                "theme_key": scene_res["theme_key"],
+                "theme_key": detected_theme,
                 "theme_name_vi": scene_res["theme_name_vi"],
                 "confidence": scene_res["confidence"],
                 "raw_category": scene_res["raw_category"],
                 "inference_ms": scene_res["inference_ms"],
-                "top_candidates": scene_res.get("top_candidates", [])
+                "top_candidates": scene_res.get("top_candidates", []),
+                "should_merge_top2": should_merge_top2,
+                "secondary_theme_key": sec_theme,
+                "secondary_theme_name_vi": scene_res.get("secondary_theme_name_vi")
             }
-            # Tầng 1 điều phối Tầng 2: Kích hoạt chính xác 30-50 từ vựng theo bối cảnh vừa phát hiện
-            detected_theme = scene_res.get("theme_key", "study_office")
-            apply_theme_classes(detected_theme)
-            effective_theme = scene_res.get("theme_name_vi", "Bàn Học, Văn Phòng & Trường Học")
-            print(f"🎯 [CONTEXT-AWARE AI] Kích hoạt bối cảnh '{effective_theme}' ({detected_theme}) theo đúng kiến trúc đồ án!")
+            # Tầng 1 điều phối Tầng 2: Soft-Gating hợp nhất Top-2 nếu confidence < 80%
+            apply_theme_classes(detected_theme, secondary_theme=sec_theme)
+            if sec_theme:
+                effective_theme = f"{scene_res.get('theme_name_vi')} & {scene_res.get('secondary_theme_name_vi')}"
+                active_scene_key = f"{detected_theme}+{sec_theme}"
+                print(f"🎯 [CONTEXT-AWARE AI] Kích hoạt Soft-Gating Top-2: '{effective_theme}' ({detected_theme}+{sec_theme})!")
+            else:
+                effective_theme = scene_res.get("theme_name_vi", "Bàn Học, Văn Phòng & Trường Học")
+                active_scene_key = detected_theme
+                print(f"🎯 [CONTEXT-AWARE AI] Kích hoạt bối cảnh '{effective_theme}' ({detected_theme}) theo đúng kiến trúc đồ án!")
         else:
             # Người dùng chọn bối cảnh thủ công
             apply_theme_classes(theme)
             effective_theme = theme
+            active_scene_key = theme
 
         # Tầng 2: Chạy suy luận nhận diện đồ vật YOLO-World siêu tốc trên CPU
-        # imgsz=480: Tăng từ 320 để nhận diện được nhiều vật thể hơn (tăng ~30% vật thể nhỏ)
-        # vẫn trong giới hạn CPU Cloud (3-4s thay vì 6s+ với imgsz=640)
+        # Đặt conf khởi tạo 0.10 để bao quát cả vật thể nhỏ/che khuất (Recall cao)
         import torch
         with torch.inference_mode():
-            results = model.predict(pil_image, conf=conf, imgsz=480, verbose=False)
+            results = model.predict(pil_image, conf=min(conf, 0.10), imgsz=480, verbose=False)
         
         detected_words = []
         seen_words = set()
@@ -364,12 +414,39 @@ async def detect_objects(
             ("#EDE9FE", "#7C3AED", "#4C1D95")
         ]
 
+        # Danh mục từ vựng trừu tượng hoặc dễ bị kích hoạt ảo giác bởi kết cấu song song / bề mặt phẳng
+        ABSTRACT_OR_STRUCTURE_WORDS = {
+            "library", "shelf", "bookshelf", "wardrobe", "counter", "countertop", 
+            "wall", "ceiling", "floor", "door", "window", "cabinet", "curtain", "blinds"
+        }
+
+        # Danh mục từ vựng nhỏ hoặc chi tiết dễ bị bỏ sót trong ảnh
+        SMALL_OR_OBSCURED_WORDS = {
+            "pen", "pencil", "cup", "coffee cup", "mug", "glass", "fork", "knife", "spoon",
+            "apple", "banana", "orange", "lemon", "lime", "medicine", "pill", "capsule",
+            "computer mouse", "smartphone", "cell phone", "bottle", "key", "eraser",
+            "airpods", "earbuds", "earphones", "strawberry", "egg", "cookie", "coin", "usb hub"
+        }
+
         item_index = 0
         for r in results:
             for box in r.boxes:
                 cls_id = int(box.cls[0])
                 word_name = r.names[cls_id]
                 score = float(box.conf[0])
+
+                # Cơ chế Adaptive Confidence Thresholds:
+                w_clean = word_name.strip().lower()
+                if w_clean in ABSTRACT_OR_STRUCTURE_WORDS:
+                    min_thresh = 0.35  # Nâng ngưỡng để đảm bảo Precision, chống ảo giác
+                elif w_clean in SMALL_OR_OBSCURED_WORDS:
+                    min_thresh = 0.12  # Hạ ngưỡng để tăng Recall cho vật thể nhỏ
+                else:
+                    min_thresh = conf   # Ngưỡng chuẩn mặc định (0.15)
+
+                if score < min_thresh:
+                    continue
+
                 x1, y1, x2, y2 = box.xyxy[0].tolist()
 
                 # Tính phần trăm vị trí theo kích thước ảnh thực tế
@@ -414,7 +491,6 @@ async def detect_objects(
         # 2. Loại bỏ dị biệt hình học (Aspect ratio / Area constraints)
         # 3. Hiệu chuẩn độ tin cậy theo Ma trận Đồng xuất hiện bối cảnh (Co-occurrence)
         # 4. Triệt tiêu hộp bao lồng nhau (Soft Containment NMS)
-        active_scene_key = auto_scene_info.get("theme_key") if (auto_scene_info and auto_scene_info.get("enabled")) else (clean_theme or "general")
         verified_words = verifier_service.verify_and_refine(pil_image, detected_words, scene_key=active_scene_key)
 
         # Fallback nếu bộ thẩm định lọc quá tay hoặc với ảnh tranh vẽ / hoạt hình

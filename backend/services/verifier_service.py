@@ -72,6 +72,36 @@ THEME_COOCCURRENCE_BOOST = {
     "baby_toys_kids": ["teddy bear", "stuffed animal", "doll", "toy car", "building blocks", "lego bricks", "baby stroller", "baby crib", "high chair", "baby bottle", "pacifier", "baby rattle", "tricycle"]
 }
 
+# Ma trận loại trừ vật thể dị biệt / ảo giác theo bối cảnh (Context Blacklist Rules)
+# Triệt tiêu 100% các trường hợp nhận nhầm kết cấu kiến trúc thành vật thể phi logic
+BLACKLIST_SCENE_OBJECTS = {
+    "gym_fitness": [
+        "library", "bookshelf", "book", "bed", "pillow", "blanket", "bathtub", "shower", 
+        "refrigerator", "gas stove", "microwave", "couch", "sofa", "dining table", "clothes rack"
+    ],
+    "restaurant_cafe": [
+        "library", "bed", "bathtub", "shower", "treadmill", "dumbbell", "barbell", "wardrobe"
+    ],
+    "kitchen_appliances": [
+        "library", "bed", "car", "motorcycle", "treadmill", "dumbbell", "bathtub"
+    ],
+    "dining_tableware": [
+        "library", "bed", "bathtub", "shower", "treadmill", "dumbbell", "car"
+    ],
+    "bathroom_toiletries": [
+        "library", "clothes rack", "gas stove", "oven", "refrigerator", "car", "motorcycle", "treadmill"
+    ],
+    "sports_recreation": [
+        "library", "bed", "bathtub", "refrigerator", "gas stove"
+    ],
+    "hospital_healthcare": [
+        "library", "menu", "cash register", "beer glass", "cocktail glass"
+    ],
+    "outdoor_vehicles_street": [
+        "library", "bed", "bathtub", "refrigerator", "shower"
+    ]
+}
+
 class TwoStageVerifier:
     """Mô hình thẩm định hộp bao hai giai đoạn (Stage-2 Verifier)"""
 
@@ -135,11 +165,25 @@ class TwoStageVerifier:
         verified_candidates = []
 
         clean_scene = (scene_key or "").strip().lower()
+        active_scenes = [s.strip() for s in clean_scene.split("+") if s.strip()]
 
         for cand in raw_candidates:
             label = str(cand.get("word") or cand.get("label") or "").lower().strip()
             if not label:
                 continue
+
+            # --- TIÊU CHÍ 0: MA TRẬN CẤM DỊ BIỆT (CONTEXT BLACKLIST RULES) ---
+            # Triệt tiêu 100% các nhãn ảo giác phi logic (như 'library' trong phòng gym hay tiệm bánh)
+            is_blacklisted = False
+            for sc in active_scenes:
+                if sc in BLACKLIST_SCENE_OBJECTS:
+                    blacklisted_words = BLACKLIST_SCENE_OBJECTS[sc]
+                    if any(bw == label or bw in label.split() for bw in blacklisted_words):
+                        is_blacklisted = True
+                        break
+            if is_blacklisted:
+                continue
+
             score = float(cand.get("confidence", 0.5))
 
             # Hỗ trợ cả 2 định dạng: leftPercent/topPercent hoặc box_percent [ymin, xmin, ymax, xmax] hoặc box_pixels
@@ -198,6 +242,13 @@ class TwoStageVerifier:
                 if aspect_ratio < min_ar or aspect_ratio > max_ar:
                     score *= 0.7  # Giảm điểm khi hình dạng méo mó bất thường
 
+            # 1d. Hộp bao chiếm diện tích quá lớn (> 75% ảnh) thường là nhận diện sai cả khung nền
+            ALLOWED_LARGE_BACKGROUNDS = {"road", "street", "sky", "floor", "wall", "field", "lawn"}
+            if area_ratio > 0.75 and label not in ALLOWED_LARGE_BACKGROUNDS:
+                score *= 0.3
+                if score < 0.25:
+                    continue
+
             # --- TIÊU CHÍ 2: DEEP FEATURE VERIFICATION (CROP VÙNG ẢNH) ---
             # Cải tiến: xử lý tốt hơn với crop vật thể nhỏ (< 40px)
             if box_w >= 20 and box_h >= 20:
@@ -212,14 +263,17 @@ class TwoStageVerifier:
 
             # --- TIÊU CHÍ 3: ĐỒNG XUẤT HIỆN BỐI CẢNH (SCENE CONSISTENCY) ---
             boost_factor = 1.0
-            if clean_scene in THEME_COOCCURRENCE_BOOST:
-                expected_items = THEME_COOCCURRENCE_BOOST[clean_scene]
-                if any(exp in label or label in exp for exp in expected_items):
-                    # Vật thể cực kỳ phù hợp với bối cảnh nhận diện -> Tăng điểm tin cậy
-                    boost_factor = 1.20
-                else:
-                    # Vật thể lạ không thuộc bối cảnh -> Kiểm tra nhẹ nhàng hơn để không bỏ sót
-                    boost_factor = 0.95
+            matched_any_scene = False
+            for sc in active_scenes:
+                if sc in THEME_COOCCURRENCE_BOOST:
+                    expected_items = THEME_COOCCURRENCE_BOOST[sc]
+                    if any(exp in label or label in exp for exp in expected_items):
+                        matched_any_scene = True
+                        break
+            if matched_any_scene:
+                boost_factor = 1.20
+            else:
+                boost_factor = 0.95
 
             # Hiệu chuẩn điểm số cuối cùng (Calibrated Final Score)
             # Công thức được tối ưu để cân bằng giữa Precision và Recall:

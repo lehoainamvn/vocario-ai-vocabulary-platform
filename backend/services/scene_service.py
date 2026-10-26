@@ -265,6 +265,12 @@ class SceneClassifierService:
                 for k, v in sorted_themes[:3]
             ]
 
+            # Cơ chế Soft-Gating Top-2: Nếu bối cảnh Top-1 không đạt độ tin cậy cao (< 0.80),
+            # tự động hợp nhất với bối cảnh xếp thứ 2 để chống sai lệch và tăng độ phủ từ vựng
+            second_theme_key = sorted_themes[1][0] if len(sorted_themes) > 1 else None
+            second_score = sorted_themes[1][1] if len(sorted_themes) > 1 else 0.0
+            should_merge_top2 = bool(conf_display < 0.80 and second_theme_key and second_score > 0.05)
+
             dt = (time.time() - t0) * 1000
 
             return {
@@ -273,7 +279,10 @@ class SceneClassifierService:
                 "confidence": conf_display,
                 "raw_category": top_raw_category,
                 "inference_ms": round(dt, 2),
-                "top_candidates": top_candidates
+                "top_candidates": top_candidates,
+                "should_merge_top2": should_merge_top2,
+                "secondary_theme_key": second_theme_key if should_merge_top2 else None,
+                "secondary_theme_name_vi": THEME_NAMES_VI.get(second_theme_key, second_theme_key) if should_merge_top2 else None
             }
 
         except Exception as e:
@@ -284,7 +293,10 @@ class SceneClassifierService:
                 "confidence": 0.80,
                 "raw_category": "unknown",
                 "inference_ms": 0.0,
-                "top_candidates": []
+                "top_candidates": [],
+                "should_merge_top2": False,
+                "secondary_theme_key": None,
+                "secondary_theme_name_vi": None
             }
 
 # Singleton instance
