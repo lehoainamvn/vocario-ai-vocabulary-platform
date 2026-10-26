@@ -5473,5 +5473,135 @@
     "vietnamese": "hiệp ước bảo tồn",
     "ipa": "/ˌkɒnsərˈveɪʃən ˈtriːtiz/",
     "level": "B2"
+  },
+  "footboard": {
+    "vietnamese": "chân giường",
+    "ipa": "/footboard/",
+    "level": "B2"
+  },
+  "dresser": {
+    "vietnamese": "tủ quần áo",
+    "ipa": "/ˈdrɛsər/",
+    "level": "A2"
+  },
+  "armoire": {
+    "vietnamese": "tủ quần áo",
+    "ipa": "/ˈɑmwɑr/",
+    "level": "B2"
+  },
+  "chest of drawers": {
+    "vietnamese": "tủ kéo",
+    "ipa": "/ʧɛst əv drɔrz/",
+    "level": "A2"
+  },
+  "daybed": {
+    "vietnamese": "giường nằm",
+    "ipa": "/daybed/",
+    "level": "B2"
+  },
+  "weighted blanket": {
+    "vietnamese": "chăn nặng",
+    "ipa": "/ˈweɪtɪd ˈblæŋkɪt/",
+    "level": "A2"
+  },
+  "flat sheet": {
+    "vietnamese": "tấm ga",
+    "ipa": "/flæt ʃit/",
+    "level": "B1"
+  },
+  "milk jug": {
+    "vietnamese": "cái bình sữa",
+    "ipa": "/mɪlk ʤəg/",
+    "level": "B1"
+  },
+  "decanter": {
+    "vietnamese": "bình rót rượu",
+    "ipa": "/decanter/",
+    "level": "B1"
+  },
+  "countertop": {
+    "vietnamese": "mặt bàn",
+    "ipa": "/ˈkaʊntərˌtɑp/",
+    "level": "B1"
+  },
+  "kitchen tongs": {
+    "vietnamese": "kẹp bếp",
+    "ipa": "/ˈkɪʧən tɔŋz/",
+    "level": "B2"
+  },
+  "citrus squeezer": {
+    "vietnamese": "máy vắt cam",
+    "ipa": "/ˈsɪtrəs squeezer/",
+    "level": "B2"
+  },
+  "white wine glass": {
+    "vietnamese": "ly rượu vang trắng",
+    "ipa": "/waɪt waɪn glæs/",
+    "level": "A1"
+  },
+  "letter opener": {
+    "vietnamese": "dao mở thư",
+    "ipa": "/ˈlɛtər ˈoʊpənər/",
+    "level": "A1"
+  },
+  "flip phone": {
+    "vietnamese": "điện thoại nắp gập",
+    "ipa": "/flɪp foʊn/",
+    "level": "A1"
+  },
+  "green bell pepper": {
+    "vietnamese": "ớt chuông xanh",
+    "ipa": "/grin bɛl ˈpɛpər/",
+    "level": "A2"
+  },
+  "tractor-trailer": {
+    "vietnamese": "xe đầu kéo",
+    "ipa": "/tractor-trailer/",
+    "level": "B2"
+  },
+  "box truck": {
+    "vietnamese": "xe tải thùng",
+    "ipa": "/bɑks trək/",
+    "level": "A1"
+  },
+  "train station": {
+    "vietnamese": "nhà ga",
+    "ipa": "/treɪn ˈsteɪʃən/",
+    "level": "A1"
+  },
+  "push-up bars": {
+    "vietnamese": "thanh chống đẩy",
+    "ipa": "/ˈpʊˌʃəp bɑrz/",
+    "level": "A2"
+  },
+  "driver": {
+    "vietnamese": "tài xế",
+    "ipa": "/ˈdraɪvər/",
+    "level": "A1"
+  },
+  "decorative tray": {
+    "vietnamese": "khay trang trí",
+    "ipa": "/ˈdɛkrətɪv treɪ/",
+    "level": "B2"
+  },
+  "wall art": {
+    "vietnamese": "tranh treo tường",
+    "ipa": "/wɔl ɑrt/",
+    "level": "A1"
+  },
+  "service bell": {
+    "vietnamese": "chuông gọi",
+    "ipa": "/ˈsərvɪs bɛl/",
+    "level": "A1"
+  },
+  "safety glasses": {
+    "vietnamese": "kính bảo hộ",
+    "ipa": "/ˈseɪfti ˈglæsɪz/",
+    "level": "A1"
+  },
+  "telephone": {
+    "vietnamese": "điện thoại",
+    "ipa": "/ˈtɛləˌfoʊn/",
+    "level": "A1"
   }
 }
