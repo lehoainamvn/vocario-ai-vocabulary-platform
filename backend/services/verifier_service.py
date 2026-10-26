@@ -320,14 +320,17 @@ class TwoStageVerifier:
                     cur_w = (current.get("word") or current.get("label") or "").strip().lower()
                     acc_w = (accepted.get("word") or accepted.get("label") or "").strip().lower()
 
-                    # 4a. Cùng nhãn từ vựng và đè lên nhau > 45% -> Bỏ hộp yếu hơn
-                    if cur_w == acc_w and iou > 0.45:
-                        keep = False
-                        break
+                    # 4a. Cùng nhãn từ vựng và đè lên nhau (IoU > 0.35 hoặc diện tích hộp nhỏ hơn bị lọt > 50% vào hộp lớn) -> Bỏ hộp yếu hơn
+                    if cur_w == acc_w:
+                        smaller_area = min(current["_area"], accepted["_area"])
+                        overlap_ratio_smaller = inter_area / float(smaller_area) if smaller_area > 0 else 0
+                        if iou > 0.35 or overlap_ratio_smaller > 0.50:
+                            keep = False
+                            break
 
-                    # 4b. Hộp hiện tại bị lọt thỏm trong hộp đã có (> 85% diện tích nằm trong hộp khác cùng họ từ)
+                    # 4b. Khác nhãn nhưng hộp hiện tại bị lọt thỏm trong hộp đã có (> 85% diện tích nằm trong hộp khác và IoU cao)
                     overlap_ratio = inter_area / float(current["_area"])
-                    if overlap_ratio > 0.85 and (cur_w == acc_w or iou > 0.6):
+                    if overlap_ratio > 0.85 and iou > 0.60:
                         keep = False
                         break
 

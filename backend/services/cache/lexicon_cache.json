@@ -5428,5 +5428,50 @@
     "vietnamese": "xe tải",
     "ipa": "/18-wheeler/",
     "level": "B2"
+  },
+  "drawer": {
+    "vietnamese": "Đồ vật đời sống",
+    "ipa": "/.../",
+    "level": "A2"
+  },
+  "marine reptiles": {
+    "vietnamese": "động vật có xương sống sống dưới nước",
+    "ipa": "/ˈmærɪn rɪˈpʃiːz/",
+    "level": "B2"
+  },
+  "streamlined": {
+    "vietnamese": "hình dáng thon gọn, giảm lực cản",
+    "ipa": "/ˈstriːmlaɪnd/",
+    "level": "B2"
+  },
+  "carapace": {
+    "vietnamese": "vỏ cứng bảo vệ trên lưng của rùa",
+    "ipa": "/ˈkærəˌpeɪs/",
+    "level": "B2"
+  },
+  "geomagnetic orientation": {
+    "vietnamese": "định hướng dựa trên từ trường Trái Đất",
+    "ipa": "/ˌdʒiːoʊmæɡˈnɛtɪk ˌɔːriənˈteɪʃən/",
+    "level": "B2"
+  },
+  "anthropogenic": {
+    "vietnamese": "do con người gây ra",
+    "ipa": "/ˌænθrəpəˈdʒɛnɪk/",
+    "level": "B2"
+  },
+  "coastal development": {
+    "vietnamese": "phát triển khu vực ven biển",
+    "ipa": "/ˈkoʊstəl dɪˈvɛləpmənt/",
+    "level": "B2"
+  },
+  "bycatch": {
+    "vietnamese": "sự bắt không mong muốn các loài sinh vật không phải mục tiêu",
+    "ipa": "/ˈbaɪkætʃ/",
+    "level": "B2"
+  },
+  "conservation treaties": {
+    "vietnamese": "hiệp ước bảo tồn",
+    "ipa": "/ˌkɒnsərˈveɪʃən ˈtriːtiz/",
+    "level": "B2"
   }
 }

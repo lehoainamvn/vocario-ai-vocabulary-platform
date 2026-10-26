@@ -498,17 +498,20 @@ async def detect_objects(
             print(f"⚠️ [VERIFIER FALLBACK] Bộ thẩm định lọc hết ứng viên, fallback lấy {len(detected_words)} vật thể nhận diện từ YOLO-World")
             verified_words = detected_words
 
-        # Tầng 2C: Ưu tiên lọc từ vựng theo mục tiêu CEFR của học viên (A1, A2, B1, B2, C1)
+        # Tầng 2C: Bộ lọc sư phạm thích ứng CEFR (Pedagogical CEFR Gating)
         cefr_order = {"A1": 1, "A2": 2, "B1": 3, "B2": 4, "C1": 5, "C2": 6}
         target_val = cefr_order.get((target_level or "A2").upper().strip(), 2)
 
         def cefr_priority_key(item):
             item_lvl = cefr_order.get(str(item.get("level", "A2")).upper().strip(), 2)
-            dist = abs(item_lvl - target_val)
-            # Ưu tiên từ có khoảng cách CEFR nhỏ nhất (đúng cấp độ trước), kết hợp độ tin cậy cao
+            # Phạt độ ưu tiên đối với các từ vượt quá 1 bậc so với trình độ học viên (ví dụ A1 gặp C1)
+            exceed_penalty = 5 if item_lvl > target_val + 1 else 0
+            dist = abs(item_lvl - target_val) + exceed_penalty
+            # Ưu tiên từ đúng cấp độ trước, sau đó đến điểm tin cậy cao
             return (dist, -float(item.get("confidence", 0.0)))
 
         candidates_to_filter = sorted(verified_words, key=cefr_priority_key)
+
 
         # Lọc bớt trùng lặp tên từ để tạo danh mục học tập phong phú
         filtered = []

@@ -1,12 +1,21 @@
 import os
+import sys
 import json
 import re
 from typing import Optional, Dict, Any
+
+if hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
 import eng_to_ipa as ipa_lib
 from deep_translator import GoogleTranslator, MyMemoryTranslator
 
 from dotenv import load_dotenv
 from groq import Groq
+
 
 try:
     import cefrpy
@@ -20,6 +29,14 @@ load_dotenv(ENV_PATH)
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 GROQ_MODEL = os.getenv("GROQ_MODEL", "qwen/qwen3.8-27b")
 
+DEFAULT_PG_URL = "postgresql://postgres.ltviznwjqsfszbjbjjqj:Vocario2026Pass@aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres?sslmode=require"
+PG_URL = os.getenv("DATABASE_URL", DEFAULT_PG_URL)
+
+try:
+    import psycopg2
+except ImportError:
+    psycopg2 = None
+
 # Đường dẫn file cache từ vựng để không bao giờ phải dịch lại lần 2
 CACHE_DIR = os.path.join(os.path.dirname(__file__), "cache")
 CACHE_FILE = os.path.join(CACHE_DIR, "lexicon_cache.json")
@@ -30,6 +47,7 @@ class LexiconService:
     def __init__(self):
         self._cache = {}
         self._load_cache()
+        self._load_from_postgres()
         self._translator = GoogleTranslator(source="en", target="vi")
         self._groq_client = None
         self._cefr_analyzer = None
@@ -54,12 +72,62 @@ class LexiconService:
                 print(f"[LexiconService] Lỗi đọc cache: {e}")
                 self._cache = {}
 
+    def _load_from_postgres(self):
+        """Tự động đồng bộ các từ vựng đã có trong bảng 'words' của PostgreSQL vào bộ nhớ RAM"""
+        if not psycopg2 or not PG_URL:
+            return
+        try:
+            conn = psycopg2.connect(PG_URL, connect_timeout=5)
+            cur = conn.cursor()
+            cur.execute("SELECT word, vietnamese_meaning, phonetic_ipa, cefr_level FROM words WHERE word IS NOT NULL;")
+            rows = cur.fetchall()
+            loaded_count = 0
+            for w, vi, ipa, cefr in rows:
+                if not w:
+                    continue
+                clean = w.strip().lower()
+                if clean not in self._cache:
+                    self._cache[clean] = {
+                        "vietnamese": vi or clean,
+                        "ipa": ipa or f"/{clean}/",
+                        "level": cefr or "A2"
+                    }
+                    loaded_count += 1
+            cur.close()
+            conn.close()
+            if loaded_count > 0:
+                print(f"[LexiconService] Da dong bo {loaded_count} tu vung moi tu CSDL PostgreSQL vao RAM!")
+                self._save_cache()
+            print(f"[LexiconService] Ket noi CSDL PostgreSQL thanh cong (Tong {len(rows)} tu trong bang words)!")
+        except Exception as e:
+            print(f"[LexiconService] Khong the ket noi PostgreSQL ({e}), tiep tuc dung cache cuc bo.")
+
+
     def _save_cache(self):
         try:
             with open(CACHE_FILE, "w", encoding="utf-8") as f:
                 json.dump(self._cache, f, ensure_ascii=False, indent=2)
         except Exception as e:
             print(f"[LexiconService] Lỗi lưu cache: {e}")
+
+    def _save_to_postgres(self, word: str, vietnamese: str, ipa: str, level: str):
+        """Lưu tức thời từ vựng mới vào bảng 'words' của PostgreSQL để đồng bộ với Spring Boot"""
+        if not psycopg2 or not PG_URL:
+            return
+        try:
+            import uuid
+            conn = psycopg2.connect(PG_URL, connect_timeout=5)
+            cur = conn.cursor()
+            cur.execute("""
+                INSERT INTO words (id, word, part_of_speech, phonetic_ipa, vietnamese_meaning, cefr_level, category)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (word) DO NOTHING;
+            """, (str(uuid.uuid4()), word.strip().lower(), "noun", ipa, vietnamese, level, "Đồ vật đời sống"))
+            conn.commit()
+            cur.close()
+            conn.close()
+        except Exception:
+            pass
 
     def _is_valid_translation(self, trans: str, original: str) -> bool:
         if not trans:
@@ -279,14 +347,16 @@ class LexiconService:
             "source": "deep-translator+eng-to-ipa+cefrpy"
         }
 
-        # 3. Lưu vào cache file json để các lần sau không cần gọi lại mạng
+        # 3. Lưu vào cache file json và đồng bộ tức thời vào PostgreSQL
         self._cache[clean] = {
             "vietnamese": vietnamese,
             "ipa": ipa,
             "level": level
         }
         self._save_cache()
+        self._save_to_postgres(clean, vietnamese, ipa, level)
         return result
+
 
 
 # Singleton instance
