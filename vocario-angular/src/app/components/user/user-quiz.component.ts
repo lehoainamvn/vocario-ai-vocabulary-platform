@@ -223,6 +223,17 @@ interface ClickFeedback {
                   >
                     CHÍNH THỨC
                   </span>
+
+                  <!-- Floating Leaderboard Badge on Image (Bottom-Right) -->
+                  <button 
+                    type="button"
+                    (click)="openStageLeaderboard(stage, $event)"
+                    class="absolute bottom-2.5 right-2.5 px-2 py-1 rounded-[3px] bg-stone-900/85 hover:bg-[#7D6853] text-white font-mono text-[10px] font-semibold flex items-center gap-1.5 shadow-md transition-all cursor-pointer backdrop-blur-xs border border-white/20 z-10 hover:scale-105 active:scale-95"
+                    title="Xem Bảng Xếp Hạng riêng của đấu trường này"
+                  >
+                    <app-icon name="trophy" [size]="11" class="text-amber-400"></app-icon>
+                    <span>BXH Kỷ lục</span>
+                  </button>
                 </div>
 
                 <!-- Content below -->
@@ -238,28 +249,34 @@ interface ClickFeedback {
                   </p>
 
                   <!-- Mini Speedrun Leaderboard Snapshot on Card -->
-                  <div class="flex items-center justify-between bg-[#FAF8F5] border border-[#E5DED3]/90 rounded px-2.5 py-1.5 text-[11px] mt-2">
+                  <div class="flex items-center justify-between bg-[#FAF8F5] border border-[#E5DED3] rounded px-3 py-1.5 text-[11px] mt-2 shadow-2xs">
                     <div class="flex items-center gap-1.5 truncate">
-                      <span class="text-amber-600 font-bold shrink-0">👑</span>
-                      <span class="text-[#746B60] truncate">
+                      <span class="text-amber-600 font-bold shrink-0">👑 Kỷ lục:</span>
+                      <span class="text-[#746B60] truncate font-medium">
                         {{ arenaLeaderboard.getStageSummary(stage.id).recordHolderName ? (arenaLeaderboard.formatTime(arenaLeaderboard.getStageSummary(stage.id).bestTimeMs) + ' · ' + arenaLeaderboard.getStageSummary(stage.id).recordHolderName) : 'Chưa có kỷ lục' }}
                       </span>
                     </div>
                     <button 
                       type="button"
                       (click)="openStageLeaderboard(stage, $event)"
-                      class="shrink-0 text-[10px] font-bold text-[#7D6853] hover:text-[#5B4A3A] bg-white border border-[#E5DED3] hover:border-[#7D6853] px-2 py-0.5 rounded transition-all cursor-pointer shadow-2xs flex items-center gap-1"
+                      class="shrink-0 text-[10px] font-bold text-[#7D6853] hover:text-white bg-white hover:bg-[#7D6853] border border-[#E5DED3] hover:border-[#7D6853] px-2.5 py-1 rounded-[3px] transition-all cursor-pointer shadow-2xs flex items-center gap-1"
                       title="Xem Bảng Xếp Hạng riêng của đấu trường này"
                     >
                       <app-icon name="trophy" [size]="10"></app-icon>
-                      <span>BXH</span>
+                      <span>Xem BXH</span>
                     </button>
                   </div>
 
                   <div class="flex items-center justify-between text-xs pt-3 mt-1 border-t border-[#E5DED3]">
-                    <span class="text-[11px] text-[#746B60] font-mono truncate">
-                      {{ stage.id === activeAdminStage().id ? 'Bảng xếp hạng tuần' : (stage.isOfficial ? 'Đấu trường chuẩn hóa' : 'Luyện phản xạ từ đã lưu') }}
-                    </span>
+                    <button 
+                      type="button"
+                      (click)="openStageLeaderboard(stage, $event)"
+                      class="text-[11px] font-bold text-[#7D6853] hover:text-[#29251F] flex items-center gap-1 cursor-pointer transition-colors hover:underline p-0 bg-transparent border-0"
+                      title="Mở Bảng Xếp Hạng Speedrun của đấu trường này"
+                    >
+                      <app-icon name="trophy" [size]="11" class="text-amber-600"></app-icon>
+                      <span>Top 10 phản xạ</span>
+                    </button>
                     <div class="flex items-center gap-1 font-semibold text-[#29251F] group-hover:text-[#7D6853] transition-colors">
                       <span>Vào thi đấu</span>
                       <app-icon name="arrow-right" [size]="12" svgClass="group-hover:translate-x-1 transition-transform"></app-icon>
