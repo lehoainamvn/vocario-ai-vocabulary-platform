@@ -6,6 +6,8 @@ import { ApiService } from '../../services/api.service';
 import { ToastService } from '../../services/toast.service';
 import { UserStudyService, ContextWord } from '../../services/user-study.service';
 import { QuizStageService, QuizStage } from '../../services/quiz-stage.service';
+import { ArenaLeaderboardService } from '../../services/arena-leaderboard.service';
+import { ArenaStageRecord } from '../../models/arena-leaderboard.model';
 import { IconComponent } from '../common/icon.component';
 import { environment } from '../../../environments/environment';
 
@@ -235,6 +237,25 @@ interface ClickFeedback {
                     {{ getWordsList(stage) }}
                   </p>
 
+                  <!-- Mini Speedrun Leaderboard Snapshot on Card -->
+                  <div class="flex items-center justify-between bg-[#FAF8F5] border border-[#E5DED3]/90 rounded px-2.5 py-1.5 text-[11px] mt-2">
+                    <div class="flex items-center gap-1.5 truncate">
+                      <span class="text-amber-600 font-bold shrink-0">👑</span>
+                      <span class="text-[#746B60] truncate">
+                        {{ arenaLeaderboard.getStageSummary(stage.id).recordHolderName ? (arenaLeaderboard.formatTime(arenaLeaderboard.getStageSummary(stage.id).bestTimeMs) + ' · ' + arenaLeaderboard.getStageSummary(stage.id).recordHolderName) : 'Chưa có kỷ lục' }}
+                      </span>
+                    </div>
+                    <button 
+                      type="button"
+                      (click)="openStageLeaderboard(stage, $event)"
+                      class="shrink-0 text-[10px] font-bold text-[#7D6853] hover:text-[#5B4A3A] bg-white border border-[#E5DED3] hover:border-[#7D6853] px-2 py-0.5 rounded transition-all cursor-pointer shadow-2xs flex items-center gap-1"
+                      title="Xem Bảng Xếp Hạng riêng của đấu trường này"
+                    >
+                      <app-icon name="trophy" [size]="10"></app-icon>
+                      <span>BXH</span>
+                    </button>
+                  </div>
+
                   <div class="flex items-center justify-between text-xs pt-3 mt-1 border-t border-[#E5DED3]">
                     <span class="text-[11px] text-[#746B60] font-mono truncate">
                       {{ stage.id === activeAdminStage().id ? 'Bảng xếp hạng tuần' : (stage.isOfficial ? 'Đấu trường chuẩn hóa' : 'Luyện phản xạ từ đã lưu') }}
@@ -429,6 +450,13 @@ interface ClickFeedback {
                 Tiến độ: <strong class="text-[#29251F]">{{ currentWordIndex() + 1 }}</strong>/{{ activeQuizQueue().length }}
               </div>
 
+              <!-- Live Speedrun Stopwatch -->
+              <div class="px-2.5 py-1 rounded-[8px] bg-[#FAF8F5] border border-[#E5DED3] text-[#29251F] text-xs font-mono font-bold flex items-center gap-1.5 shadow-2xs" title="Tổng thời gian phản xạ (gồm tiền phạt)">
+                <span class="text-[#7D6853]">⏱️</span>
+                <span>{{ arenaLeaderboard.formatTime(gameElapsedTimeMs() + penaltyTimeMs()) }}</span>
+                <span *ngIf="mistakeCount() > 0" class="text-rose-600 text-[10px] font-bold" title="Thời gian phạt do chạm sai">+{{ mistakeCount() * 2 }}s</span>
+              </div>
+
               <div 
                 class="px-3 py-1 rounded-[8px] border text-xs font-mono font-bold flex items-center gap-1.5"
                 [class.bg-[#FAF7F2]]="timerSeconds() > 5"
@@ -437,6 +465,7 @@ interface ClickFeedback {
                 [class.bg-rose-50]="timerSeconds() <= 5"
                 [class.border-rose-200]="timerSeconds() <= 5"
                 [class.text-rose-700]="timerSeconds() <= 5"
+                title="Thời gian câu hỏi hiện tại"
               >
                 <app-icon name="clock" [size]="13"></app-icon>
                 <span>{{ timerSeconds() }}s</span>
@@ -688,6 +717,48 @@ interface ClickFeedback {
             </p>
           </div>
 
+          <!-- Speedrun Rank Milestone Banner -->
+          <div *ngIf="lastRunResult()" class="p-4 sm:p-5 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left shadow-2xs"
+            [class.bg-amber-50]="lastRunResult()?.isNewPB"
+            [class.border-amber-300]="lastRunResult()?.isNewPB"
+            [class.bg-[#FAF8F5]]="!lastRunResult()?.isNewPB"
+            [class.border-[#E5DED3]]="!lastRunResult()?.isNewPB"
+          >
+            <div class="flex items-center gap-3.5 min-w-0">
+              <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0 shadow-2xs"
+                [class.bg-amber-400]="lastRunResult()?.isNewPB"
+                [class.text-amber-950]="lastRunResult()?.isNewPB"
+                [class.bg-[#EAE5DC]]="!lastRunResult()?.isNewPB"
+              >
+                {{ lastRunResult()?.isNewPB ? '👑' : '⚡' }}
+              </div>
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <strong class="font-serif text-lg text-[#29251F]">
+                    {{ lastRunResult()?.isNewPB ? 'Kỷ Lục Cá Nhân Mới (PB)!' : 'Đã Ghi Nhận Thành Tích Phản Xạ!' }}
+                  </strong>
+                  <span class="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                    Hạng #{{ lastRunResult()?.rank }} trong phòng
+                  </span>
+                </div>
+                <p class="text-xs text-[#746B60] m-0 mt-1">
+                  Thời gian: <strong class="text-[#29251F] font-mono text-sm">{{ arenaLeaderboard.formatTime(lastRunResult()?.record?.completionTimeMs) }}</strong>
+                  <span class="text-[11px] text-[#A89E91] ml-1">(Thuần túy {{ arenaLeaderboard.formatTime(lastRunResult()?.record?.pureTimeMs) }}<span *ngIf="(lastRunResult()?.record?.penaltyMs || 0) > 0" class="text-rose-600 font-semibold"> + phạt {{ (lastRunResult()?.record?.penaltyMs || 0) / 1000 }}s do {{ lastRunResult()?.record?.mistakeCount }} lỗi</span>)</span>
+                  · Nhanh hơn <strong>{{ lastRunResult()?.betterThanPercent }}%</strong> bạn học khác!
+                </p>
+              </div>
+            </div>
+
+            <button 
+              type="button"
+              (click)="openCurrentStageLeaderboard()"
+              class="px-4 py-2.5 rounded-xl bg-white border border-[#E5DED3] hover:border-[#7D6853] text-[#7D6853] text-xs font-semibold flex items-center gap-2 cursor-pointer shadow-2xs transition-all shrink-0 hover:bg-[#FAF8F5]"
+            >
+              <app-icon name="trophy" [size]="14"></app-icon>
+              <span>Xem BXH Phòng</span>
+            </button>
+          </div>
+
           <!-- 4 KPI Blocks -->
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-left">
             <div class="p-4 bg-white border border-[#E5DED3] rounded-xl shadow-2xs">
@@ -743,6 +814,15 @@ interface ClickFeedback {
             </button>
 
             <button 
+              type="button"
+              (click)="openCurrentStageLeaderboard()"
+              class="h-[43px] px-5 rounded-[10px] bg-amber-50 border border-amber-300 hover:bg-amber-100 text-amber-900 font-semibold text-xs flex items-center gap-2 cursor-pointer transition-colors shadow-2xs"
+            >
+              <app-icon name="award" [size]="14"></app-icon>
+              <span>BXH Đấu Trường Này</span>
+            </button>
+
+            <button 
               type="button" 
               (click)="exitToStageSelect()"
               class="h-[43px] px-5 rounded-[10px] bg-white border border-[#E5DED3] hover:bg-[#FAF7F2] text-[#29251F] font-semibold text-xs flex items-center gap-2 cursor-pointer transition-colors shadow-2xs"
@@ -755,12 +835,170 @@ interface ClickFeedback {
               class="h-[43px] px-5 rounded-[10px] bg-[#F1ECE3] border border-[#E5DED3] hover:bg-[#EAE5DC] text-[#7D6853] font-semibold text-xs flex items-center gap-2 cursor-pointer transition-colors no-underline shadow-2xs"
             >
               <app-icon name="trophy" [size]="14"></app-icon>
-              <span>Xem bảng xếp hạng</span>
+              <span>Bảng xếp hạng chung</span>
             </a>
           </div>
 
         </div>
       </ng-container>
+
+      <!-- =========================================================================
+           DRAWER BẢNG XẾP HẠNG RIÊNG BIỆT TỪNG ĐẤU TRƯỜNG (PER-ARENA LEADERBOARD)
+           ========================================================================= -->
+      <div *ngIf="isLeaderboardOpen()" class="fixed inset-0 z-50 overflow-hidden flex justify-end select-none animate-fade-in">
+        <!-- Backdrop -->
+        <div (click)="closeStageLeaderboard()" class="fixed inset-0 bg-black/40 backdrop-blur-2xs transition-opacity"></div>
+
+        <!-- Drawer Panel -->
+        <aside class="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col z-10 border-l border-[#E5DED3]">
+          <!-- Drawer Header -->
+          <div class="p-5 border-b border-[#E5DED3] bg-[#FAF8F5] flex items-start justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-11 h-11 rounded-lg overflow-hidden bg-[#EAE5DC] border border-[#E5DED3] shrink-0">
+                <img *ngIf="selectedLeaderboardStage()?.imageUrl" [src]="selectedLeaderboardStage()?.imageUrl" class="w-full h-full object-cover" />
+              </div>
+              <div class="min-w-0">
+                <span class="text-[9px] font-bold uppercase tracking-[0.1em] text-[#7D6853] block">Bảng xếp hạng tốc độ phản xạ</span>
+                <h2 class="font-serif text-lg font-semibold text-[#29251F] m-0 line-clamp-1 leading-snug">
+                  {{ selectedLeaderboardStage()?.title }}
+                </h2>
+                <span class="text-[11px] text-[#746B60] block truncate">
+                  {{ currentStageRecords().length }} kỷ lục gia · {{ selectedLeaderboardStage()?.words?.length || 5 }} đồ vật
+                </span>
+              </div>
+            </div>
+            <button 
+              type="button" 
+              (click)="closeStageLeaderboard()"
+              class="w-8 h-8 rounded-full border border-[#E5DED3] bg-white hover:bg-[#FAF8F5] text-[#746B60] hover:text-[#29251F] flex items-center justify-center cursor-pointer p-0 transition-colors shrink-0"
+            >
+              <app-icon name="x" [size]="15"></app-icon>
+            </button>
+          </div>
+
+          <!-- Tabs: Mọi thời đại / Tuần này -->
+          <div class="px-5 pt-3 pb-2 border-b border-[#E5DED3] flex items-center justify-between gap-2 bg-white shrink-0">
+            <div class="flex items-center gap-4">
+              <button 
+                type="button" 
+                (click)="setStageLeaderboardPeriod('all')"
+                [class.text-[#29251F]]="leaderboardPeriod() === 'all'"
+                [class.font-bold]="leaderboardPeriod() === 'all'"
+                [class.border-[#7D6853]]="leaderboardPeriod() === 'all'"
+                [class.text-[#746B60]]="leaderboardPeriod() !== 'all'"
+                class="pb-2 text-xs border-b-2 border-transparent transition-all cursor-pointer bg-transparent border-0"
+              >
+                Mọi thời đại
+              </button>
+              <button 
+                type="button" 
+                (click)="setStageLeaderboardPeriod('weekly')"
+                [class.text-[#29251F]]="leaderboardPeriod() === 'weekly'"
+                [class.font-bold]="leaderboardPeriod() === 'weekly'"
+                [class.border-[#7D6853]]="leaderboardPeriod() === 'weekly'"
+                [class.text-[#746B60]]="leaderboardPeriod() !== 'weekly'"
+                class="pb-2 text-xs border-b-2 border-transparent transition-all cursor-pointer bg-transparent border-0"
+              >
+                Tuần này
+              </button>
+            </div>
+
+            <span class="text-[10px] text-[#A89E91] font-mono">
+              Xếp theo: Giây ⏱️
+            </span>
+          </div>
+
+          <!-- Records List -->
+          <div class="flex-1 overflow-y-auto p-5 space-y-2.5">
+            <div *ngIf="isLoadingRecords()" class="py-12 text-center text-[#746B60] text-xs flex items-center justify-center gap-2">
+              <span class="animate-spin inline-block w-4 h-4 border border-[#7D6853] border-t-transparent rounded-full"></span>
+              <span>Đang tải bảng kỷ lục...</span>
+            </div>
+
+            <div *ngIf="!isLoadingRecords() && currentStageRecords().length === 0" class="py-12 text-center text-[#746B60] text-xs">
+              Chưa có lượt chạy nào trong bối cảnh này. Hãy là người đầu tiên lập kỷ lục!
+            </div>
+
+            <div 
+              *ngFor="let rec of currentStageRecords()" 
+              class="flex items-center justify-between p-3 rounded-xl border transition-all"
+              [class.bg-amber-50\/40]="rec.rank === 1"
+              [class.border-amber-300]="rec.rank === 1"
+              [class.bg-[#FAF8F5]]="rec.rank !== 1 && !rec.isCurrentUser"
+              [class.border-[#E5DED3]]="rec.rank !== 1 && !rec.isCurrentUser"
+              [class.bg-[#F7F4EE]]="rec.isCurrentUser"
+              [class.border-[#7D6853]]="rec.isCurrentUser"
+              [class.ring-1]="rec.isCurrentUser"
+              [class.ring-[#7D6853]]="rec.isCurrentUser"
+            >
+              <!-- Rank & User Info -->
+              <div class="flex items-center gap-3 min-w-0">
+                <!-- Rank Badge -->
+                <div class="w-7 h-7 rounded-full flex items-center justify-center font-serif text-xs font-bold shrink-0"
+                  [class.bg-amber-400]="rec.rank === 1"
+                  [class.text-amber-950]="rec.rank === 1"
+                  [class.bg-slate-200]="rec.rank === 2"
+                  [class.text-slate-800]="rec.rank === 2"
+                  [class.bg-amber-700\/20]="rec.rank === 3"
+                  [class.text-amber-900]="rec.rank === 3"
+                  [class.bg-[#EAE5DC]]="(rec.rank || 4) > 3"
+                  [class.text-[#746B60]]="(rec.rank || 4) > 3"
+                >
+                  {{ rec.rank === 1 ? '🥇' : (rec.rank === 2 ? '🥈' : (rec.rank === 3 ? '🥉' : rec.rank)) }}
+                </div>
+
+                <!-- Avatar & Name -->
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <strong class="text-xs font-semibold text-[#29251F] truncate block">{{ rec.userName }}</strong>
+                    <span *ngIf="rec.isCurrentUser" class="text-[9px] font-mono font-bold bg-[#7D6853] text-white px-1 rounded">BẠN</span>
+                    <span *ngIf="rec.isPerfectRun" class="text-[10px] text-emerald-600 font-bold" title="100% không chạm sai">✨ Clean</span>
+                  </div>
+                  <div class="flex items-center gap-2 text-[10px] text-[#746B60] mt-0.5">
+                    <span>Độ chính xác: {{ rec.accuracyPct }}%</span>
+                    <span *ngIf="rec.mistakeCount > 0" class="text-rose-600">({{ rec.mistakeCount }} lỗi, +{{ rec.penaltyMs / 1000 }}s)</span>
+                    <span>· {{ rec.totalXpEarned }} XP</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Completion Time -->
+              <div class="text-right shrink-0">
+                <span class="font-mono text-sm font-bold block"
+                  [class.text-amber-700]="rec.rank === 1"
+                  [class.text-[#29251F]]="rec.rank !== 1"
+                >
+                  {{ arenaLeaderboard.formatTime(rec.completionTimeMs) }}
+                </span>
+                <span class="text-[9px] text-[#A89E91] font-mono block">
+                  Thuần {{ arenaLeaderboard.formatTime(rec.pureTimeMs) }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pinned User Quick Play CTA at bottom -->
+          <div class="p-4 border-t border-[#E5DED3] bg-[#FAF8F5] space-y-2 shrink-0">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-[#746B60]">Kỷ lục của bạn trong phòng này:</span>
+              <strong class="font-mono text-[#29251F]">
+                {{ arenaLeaderboard.formatTime(arenaLeaderboard.getStageSummary(selectedLeaderboardStage()?.id || '').userBestTimeMs) }}
+                <span *ngIf="arenaLeaderboard.getStageSummary(selectedLeaderboardStage()?.id || '').userRank" class="text-[10px] text-[#7D6853] ml-1">
+                  (Hạng #{{ arenaLeaderboard.getStageSummary(selectedLeaderboardStage()?.id || '').userRank }})
+                </span>
+              </strong>
+            </div>
+            <button 
+              type="button"
+              (click)="startStageFromLeaderboard()"
+              class="w-full h-10 rounded-lg bg-[#7D6853] hover:bg-[#685542] text-white font-semibold text-xs flex items-center justify-center gap-2 cursor-pointer transition-colors border-0 shadow-2xs"
+            >
+              <app-icon name="play" [size]="13"></app-icon>
+              <span>Vào thi đấu ngay để bứt phá kỷ lục</span>
+            </button>
+          </div>
+        </aside>
+      </div>
 
     </div>
   `
@@ -772,8 +1010,99 @@ export class UserQuizComponent implements OnInit, OnDestroy {
   http = inject(HttpClient);
   router = inject(Router);
   quizStageService = inject(QuizStageService);
+  arenaLeaderboard = inject(ArenaLeaderboardService);
 
   private readonly baseUrl = environment.apiUrl;
+
+  // ==========================================
+  // SPEEDRUN STOPWATCH & THỜI GIAN PHẢN XẠ
+  // ==========================================
+  gameStartTime = 0;
+  gameElapsedTimeMs = signal<number>(0);
+  mistakeCount = signal<number>(0);
+  penaltyTimeMs = signal<number>(0);
+  private speedrunInterval: any = null;
+
+  // Kết quả lượt chạy vừa hoàn thành
+  lastRunResult = signal<{
+    rank: number;
+    isNewPB: boolean;
+    record: ArenaStageRecord;
+    prevBestMs?: number;
+    betterThanPercent: number;
+  } | null>(null);
+
+  // ==========================================
+  // DRAWER BẢNG XẾP HẠNG RIÊNG TỪNG ĐẤU TRƯỜNG
+  // ==========================================
+  selectedLeaderboardStage = signal<QuizStage | null>(null);
+  isLeaderboardOpen = signal<boolean>(false);
+  leaderboardPeriod = signal<'all' | 'weekly'>('all');
+  currentStageRecords = signal<ArenaStageRecord[]>([]);
+  isLoadingRecords = signal<boolean>(false);
+
+  openStageLeaderboard(stage: QuizStage, event?: MouseEvent) {
+    if (event) event.stopPropagation();
+    this.selectedLeaderboardStage.set(stage);
+    this.isLeaderboardOpen.set(true);
+    this.fetchStageRecords(stage.id, this.leaderboardPeriod());
+  }
+
+  openCurrentStageLeaderboard() {
+    const st = this.currentStage();
+    if (st) {
+      this.openStageLeaderboard(st);
+    }
+  }
+
+  closeStageLeaderboard() {
+    this.isLeaderboardOpen.set(false);
+  }
+
+  setStageLeaderboardPeriod(period: 'all' | 'weekly') {
+    this.leaderboardPeriod.set(period);
+    const st = this.selectedLeaderboardStage();
+    if (st) {
+      this.fetchStageRecords(st.id, period);
+    }
+  }
+
+  private fetchStageRecords(stageId: string, period: 'all' | 'weekly') {
+    this.isLoadingRecords.set(true);
+    this.arenaLeaderboard.getStageLeaderboard(stageId, period).subscribe({
+      next: (records) => {
+        this.currentStageRecords.set(records);
+        this.isLoadingRecords.set(false);
+      },
+      error: () => {
+        this.isLoadingRecords.set(false);
+      }
+    });
+  }
+
+  startStageFromLeaderboard() {
+    const st = this.selectedLeaderboardStage();
+    if (st) {
+      this.closeStageLeaderboard();
+      this.startStage(st);
+    }
+  }
+
+  private startSpeedrunStopwatch() {
+    this.stopSpeedrunStopwatch();
+    this.gameStartTime = performance.now();
+    this.gameElapsedTimeMs.set(0);
+    this.speedrunInterval = setInterval(() => {
+      this.gameElapsedTimeMs.set(Math.round(performance.now() - this.gameStartTime));
+    }, 50);
+  }
+
+  private stopSpeedrunStopwatch() {
+    if (this.speedrunInterval) {
+      clearInterval(this.speedrunInterval);
+      this.speedrunInterval = null;
+    }
+  }
 
   // Trạng thái game
   gameMode = signal<'SELECT_STAGE' | 'PLAYING' | 'VICTORY'>('SELECT_STAGE');
@@ -936,6 +1265,7 @@ export class UserQuizComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.stopTimer();
+    this.stopSpeedrunStopwatch();
   }
 
   private initAudioContext() {
@@ -958,7 +1288,7 @@ export class UserQuizComponent implements OnInit, OnDestroy {
     this.activeQuizQueue.set(shuffled);
     this.currentWordIndex.set(0);
 
-    // Đặt lại các thông số trận đấu
+    // Đặt lại các thông số trận đấu & Tốc độ phản xạ
     this.totalScore.set(0);
     this.comboMultiplier.set(1.0);
     this.maxCombo.set(1.0);
@@ -970,9 +1300,15 @@ export class UserQuizComponent implements OnInit, OnDestroy {
     this.solvedWordIds.set(new Set());
     this.wrongClickedWord.set(null);
     this.isZoomed.set(false);
+    this.mistakeCount.set(0);
+    this.penaltyTimeMs.set(0);
+    this.lastRunResult.set(null);
 
     // Chuyển sang màn hình chơi
     this.gameMode.set('PLAYING');
+
+    // Bắt đầu đồng hồ bấm giờ tốc độ Speedrun
+    this.startSpeedrunStopwatch();
 
     // Bắt đầu câu đầu tiên
     this.startQuestionRound();
@@ -1112,12 +1448,14 @@ export class UserQuizComponent implements OnInit, OnDestroy {
     this.wrongClickedWord.set(item);
     this.playSfx('miss');
     this.comboMultiplier.set(1.0);
+    this.mistakeCount.update(c => c + 1);
+    this.penaltyTimeMs.update(p => p + 2000);
 
     const cur = this.timerSeconds();
     this.timerSeconds.set(Math.max(1, cur - 2));
 
     this.toast.info(
-      `Đó là "${item.word}" (${item.vietnamese}), hãy tìm "${target.word}"!`,
+      `Đó là "${item.word}" (${item.vietnamese}), hãy tìm "${target.word}"! (+2s phạt)`,
       'Chưa Đúng (-2s)'
     );
 
@@ -1131,6 +1469,8 @@ export class UserQuizComponent implements OnInit, OnDestroy {
   private handleMissClick(clickX: number, clickY: number) {
     this.playSfx('miss');
     this.comboMultiplier.set(1.0);
+    this.mistakeCount.update(c => c + 1);
+    this.penaltyTimeMs.update(p => p + 2000);
 
     const cur = this.timerSeconds();
     this.timerSeconds.set(Math.max(1, cur - 2));
@@ -1219,12 +1559,53 @@ export class UserQuizComponent implements OnInit, OnDestroy {
   // Hoàn thành trận đấu
   private finishGame() {
     this.stopTimer();
+    this.stopSpeedrunStopwatch();
     this.gameMode.set('VICTORY');
     this.playSfx('victory');
-    this.toast.success(
-      `Hoàn thành thử thách! Bạn nhận được tổng cộng +${this.totalScore()} XP vào bảng xếp hạng!`,
-      'Chúc Mừng!'
-    );
+
+    const stage = this.currentStage();
+    if (stage) {
+      const pureMs = Math.max(500, Math.round(performance.now() - this.gameStartTime));
+      const totalMs = pureMs + this.penaltyTimeMs();
+      const totalClicks = this.totalClicks();
+      const acc = totalClicks > 0 ? Math.min(100, Math.round((this.correctCount() / totalClicks) * 100)) : 100;
+
+      const runRes = this.arenaLeaderboard.submitStageRun({
+        stageId: stage.id,
+        completionTimeMs: totalMs,
+        pureTimeMs: pureMs,
+        mistakeCount: this.mistakeCount(),
+        penaltyMs: this.penaltyTimeMs(),
+        accuracyPct: acc,
+        maxCombo: Math.round(this.maxCombo()),
+        totalXpEarned: this.totalScore(),
+        isPerfectRun: this.mistakeCount() === 0,
+        userId: this.api.currentUser()?.userId || this.api.currentUser()?.id || '',
+        userName: this.api.currentUser()?.fullName || 'Học viên Vocario',
+        userAvatar: this.api.currentUser()?.avatarUrl,
+        targetLevel: this.api.currentUser()?.targetLevel || 'A2'
+      });
+
+      this.lastRunResult.set(runRes);
+
+      const timeStr = this.arenaLeaderboard.formatTime(totalMs);
+      if (runRes.isNewPB) {
+        this.toast.success(
+          `🎉 KỶ LỤC CÁ NHÂN MỚI! ${timeStr} (Hạng #${runRes.rank} trong phòng này)!`,
+          'Kỷ Lục Mới!'
+        );
+      } else {
+        this.toast.success(
+          `Hoàn thành thử thách trong ${timeStr}! Nhận +${this.totalScore()} XP!`,
+          'Chúc Mừng!'
+        );
+      }
+    } else {
+      this.toast.success(
+        `Hoàn thành thử thách! Bạn nhận được tổng cộng +${this.totalScore()} XP vào bảng xếp hạng!`,
+        'Chúc Mừng!'
+      );
+    }
   }
 
   // Chơi lại stage hiện tại
@@ -1238,6 +1619,7 @@ export class UserQuizComponent implements OnInit, OnDestroy {
   // Quay về màn hình chọn bối cảnh
   exitToStageSelect() {
     this.stopTimer();
+    this.stopSpeedrunStopwatch();
     this.gameMode.set('SELECT_STAGE');
   }
 

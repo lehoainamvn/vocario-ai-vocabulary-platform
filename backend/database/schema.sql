@@ -227,8 +227,25 @@ CREATE INDEX IF NOT EXISTS idx_cert_types_code ON certificate_types(type_code);
 INSERT INTO certificate_types (type_code, title, cefr_level, required_words, required_streak, approved_by, badge_color, is_active, description)
 VALUES
 ('A1', 'Chứng Chỉ Tinh Thông Chuẩn Từ Vựng CEFR A1', 'A1', 10, 0, 'Hội Đồng Khảo Thí & Đào Tạo Vocario', '#059669', TRUE, 'Chứng nhận học viên đã làm chủ các từ vựng căn bản nền tảng về đời sống, đồ vật quanh ta.'),
-('A2', 'Chứng Chỉ Tinh Thông Chuẩn Từ Vựng CEFR A2', 'A2', 15, 3, 'Hội Đồng Khảo Thí & Đào Tạo Vocario', '#0284C7', TRUE, 'Chứng nhận năng lực diễn đạt các tình huống giao tiếp thông dụng hàng ngày.'),
-('B1', 'Chứng Chỉ Tinh Thông Chuẩn Từ Vựng CEFR B1', 'B1', 20, 5, 'Hội Đồng Khảo Thí & Đào Tạo Vocario', '#4F46E5', TRUE, 'Chứng nhận năng lực độc lập trong môi trường học thuật, công sở và du lịch.'),
-('B2', 'Chứng Chỉ Tinh Thông Chuẩn Từ Vựng CEFR B2', 'B2', 30, 7, 'Hội Đồng Khảo Thí & Đào Tạo Vocario', '#7C3AED', TRUE, 'Chứng nhận trình độ từ vựng nâng cao, đọc hiểu và phản biện trôi chảy.'),
-('C1', 'Chứng Chỉ Tinh Thông Chuẩn Từ Vựng CEFR C1', 'C1', 50, 14, 'Hội Đồng Khảo Thí & Đào Tạo Vocario', '#B45309', TRUE, 'Chứng nhận trình độ tinh anh học thuật, làm chủ vốn từ chuyên sâu đa lĩnh vực.')
-ON CONFLICT (type_code) DO NOTHING;
+-- ====================================================================
+-- 12. BẢNG BẢNG XẾP HẠNG & KỶ LỤC TỐC ĐỘ RIÊNG CHO TỪNG ĐẤU TRƯỜNG (Per-Arena Records)
+-- ====================================================================
+CREATE TABLE IF NOT EXISTS arena_stage_records (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    stage_id VARCHAR(100) NOT NULL,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    completion_time_ms INT NOT NULL,              -- Tổng thời gian (mili-giây) bao gồm tiền phạt
+    pure_time_ms INT NOT NULL,                    -- Thời gian thuần túy
+    mistake_count INT DEFAULT 0,                  -- Số lần chạm sai
+    penalty_ms INT DEFAULT 0,                     -- Thời gian phạt (+2s mỗi lỗi)
+    accuracy_pct NUMERIC(5, 2) NOT NULL,          -- Độ chính xác %
+    max_combo INT DEFAULT 1,                      -- Chuỗi combo cao nhất
+    total_xp_earned INT DEFAULT 0,                -- Điểm kinh nghiệm tích lũy
+    is_perfect_run BOOLEAN DEFAULT FALSE,         -- Không phạm lỗi nào
+    achieved_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_arena_stage_fastest ON arena_stage_records (stage_id, completion_time_ms ASC, accuracy_pct DESC);
+CREATE INDEX IF NOT EXISTS idx_arena_stage_user_pb ON arena_stage_records (stage_id, user_id, completion_time_ms ASC);
+
