@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/constants/tokens.dart';
 import '../../core/services/api_service.dart';
 import '../scanner/scanner_screen.dart';
+import '../wordbook/wordbook_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -438,7 +439,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: double.infinity,
                   height: 44,
                   child: ElevatedButton(
-                    onPressed: () => _showToast('Khởi động phiên ôn tập $_dueWordsCount từ SM-2...'),
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const WordbookScreen(initialTabIndex: 1),
+                      ),
+                    ).then((_) => _fetchDatabaseData()),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: VocarioTokens.goldAccent,
                       foregroundColor: VocarioTokens.ink,
@@ -630,7 +636,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: Icons.style_outlined,
                 title: 'Sổ Từ SM-2',
                 subtitle: 'Kho thẻ nhớ của bạn',
-                onTap: () => _showToast('Mở sổ từ vựng & phòng luyện Flashcard...'),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const WordbookScreen(initialTabIndex: 0),
+                  ),
+                ).then((_) => _fetchDatabaseData()),
               ),
             ),
             const SizedBox(width: 9),
@@ -1211,6 +1222,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         context,
                         MaterialPageRoute(builder: (_) => const ScannerScreen()),
                       );
+                      return;
+                    }
+                    if (label == 'Sổ từ vựng') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const WordbookScreen(initialTabIndex: 0),
+                        ),
+                      ).then((_) => _fetchDatabaseData());
                       return;
                     }
                     setState(() => _activeNav = label);

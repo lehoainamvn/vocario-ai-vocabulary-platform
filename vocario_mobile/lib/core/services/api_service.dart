@@ -199,6 +199,58 @@ class ApiService {
     }
   }
 
+  /// Lấy toàn bộ danh sách từ vựng cá nhân từ CSDL
+  Future<List<dynamic>> getMyWords() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('vocario_user_id');
+
+      final response = await _dio.get(
+        '/api/srs/my-words',
+        queryParameters: userId != null && userId.isNotEmpty ? {'userId': userId} : null,
+      );
+      if (response.data is List) {
+        return response.data as List<dynamic>;
+      }
+      return [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  /// Gửi kết quả đánh giá thẻ Flashcard theo thuật toán SuperMemo SM-2
+  Future<Map<String, dynamic>?> submitReview({
+    String? progressId,
+    String? wordText,
+    required int ratingGrade,
+    int responseTimeMs = 2000,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('vocario_user_id');
+
+      final Map<String, dynamic> requestBody = {
+        'ratingGrade': ratingGrade,
+        'reviewType': 'FLASHCARD',
+        'responseTimeMs': responseTimeMs,
+      };
+      if (progressId != null) requestBody['progressId'] = progressId;
+      if (wordText != null) requestBody['wordText'] = wordText;
+
+      final response = await _dio.post(
+        '/api/srs/review',
+        queryParameters: userId != null && userId.isNotEmpty ? {'userId': userId} : null,
+        data: requestBody,
+      );
+      if (response.data is Map<String, dynamic>) {
+        return response.data as Map<String, dynamic>;
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Lưu từ vựng bóc tách từ ảnh AI Vision vào sổ học SM-2
   Future<Map<String, dynamic>?> learnWordFromVision({
     required String englishWord,
