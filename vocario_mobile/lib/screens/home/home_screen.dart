@@ -7,6 +7,9 @@ import '../wordbook/wordbook_screen.dart';
 import '../arena/arena_screen.dart';
 import '../leaderboard/leaderboard_screen.dart';
 import '../profile/profile_screen.dart';
+import '../collection/collection_screen.dart';
+import '../extractor/text_extractor_screen.dart';
+import '../classroom/classroom_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -602,7 +605,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             Text(
-              '01—04',
+              '01—06',
               style: VocarioTokens.monoSmall.copyWith(
                 fontSize: 9,
                 color: VocarioTokens.muted,
@@ -628,10 +631,14 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(width: 9),
             Expanded(
               child: _buildQuickActionCard(
-                icon: Icons.description_outlined,
-                title: 'Tài Liệu OCR',
-                subtitle: 'Trích xuất PDF / Word',
-                onTap: () => _showToast('Mở trình trích xuất tài liệu văn bản...'),
+                icon: Icons.photo_library_outlined,
+                title: 'Bộ Sưu Tập',
+                subtitle: 'Kho ảnh và từ theo không gian',
+                tag: 'MỚI',
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const CollectionScreen()),
+                ).then((_) => _fetchDatabaseData()),
               ),
             ),
           ],
@@ -661,6 +668,34 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const ArenaScreen()),
+                ).then((_) => _fetchDatabaseData()),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 9),
+        Row(
+          children: [
+            Expanded(
+              child: _buildQuickActionCard(
+                icon: Icons.description_outlined,
+                title: 'Tài Liệu OCR',
+                subtitle: 'Trích xuất văn bản AI',
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const TextExtractorScreen()),
+                ).then((_) => _fetchDatabaseData()),
+              ),
+            ),
+            const SizedBox(width: 9),
+            Expanded(
+              child: _buildQuickActionCard(
+                icon: Icons.groups_outlined,
+                title: 'Lớp Học Ảo',
+                subtitle: 'Mã phòng & chia sẻ bộ từ',
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ClassroomScreen()),
                 ).then((_) => _fetchDatabaseData()),
               ),
             ),

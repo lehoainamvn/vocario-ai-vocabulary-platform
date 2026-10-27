@@ -300,6 +300,177 @@ class ApiService {
     }
   }
 
+  /// Xóa một bức ảnh bối cảnh khỏi CSDL
+  Future<bool> deleteCapture(String sceneId) async {
+    try {
+      final response = await _dio.delete('/api/vision/captures/$sceneId');
+      return response.statusCode == 200 || response.statusCode == 204;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Xóa một từ vựng khỏi sổ tay SM-2
+  Future<bool> deleteWordFromSrs(String progressId) async {
+    try {
+      final response = await _dio.delete('/api/srs/word/$progressId');
+      return response.statusCode == 200 || response.statusCode == 204;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Xóa toàn bộ từ thuộc một bối cảnh / chủ đề khỏi sổ tay SM-2
+  Future<bool> deleteTopicFromSrs(String topicName) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('vocario_user_id');
+      final response = await _dio.delete(
+        '/api/srs/topic',
+        queryParameters: {
+          'topicName': topicName,
+          if (userId != null && userId.isNotEmpty) 'userId': userId,
+        },
+      );
+      return response.statusCode == 200 || response.statusCode == 204;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Lưu danh sách từ vựng vào sổ tay SM-2 (dùng cho trích xuất văn bản hoặc bộ sưu tập)
+  Future<Map<String, dynamic>?> saveWordsToNotebook(
+    List<Map<String, dynamic>> words, {
+    String category = 'Trích xuất văn bản',
+    String targetLevel = 'B1',
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('vocario_user_id');
+      final response = await _dio.post(
+        '/api/classrooms/save-words-to-notebook',
+        queryParameters: userId != null && userId.isNotEmpty ? {'userId': userId} : null,
+        data: {
+          'category': category,
+          'targetLevel': targetLevel,
+          'words': words,
+        },
+      );
+      if (response.data is Map<String, dynamic>) {
+        return response.data as Map<String, dynamic>;
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Lấy danh sách lớp học của tôi
+  Future<List<dynamic>> getMyClassrooms() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('vocario_user_id');
+      final response = await _dio.get(
+        '/api/classrooms/my-classrooms',
+        queryParameters: userId != null && userId.isNotEmpty ? {'userId': userId} : null,
+      );
+      if (response.data is List) {
+        return response.data as List<dynamic>;
+      }
+      return [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  /// Tra cứu chi tiết lớp học theo mã code
+  Future<Map<String, dynamic>?> getClassroomByCode(String code) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('vocario_user_id');
+      final formattedCode = code.trim().toUpperCase();
+      final response = await _dio.get(
+        '/api/classrooms/$formattedCode',
+        queryParameters: userId != null && userId.isNotEmpty ? {'userId': userId} : null,
+      );
+      if (response.data is Map<String, dynamic>) {
+        return response.data as Map<String, dynamic>;
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Tham gia phòng học bằng mã code
+  Future<Map<String, dynamic>?> joinClassroom(String code) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('vocario_user_id');
+      final formattedCode = code.trim().toUpperCase();
+      final response = await _dio.post(
+        '/api/classrooms/$formattedCode/join',
+        queryParameters: userId != null && userId.isNotEmpty ? {'userId': userId} : null,
+        data: {},
+      );
+      if (response.data is Map<String, dynamic>) {
+        return response.data as Map<String, dynamic>;
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Kéo toàn bộ từ vựng phòng học về sổ tay SM-2
+  Future<Map<String, dynamic>?> cloneClassroomToNotebook(String code) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('vocario_user_id');
+      final formattedCode = code.trim().toUpperCase();
+      final response = await _dio.post(
+        '/api/classrooms/$formattedCode/clone-to-notebook',
+        queryParameters: userId != null && userId.isNotEmpty ? {'userId': userId} : null,
+        data: {},
+      );
+      if (response.data is Map<String, dynamic>) {
+        return response.data as Map<String, dynamic>;
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Tạo phòng học mới
+  Future<Map<String, dynamic>?> createClassroom({
+    required String name,
+    required String description,
+    required String targetLevel,
+    required List<Map<String, dynamic>> words,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('vocario_user_id');
+      final response = await _dio.post(
+        '/api/classrooms',
+        queryParameters: userId != null && userId.isNotEmpty ? {'userId': userId} : null,
+        data: {
+          'name': name,
+          'description': description,
+          'targetLevel': targetLevel,
+          'words': words,
+        },
+      );
+      if (response.data is Map<String, dynamic>) {
+        return response.data as Map<String, dynamic>;
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Cập nhật thông tin học viên (Họ tên, mục tiêu CEFR, mục tiêu hàng ngày)
   Future<Map<String, dynamic>?> updateProfile({
     String? fullName,
