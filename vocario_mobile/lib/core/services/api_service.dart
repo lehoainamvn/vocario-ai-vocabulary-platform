@@ -281,6 +281,195 @@ class ApiService {
     }
   }
 
+  /// Lấy danh sách các ảnh bối cảnh người dùng đã lưu từ CSDL
+  Future<List<dynamic>> getUserCaptures() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('vocario_user_id');
+
+      final response = await _dio.get(
+        '/api/vision/captures',
+        queryParameters: userId != null && userId.isNotEmpty ? {'userId': userId} : null,
+      );
+      if (response.data is List) {
+        return response.data as List<dynamic>;
+      }
+      return [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  /// Cập nhật thông tin học viên (Họ tên, mục tiêu CEFR, mục tiêu hàng ngày)
+  Future<Map<String, dynamic>?> updateProfile({
+    String? fullName,
+    String? targetLevel,
+    int? dailyGoal,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('vocario_user_id');
+
+      final Map<String, dynamic> requestBody = {};
+      if (fullName != null) requestBody['fullName'] = fullName;
+      if (targetLevel != null) requestBody['targetLevel'] = targetLevel;
+      if (dailyGoal != null) requestBody['dailyGoal'] = dailyGoal;
+
+      final response = await _dio.put(
+        '/api/auth/profile',
+        queryParameters: userId != null && userId.isNotEmpty ? {'userId': userId} : null,
+        data: requestBody,
+      );
+      if (response.data is Map<String, dynamic>) {
+        return response.data as Map<String, dynamic>;
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Lấy bảng xếp hạng học viên có phân trang (Weekly / All-Time)
+  Future<Map<String, dynamic>?> getLeaderboard({
+    String period = 'all-time',
+    String level = 'ALL',
+    int page = 0,
+    int size = 10,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('vocario_user_id');
+
+      final response = await _dio.get(
+        '/api/leaderboard',
+        queryParameters: {
+          if (userId != null && userId.isNotEmpty) 'userId': userId,
+          'period': period,
+          'level': level,
+          'page': page,
+          'size': size,
+        },
+      );
+      if (response.data is Map<String, dynamic>) {
+        return response.data as Map<String, dynamic>;
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Lấy thông tin thứ hạng cá nhân và mục tiêu vượt hạng
+  Future<Map<String, dynamic>?> getMyRank({String period = 'all-time'}) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('vocario_user_id');
+
+      final response = await _dio.get(
+        '/api/leaderboard/my-rank',
+        queryParameters: {
+          if (userId != null && userId.isNotEmpty) 'userId': userId,
+          'period': period,
+        },
+      );
+      if (response.data is Map<String, dynamic>) {
+        return response.data as Map<String, dynamic>;
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Lấy BXH tốc độ phản xạ của một không gian đấu trường
+  Future<List<dynamic>> getStageLeaderboard(String stageId, {String period = 'all'}) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('vocario_user_id');
+
+      final response = await _dio.get(
+        '/api/arena/stages/$stageId/leaderboard',
+        queryParameters: {
+          'period': period,
+          if (userId != null && userId.isNotEmpty) 'currentUserId': userId,
+        },
+      );
+      if (response.data is List) {
+        return response.data as List<dynamic>;
+      }
+      return [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  /// Gửi kết quả lượt thi đấu Speedrun 60s vào CSDL
+  Future<Map<String, dynamic>?> submitArenaRun({
+    required String stageId,
+    required int completionTimeMs,
+    required int pureTimeMs,
+    required int mistakeCount,
+    required int penaltyMs,
+    required double accuracyPct,
+    required int maxCombo,
+    required int totalXpEarned,
+    required bool isPerfectRun,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('vocario_user_id');
+
+      final response = await _dio.post(
+        '/api/arena/submit-run',
+        data: {
+          'stageId': stageId,
+          if (userId != null && userId.isNotEmpty) 'userId': userId,
+          'completionTimeMs': completionTimeMs,
+          'pureTimeMs': pureTimeMs,
+          'mistakeCount': mistakeCount,
+          'penaltyMs': penaltyMs,
+          'accuracyPct': accuracyPct,
+          'maxCombo': maxCombo,
+          'totalXpEarned': totalXpEarned,
+          'isPerfectRun': isPerfectRun,
+        },
+      );
+      if (response.data is Map<String, dynamic>) {
+        return response.data as Map<String, dynamic>;
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Lấy danh sách chứng chỉ chuẩn hóa CEFR đã đạt được
+  Future<List<dynamic>> getMyCertificates() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('vocario_user_id');
+
+      final response = await _dio.get(
+        '/api/certificates/my-certificates',
+        queryParameters: userId != null && userId.isNotEmpty ? {'userId': userId} : null,
+      );
+      if (response.data is List) {
+        return response.data as List<dynamic>;
+      }
+      return [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  /// Đăng xuất và xóa token / user id
+  Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('vocario_jwt_token');
+    await prefs.remove('vocario_user_id');
+    await prefs.remove('vocario_username');
+  }
+
   /// Lấy dữ liệu tổng hợp đồng bộ với CSDL cho trang chủ
   Future<Map<String, dynamic>> getDashboardData() async {
     final results = await Future.wait([

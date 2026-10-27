@@ -4,6 +4,7 @@ import '../../core/constants/tokens.dart';
 import '../../core/services/api_service.dart';
 import '../scanner/scanner_screen.dart';
 import '../wordbook/wordbook_screen.dart';
+import '../arena/arena_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -650,7 +651,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: Icons.sports_kabaddi_outlined,
                 title: 'Đấu Trường',
                 subtitle: 'Phản xạ qua ảnh thật',
-                onTap: () => _showToast('Mở Đấu trường thị giác tìm đồ vật...'),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ArenaScreen()),
+                ).then((_) => _fetchDatabaseData()),
               ),
             ),
           ],
@@ -1093,7 +1097,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                     ElevatedButton(
-                      onPressed: () => _showToast('Khởi động Đấu trường 60 giây...'),
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ArenaScreen(initialStageId: 'stage-admin-desk'),
+                        ),
+                      ).then((_) => _fetchDatabaseData()),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: VocarioTokens.ink,
                         foregroundColor: Colors.white,
@@ -1229,6 +1238,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (_) => const WordbookScreen(initialTabIndex: 0),
+                        ),
+                      ).then((_) => _fetchDatabaseData());
+                      return;
+                    }
+                    if (label == 'Đấu trường') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ArenaScreen(),
                         ),
                       ).then((_) => _fetchDatabaseData());
                       return;
