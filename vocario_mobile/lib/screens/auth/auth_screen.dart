@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../core/constants/tokens.dart';
 import '../../core/services/api_service.dart';
+import '../home/home_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -97,6 +98,13 @@ class _AuthScreenState extends State<AuthScreen> {
         _showToast(
           'Đăng nhập thành công! Chào mừng ${result['fullName'] ?? identity} trở lại Vocario.',
         );
+        Future.delayed(const Duration(milliseconds: 600), () {
+          if (!mounted) return;
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const HomeScreen()),
+          );
+        });
       } else {
         final name = _nameController.text.trim();
         final email = _emailController.text.trim();
@@ -123,6 +131,13 @@ class _AuthScreenState extends State<AuthScreen> {
         _showToast(
           'Đăng ký thành công! Chào mừng $registeredName với mục tiêu CEFR $_selectedLevel!',
         );
+        Future.delayed(const Duration(milliseconds: 600), () {
+          if (!mounted) return;
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const HomeScreen()),
+          );
+        });
       }
     } catch (e) {
       if (!mounted) return;

@@ -141,4 +141,76 @@ class ApiService {
       throw Exception(message);
     }
   }
+
+  /// Lấy thông tin người dùng từ CSDL
+  Future<Map<String, dynamic>?> getUserProfile() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('vocario_user_id');
+
+      final response = await _dio.get(
+        '/api/auth/me',
+        queryParameters: userId != null && userId.isNotEmpty ? {'userId': userId} : null,
+      );
+      if (response.data is Map<String, dynamic>) {
+        return response.data as Map<String, dynamic>;
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Lấy danh sách từ cần ôn tập hôm nay (SM-2) từ CSDL
+  Future<List<dynamic>> getDueCards() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('vocario_user_id');
+
+      final response = await _dio.get(
+        '/api/srs/due-cards',
+        queryParameters: userId != null && userId.isNotEmpty ? {'userId': userId} : null,
+      );
+      if (response.data is List) {
+        return response.data as List<dynamic>;
+      }
+      return [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  /// Lấy tiến độ mục tiêu chuẩn hóa CEFR từ CSDL
+  Future<Map<String, dynamic>?> getTargetProgress() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('vocario_user_id');
+
+      final response = await _dio.get(
+        '/api/srs/target-progress',
+        queryParameters: userId != null && userId.isNotEmpty ? {'userId': userId} : null,
+      );
+      if (response.data is Map<String, dynamic>) {
+        return response.data as Map<String, dynamic>;
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Lấy dữ liệu tổng hợp đồng bộ với CSDL cho trang chủ
+  Future<Map<String, dynamic>> getDashboardData() async {
+    final results = await Future.wait([
+      getUserProfile(),
+      getDueCards(),
+      getTargetProgress(),
+    ]);
+
+    return {
+      'user': results[0] as Map<String, dynamic>?,
+      'dueCards': results[1] as List<dynamic>,
+      'targetProgress': results[2] as Map<String, dynamic>?,
+    };
+  }
 }
