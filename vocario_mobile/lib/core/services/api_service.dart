@@ -199,6 +199,36 @@ class ApiService {
     }
   }
 
+  /// Lưu từ vựng bóc tách từ ảnh AI Vision vào sổ học SM-2
+  Future<Map<String, dynamic>?> learnWordFromVision({
+    required String englishWord,
+    required String vietnameseMeaning,
+    required String phoneticIpa,
+    required String cefrLevel,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('vocario_user_id');
+
+      final response = await _dio.post(
+        '/api/vision/learn-word',
+        queryParameters: {
+          if (userId != null && userId.isNotEmpty) 'userId': userId,
+          'englishWord': englishWord,
+          'vietnameseMeaning': vietnameseMeaning,
+          'phoneticIpa': phoneticIpa,
+          'cefrLevel': cefrLevel,
+        },
+      );
+      if (response.data is Map<String, dynamic>) {
+        return response.data as Map<String, dynamic>;
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Lấy dữ liệu tổng hợp đồng bộ với CSDL cho trang chủ
   Future<Map<String, dynamic>> getDashboardData() async {
     final results = await Future.wait([

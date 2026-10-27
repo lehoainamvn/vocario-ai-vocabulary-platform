@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../core/constants/tokens.dart';
 import '../../core/services/api_service.dart';
+import '../scanner/scanner_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -604,7 +605,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: 'Quét Camera',
                 subtitle: 'Nhận diện AI thế giới thực',
                 tag: 'HOT',
-                onTap: () => _showToast('Mở AI Vision Camera Scanner...'),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ScannerScreen()),
+                ),
               ),
             ),
             const SizedBox(width: 9),
@@ -1202,6 +1206,13 @@ class _HomeScreenState extends State<HomeScreen> {
               return Expanded(
                 child: InkWell(
                   onTap: () {
+                    if (label == 'Thu nạp AI') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const ScannerScreen()),
+                      );
+                      return;
+                    }
                     setState(() => _activeNav = label);
                     if (label != 'Trang chủ') {
                       _showToast('$label đang được chuẩn bị.');
