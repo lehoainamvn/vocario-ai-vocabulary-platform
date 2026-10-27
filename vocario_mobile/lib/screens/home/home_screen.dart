@@ -5,6 +5,8 @@ import '../../core/services/api_service.dart';
 import '../scanner/scanner_screen.dart';
 import '../wordbook/wordbook_screen.dart';
 import '../arena/arena_screen.dart';
+import '../leaderboard/leaderboard_screen.dart';
+import '../profile/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -226,7 +228,10 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           // User Avatar & Greeting Stack
           InkWell(
-            onTap: () => _showToast('Hồ sơ học viên: $_userFullName'),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfileScreen()),
+            ).then((_) => _fetchDatabaseData()),
             borderRadius: BorderRadius.circular(12),
             child: Row(
               children: [
@@ -1216,11 +1221,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-            Text(
-              'TOP 3',
-              style: VocarioTokens.monoSmall.copyWith(
-                fontSize: 9,
-                color: VocarioTokens.muted,
+            InkWell(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const LeaderboardScreen()),
+              ),
+              child: Text(
+                'TOP 3 →',
+                style: VocarioTokens.monoSmall.copyWith(
+                  fontSize: 9,
+                  color: VocarioTokens.brand,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],
@@ -1405,6 +1417,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (_) => const ArenaScreen(),
+                        ),
+                      ).then((_) => _fetchDatabaseData());
+                      return;
+                    }
+                    if (label == 'Hồ sơ') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ProfileScreen(),
                         ),
                       ).then((_) => _fetchDatabaseData());
                       return;

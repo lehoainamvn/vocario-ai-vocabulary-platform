@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../core/constants/tokens.dart';
 import '../../core/services/api_service.dart';
+import '../leaderboard/leaderboard_screen.dart';
 
 /// Dữ liệu một vật thể trong đấu trường thị giác
 class ArenaWord {
@@ -746,26 +747,32 @@ class _ArenaScreenState extends State<ArenaScreen> with SingleTickerProviderStat
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: VocarioTokens.surface,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: VocarioTokens.border),
+              GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LeaderboardScreen()),
                 ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.emoji_events_outlined, size: 14, color: VocarioTokens.brand),
-                    const SizedBox(width: 5),
-                    Text(
-                      '$_totalScore XP',
-                      style: VocarioTokens.monoSmall.copyWith(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: VocarioTokens.ink,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: VocarioTokens.surface,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: VocarioTokens.border),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.emoji_events_outlined, size: 14, color: VocarioTokens.brand),
+                      const SizedBox(width: 5),
+                      Text(
+                        '$_totalScore XP',
+                        style: VocarioTokens.monoSmall.copyWith(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: VocarioTokens.ink,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -1847,6 +1854,25 @@ class _ArenaScreenState extends State<ArenaScreen> with SingleTickerProviderStat
                 backgroundColor: VocarioTokens.brand,
                 foregroundColor: Colors.white,
                 elevation: 0,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          SizedBox(
+            width: double.infinity,
+            height: 42,
+            child: OutlinedButton.icon(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const LeaderboardScreen()),
+              ),
+              icon: const Icon(Icons.emoji_events_outlined, size: 16),
+              label: const Text('Xem bảng xếp hạng tuần', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: VocarioTokens.brand,
+                side: const BorderSide(color: VocarioTokens.brand),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
               ),
             ),
