@@ -186,6 +186,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           const SizedBox(height: 20),
                           _buildVisualArenaSection(),
                           const SizedBox(height: 20),
+                          _buildWeeklyLeaderboardSection(),
+                          const SizedBox(height: 20),
                           _buildFooterSyncStatus(),
                         ],
                       ),
@@ -1156,6 +1158,162 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  // ==========================================================================
+  // 5. WEEKLY LEADERBOARD SECTION (KHỚP 100% WEB USERHOMECOMPONENT)
+  // ==========================================================================
+  Widget _buildWeeklyLeaderboardSection() {
+    final topThree = [
+      {
+        'rank': 1,
+        'name': 'Minh Hoàng',
+        'level': 'B2',
+        'streak': 7,
+        'xp': 1420,
+        'isMe': false,
+      },
+      {
+        'rank': 2,
+        'name': 'Phương Thảo',
+        'level': 'A2',
+        'streak': 5,
+        'xp': 1280,
+        'isMe': false,
+      },
+      {
+        'rank': 3,
+        'name': '$_userFullName (Bạn)',
+        'level': _targetLevel,
+        'streak': _streakCount,
+        'xp': 960,
+        'isMe': true,
+      },
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'CỘNG ĐỒNG HỌC VIÊN',
+                  style: VocarioTokens.monoSmall.copyWith(
+                    fontSize: 8,
+                    color: VocarioTokens.brand,
+                    letterSpacing: 1.0,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Xếp hạng tuần',
+                  style: VocarioTokens.serifHeadline.copyWith(fontSize: 16),
+                ),
+              ],
+            ),
+            Text(
+              'TOP 3',
+              style: VocarioTokens.monoSmall.copyWith(
+                fontSize: 9,
+                color: VocarioTokens.muted,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: VocarioTokens.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: VocarioTokens.border),
+          ),
+          child: Column(
+            children: topThree.map((user) {
+              final rank = user['rank'] as int;
+              final isMe = user['isMe'] as bool;
+
+              return Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                decoration: BoxDecoration(
+                  color: rank == 1
+                      ? const Color(0xFFFEF9C3).withValues(alpha: 0.35)
+                      : VocarioTokens.field,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: rank == 1 ? VocarioTokens.goldAccent : VocarioTokens.border,
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            color: rank == 1
+                                ? VocarioTokens.goldAccent
+                                : rank == 2
+                                    ? const Color(0xFFE2E8F0)
+                                    : const Color(0xFFFED7AA),
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            '#$rank',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: rank == 1 ? VocarioTokens.ink : VocarioTokens.muted,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              user['name'] as String,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: isMe ? VocarioTokens.brand : VocarioTokens.ink,
+                              ),
+                            ),
+                            Text(
+                              '${user['level']} · ${user['streak']} ngày chuỗi',
+                              style: VocarioTokens.monoSmall.copyWith(
+                                fontSize: 8.5,
+                                color: VocarioTokens.muted,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Text(
+                      '${user['xp']} XP',
+                      style: VocarioTokens.monoSmall.copyWith(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: VocarioTokens.brand,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+      ],
     );
   }
 
