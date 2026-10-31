@@ -179,7 +179,7 @@ import { IconComponent } from '../common/icon.component';
                       [style.left.%]="item.leftPercent"
                       [style.width.%]="item.widthPercent"
                       [style.height.%]="item.heightPercent"
-                      [style.border]="selectedWord() === item.word ? '2px solid #F7D147' : ('1.5px solid ' + (item.colorBorder || '#ffffff'))"
+                      [style.border]="selectedWord() === item.word ? '2px solid #F7D147' : '1.5px solid rgba(255, 255, 255, 0.85)'"
                       [style.background-color]="selectedWord() === item.word ? 'rgba(247, 209, 71, 0.28)' : 'rgba(0, 0, 0, 0.08)'"
                       [title]="item.word + ': ' + item.vietnamese"
                     >
@@ -248,7 +248,7 @@ import { IconComponent } from '../common/icon.component';
                       [style.left.%]="item.leftPercent"
                       [style.width.%]="item.widthPercent"
                       [style.height.%]="item.heightPercent"
-                      [style.border]="selectedWord() === item.word ? '2px solid #F7D147' : ('1.5px solid ' + (item.colorBorder || '#ffffff'))"
+                      [style.border]="selectedWord() === item.word ? '2px solid #F7D147' : '1.5px solid rgba(255, 255, 255, 0.85)'"
                       [style.background-color]="selectedWord() === item.word ? 'rgba(247, 209, 71, 0.28)' : 'rgba(0, 0, 0, 0.08)'"
                       [title]="item.word + ': ' + item.vietnamese"
                     >

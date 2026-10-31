@@ -406,12 +406,12 @@ async def detect_objects(
         seen_words = set()
 
         color_palettes = [
-            ("#FEF3C7", "#D97706", "#1A1612"),
-            ("#E0E7FF", "#4F46E5", "#1E1B4B"),
-            ("#D1FAE5", "#059669", "#064E3B"),
-            ("#FCE7F3", "#DB2777", "#831843"),
-            ("#CFFAFE", "#0891B2", "#164E63"),
-            ("#EDE9FE", "#7C3AED", "#4C1D95")
+            ("#FEF3C7", "#FFFFFF", "#1A1612"),
+            ("#E0E7FF", "#FFFFFF", "#1E1B4B"),
+            ("#D1FAE5", "#FFFFFF", "#064E3B"),
+            ("#FCE7F3", "#FFFFFF", "#831843"),
+            ("#CFFAFE", "#FFFFFF", "#164E63"),
+            ("#EDE9FE", "#FFFFFF", "#4C1D95")
         ]
 
         # Danh mục từ vựng trừu tượng hoặc dễ bị kích hoạt ảo giác bởi kết cấu song song / bề mặt phẳng
