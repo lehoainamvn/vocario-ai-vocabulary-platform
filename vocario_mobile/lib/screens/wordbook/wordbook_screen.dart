@@ -777,35 +777,43 @@ class _WordbookScreenState extends State<WordbookScreen> with SingleTickerProvid
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: VocarioTokens.field,
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: VocarioTokens.border),
+              Expanded(
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: VocarioTokens.field,
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: VocarioTokens.border),
+                      ),
+                      child: Text(
+                        '$level · ${item['partOfSpeech']}',
+                        style: VocarioTokens.monoSmall.copyWith(fontSize: 8.5, color: VocarioTokens.brand),
+                      ),
                     ),
-                    child: Text(
-                      '$level · ${item['partOfSpeech']}',
-                      style: VocarioTokens.monoSmall.copyWith(fontSize: 8.5, color: VocarioTokens.brand),
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: statusColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          '$statusText · +$interval ngày · EF $ef',
+                          style: VocarioTokens.monoSmall.copyWith(fontSize: 8.5, color: statusColor),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: statusColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      '$statusText · +$interval ngày · EF $ef',
-                      style: VocarioTokens.monoSmall.copyWith(fontSize: 8.5, color: statusColor),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   InkWell(
                     onTap: () => _playWordAudio(word),
