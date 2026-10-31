@@ -9,6 +9,7 @@ import {
   RefreshControl,
   ActivityIndicator,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import * as Speech from 'expo-speech';
 import { VocarioTheme } from '../constants/theme';
 import { srsService } from '../api/services';
@@ -83,14 +84,14 @@ export const WordbookScreen: React.FC = () => {
             style={styles.actionBtn}
             onPress={() => Speech.speak(item.word, { language: 'en-US' })}
           >
-            <Text style={styles.actionIcon}>🔊</Text>
+            <Ionicons name="volume-medium-outline" size={18} color={VocarioTheme.colors.brand} />
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.actionBtn, styles.micBtn]}
             onPress={() => setSelectedWord(item)}
           >
-            <Text style={styles.actionIcon}>🎙️</Text>
+            <Ionicons name="mic-outline" size={18} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
       </View>

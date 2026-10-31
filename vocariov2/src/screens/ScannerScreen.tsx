@@ -9,6 +9,7 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as Speech from 'expo-speech';
@@ -108,10 +109,12 @@ export const ScannerScreen: React.FC = () => {
         </View>
         <View style={styles.headerActions}>
           <TouchableOpacity style={styles.iconBtn} onPress={() => pickImage(false)}>
-            <Text style={styles.btnText}>🖼️ Thư viện</Text>
+            <Ionicons name="images-outline" size={16} color={VocarioTheme.colors.ink} style={{ marginRight: 4 }} />
+            <Text style={styles.btnText}>Thư viện</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.iconBtn, styles.iconBtnActive]} onPress={() => pickImage(true)}>
-            <Text style={[styles.btnText, { color: '#FFFFFF' }]}>📷 Máy ảnh</Text>
+            <Ionicons name="camera" size={16} color="#FFFFFF" style={{ marginRight: 4 }} />
+            <Text style={[styles.btnText, { color: '#FFFFFF' }]}>Máy ảnh</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -141,7 +144,7 @@ export const ScannerScreen: React.FC = () => {
           </View>
         ) : (
           <View style={styles.placeholderBox}>
-            <Text style={styles.placeholderIcon}>📸</Text>
+            <Ionicons name="camera-outline" size={54} color={VocarioTheme.colors.brandLight} style={{ marginBottom: 12 }} />
             <Text style={styles.placeholderTitle}>Chưa có ảnh nào được chọn</Text>
             <Text style={styles.placeholderDesc}>
               Chụp ảnh phòng học, bàn làm việc hoặc tải ảnh lên để AI phân tích đồ vật và xuất từ vựng chuẩn CEFR.
@@ -164,7 +167,8 @@ export const ScannerScreen: React.FC = () => {
                 style={styles.speakBtn}
                 onPress={() => Speech.speak(selectedBox.object_name, { language: 'en-US' })}
               >
-                <Text style={styles.speakText}>🔊 Nghe</Text>
+                <Ionicons name="volume-medium-outline" size={16} color="#FFFFFF" style={{ marginRight: 4 }} />
+                <Text style={styles.speakText}>Nghe</Text>
               </TouchableOpacity>
             </View>
 

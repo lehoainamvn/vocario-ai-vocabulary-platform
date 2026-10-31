@@ -2,6 +2,26 @@ import axios from 'axios';
 import { apiClient, AI_VISION_URL } from './client';
 import { TargetProgress, WordItem, LeaderboardEntry, CertificateItem, DetectedBox } from '../types';
 
+// Helper chuyển đổi DTO UserWordProgress từ backend Spring Boot sang giao diện WordItem
+export const mapProgressToWordItem = (item: any): WordItem => {
+  if (!item) return {} as WordItem;
+  if (typeof item.word === 'string') {
+    return item as WordItem;
+  }
+  const w = item.word || {};
+  return {
+    id: item.id ? String(item.id) : (w.id ? String(w.id) : String(Math.random())),
+    word: w.word || item.wordText || 'Unknown',
+    ipa: w.ipa || '',
+    vietnameseMeaning: w.vietnameseMeaning || '',
+    cefrLevel: w.cefrLevel || 'A1',
+    repetitionCount: item.repetitionNumber ?? item.repetitionCount ?? 0,
+    status: item.status || 'NEW',
+    exampleSentenceEn: w.exampleSentenceEn || '',
+    exampleSentenceVi: w.exampleSentenceVi || '',
+  };
+};
+
 export const authService = {
   async login(usernameOrEmail: string, password: string) {
     const res = await apiClient.post('/api/auth/login', {
@@ -21,8 +41,10 @@ export const authService = {
     return res.data;
   },
 
-  async getProfile() {
-    const res = await apiClient.get('/api/users/profile');
+  async getProfile(userId?: string) {
+    const res = await apiClient.get('/api/auth/me', {
+      params: userId ? { userId } : {},
+    });
     return res.data;
   },
 };
@@ -36,17 +58,19 @@ export const srsService = {
   },
 
   async getDueCards(userId?: string): Promise<WordItem[]> {
-    const res = await apiClient.get('/api/srs/due', {
+    const res = await apiClient.get('/api/srs/due-cards', {
       params: userId ? { userId } : {},
     });
-    return res.data || [];
+    const rawList = res.data || [];
+    return rawList.map(mapProgressToWordItem);
   },
 
   async getSavedWords(userId?: string): Promise<WordItem[]> {
-    const res = await apiClient.get('/api/srs/words', {
+    const res = await apiClient.get('/api/srs/my-words', {
       params: userId ? { userId } : {},
     });
-    return res.data || [];
+    const rawList = res.data || [];
+    return rawList.map(mapProgressToWordItem);
   },
 
   async submitReview(data: {
@@ -124,23 +148,54 @@ export const arenaService = {
     }
   },
 
-  async submitArenaScore(data: { stageId: string; completionTimeMs: number; accuracy: number }) {
-    const res = await apiClient.post('/api/arena/submit', data);
+  async submitArenaScore(data: {
+    stageId: string;
+    completionTimeMs: number;
+    pureTimeMs?: number;
+    mistakeCount?: number;
+    accuracyPct?: number;
+    maxCombo?: number;
+    totalXpEarned?: number;
+    userId?: string;
+  }) {
+    const res = await apiClient.post('/api/arena/submit-run', data);
     return res.data;
   },
 };
 
 export const leaderboardService = {
-  async getWeeklyLeaderboard(type: string = 'weekly') {
+  async getWeeklyLeaderboard(period: string = 'weekly', level: string = 'ALL'): Promise<LeaderboardEntry[]> {
     const res = await apiClient.get('/api/leaderboard', {
-      params: { type },
+      params: { period, level, page: 0, size: 20 },
     });
-    return res.data;
+    const data = res.data;
+    if (data && Array.isArray(data.topUsers)) {
+      return data.topUsers.map((u: any) => ({
+        rank: u.rank,
+        userId: String(u.userId),
+        username: u.username,
+        fullName: u.fullName,
+        score: u.xp || 0,
+        streakDays: u.streakCount || 0,
+        accuracyRate: 100,
+      }));
+    }
+    if (Array.isArray(data)) return data;
+    return [];
   },
 
   async getStageLeaderboard(stageId: string): Promise<LeaderboardEntry[]> {
     const res = await apiClient.get(`/api/arena/stages/${stageId}/leaderboard`);
-    return res.data || [];
+    const raw = res.data || [];
+    return raw.map((r: any) => ({
+      rank: r.rank,
+      userId: String(r.userId),
+      username: r.userName || 'Học viên',
+      score: r.totalXpEarned || 0,
+      streakDays: 0,
+      accuracyRate: r.accuracyPct,
+      timeTakenSeconds: r.completionTimeMs ? r.completionTimeMs / 1000 : 0,
+    }));
   },
 };
 

@@ -9,6 +9,7 @@ import {
   TextInput,
   ScrollView,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import * as Speech from 'expo-speech';
 import { VocarioTheme } from '../constants/theme';
 import { srsService } from '../api/services';
@@ -143,7 +144,8 @@ export const SpeechScorerModal: React.FC<Props> = ({
               {vietnamese ? <Text style={styles.meaningText}>{vietnamese}</Text> : null}
 
               <TouchableOpacity style={styles.listenBtn} onPress={speakSample}>
-                <Text style={styles.listenText}>🔊 Nghe phát âm chuẩn</Text>
+                <Ionicons name="volume-medium-outline" size={16} color={VocarioTheme.colors.brand} style={{ marginRight: 6 }} />
+                <Text style={styles.listenText}>Nghe phát âm chuẩn</Text>
               </TouchableOpacity>
             </View>
 
@@ -160,7 +162,8 @@ export const SpeechScorerModal: React.FC<Props> = ({
                 style={styles.evaluateBtn}
                 onPress={() => evaluateSpeech(spokenText)}
               >
-                <Text style={styles.evaluateBtnText}>⚡ Chấm điểm phát âm</Text>
+                <Ionicons name="flash-outline" size={16} color="#FFFFFF" style={{ marginRight: 6 }} />
+                <Text style={styles.evaluateBtnText}>Chấm điểm phát âm</Text>
               </TouchableOpacity>
             </View>
 

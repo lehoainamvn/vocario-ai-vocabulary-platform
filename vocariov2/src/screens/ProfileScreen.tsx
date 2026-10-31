@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { VocarioTheme } from '../constants/theme';
 import { certificateService, authService } from '../api/services';
 import { CertificateItem, User } from '../types';
@@ -76,15 +77,24 @@ export const ProfileScreen: React.FC = () => {
 
         <View style={styles.statsBadgeRow}>
           <View style={styles.statChip}>
-            <Text style={styles.statChipVal}>🔥 {user?.streakCount || 0}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Ionicons name="flame" size={16} color="#E07A5F" style={{ marginRight: 4 }} />
+              <Text style={styles.statChipVal}>{user?.streakCount || 0}</Text>
+            </View>
             <Text style={styles.statChipLabel}>ngày streak</Text>
           </View>
           <View style={styles.statChip}>
-            <Text style={styles.statChipVal}>📚 {user?.totalWordsLearned || 0}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Ionicons name="book" size={15} color={VocarioTheme.colors.brand} style={{ marginRight: 4 }} />
+              <Text style={styles.statChipVal}>{user?.totalWordsLearned || 0}</Text>
+            </View>
             <Text style={styles.statChipLabel}>từ đã nạp</Text>
           </View>
           <View style={styles.statChip}>
-            <Text style={styles.statChipVal}>🎯 {user?.targetLevel || 'A2'}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Ionicons name="ribbon" size={16} color="#457B9D" style={{ marginRight: 4 }} />
+              <Text style={styles.statChipVal}>{user?.targetLevel || 'A2'}</Text>
+            </View>
             <Text style={styles.statChipLabel}>chuẩn CEFR</Text>
           </View>
         </View>
@@ -112,7 +122,8 @@ export const ProfileScreen: React.FC = () => {
 
         {/* Claim button for next level */}
         <TouchableOpacity style={styles.claimBtn} onPress={() => handleClaim('A2')}>
-          <Text style={styles.claimBtnText}>🏆 Khảo thí & Nhận chứng chỉ CEFR A2</Text>
+          <Ionicons name="trophy-outline" size={18} color="#FFFFFF" style={{ marginRight: 6 }} />
+          <Text style={styles.claimBtnText}>Khảo thí & Nhận chứng chỉ CEFR A2</Text>
         </TouchableOpacity>
       </View>
 

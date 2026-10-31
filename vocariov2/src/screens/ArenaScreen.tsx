@@ -8,6 +8,7 @@ import {
   Image,
   Alert,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { VocarioTheme } from '../constants/theme';
 import { arenaService } from '../api/services';
 
@@ -54,7 +55,8 @@ export const ArenaScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         style={styles.startBlitzBtn}
         onPress={() => stages[0] && handleStartStage(stages[0])}
       >
-        <Text style={styles.startBlitzText}>⏱️ Bắt đầu 60s Blitz</Text>
+        <Ionicons name="timer-outline" size={18} color="#FFFFFF" style={{ marginRight: 6 }} />
+        <Text style={styles.startBlitzText}>Bắt đầu 60s Blitz</Text>
       </TouchableOpacity>
 
       {/* Tab Switcher */}

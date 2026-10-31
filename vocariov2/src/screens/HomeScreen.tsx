@@ -8,6 +8,7 @@ import {
   RefreshControl,
   ActivityIndicator,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import * as Speech from 'expo-speech';
 import { VocarioTheme } from '../constants/theme';
 import { srsService } from '../api/services';
@@ -149,27 +150,30 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               style={styles.cardBtn}
               onPress={() => Speech.speak(dueCards[0].word, { language: 'en-US' })}
             >
-              <Text style={styles.cardBtnText}>🔊 Phát âm</Text>
+              <Ionicons name="volume-medium-outline" size={16} color={VocarioTheme.colors.brand} style={{ marginRight: 6 }} />
+              <Text style={styles.cardBtnText}>Phát âm</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={[styles.cardBtn, styles.cardBtnAccent]}
               onPress={() => setSelectedWord(dueCards[0])}
             >
-              <Text style={[styles.cardBtnText, { color: '#FFFFFF' }]}>🎙️ Luyện phát âm AI</Text>
+              <Ionicons name="mic-outline" size={16} color="#FFFFFF" style={{ marginRight: 6 }} />
+              <Text style={[styles.cardBtnText, { color: '#FFFFFF' }]}>Luyện phát âm AI</Text>
             </TouchableOpacity>
           </View>
         </View>
       ) : (
         <View style={styles.emptyBox}>
           <Text style={styles.emptyText}>
-            🎉 Tuyệt vời! Bạn đã hoàn thành hết các thẻ cần ôn tập hôm nay. Hãy mở máy ảnh để quét nạp từ mới!
+            Bạn đã hoàn thành hết các thẻ cần ôn tập hôm nay. Hãy mở máy ảnh để quét nạp từ mới!
           </Text>
           <TouchableOpacity
             style={styles.scanNowBtn}
             onPress={() => navigation.navigate('Scanner')}
           >
-            <Text style={styles.scanNowText}>📷 Quét đồ vật ngay</Text>
+            <Ionicons name="camera-outline" size={18} color="#FFFFFF" style={{ marginRight: 6 }} />
+            <Text style={styles.scanNowText}>Quét đồ vật ngay</Text>
           </TouchableOpacity>
         </View>
       )}

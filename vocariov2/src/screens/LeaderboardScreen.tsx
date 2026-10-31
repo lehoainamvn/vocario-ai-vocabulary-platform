@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { VocarioTheme } from '../constants/theme';
 import { leaderboardService } from '../api/services';
 import { LeaderboardEntry } from '../types';
@@ -20,8 +21,8 @@ export const LeaderboardScreen: React.FC = () => {
     try {
       setLoading(true);
       const res = await leaderboardService.getWeeklyLeaderboard('weekly');
-      if (res && res.topUsers) {
-        setEntries(res.topUsers);
+      if (Array.isArray(res) && res.length > 0) {
+        setEntries(res);
       } else {
         // Fallback dữ liệu mẫu chuẩn
         setEntries([
@@ -59,8 +60,14 @@ export const LeaderboardScreen: React.FC = () => {
           style={[styles.modeBtn, mode === 'srs' && styles.modeBtnActive]}
           onPress={() => setMode('srs')}
         >
+          <Ionicons
+            name="book-outline"
+            size={15}
+            color={mode === 'srs' ? '#FFFFFF' : VocarioTheme.colors.ink}
+            style={{ marginRight: 6 }}
+          />
           <Text style={[styles.modeText, mode === 'srs' && styles.modeTextActive]}>
-            📚 Thẻ Từ SM-2
+            Thẻ Từ SM-2
           </Text>
         </TouchableOpacity>
 
@@ -68,8 +75,14 @@ export const LeaderboardScreen: React.FC = () => {
           style={[styles.modeBtn, mode === 'arena' && styles.modeBtnActive]}
           onPress={() => setMode('arena')}
         >
+          <Ionicons
+            name="flash-outline"
+            size={15}
+            color={mode === 'arena' ? '#FFFFFF' : VocarioTheme.colors.ink}
+            style={{ marginRight: 6 }}
+          />
           <Text style={[styles.modeText, mode === 'arena' && styles.modeTextActive]}>
-            ⚡ Đấu Trường Tốc Độ
+            Đấu Trường Tốc Độ
           </Text>
         </TouchableOpacity>
       </View>
@@ -94,7 +107,7 @@ export const LeaderboardScreen: React.FC = () => {
           {/* Rank 1 */}
           <View style={styles.podiumCol}>
             <View style={styles.crown}>
-              <Text style={{ fontSize: 16 }}>👑</Text>
+              <Ionicons name="trophy" size={20} color="#D4AF37" />
             </View>
             <View style={[styles.avatarBox, styles.goldBorder]}>
               <Text style={styles.avatarLetter}>{top3[0].fullName?.charAt(0) || '1'}</Text>
@@ -136,7 +149,10 @@ export const LeaderboardScreen: React.FC = () => {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.otherName}>{item.fullName || item.username}</Text>
-              <Text style={styles.otherStreak}>🔥 Chuỗi {item.streakDays} ngày</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
+                <Ionicons name="flame" size={13} color="#E07A5F" style={{ marginRight: 3 }} />
+                <Text style={styles.otherStreak}>Chuỗi {item.streakDays} ngày</Text>
+              </View>
             </View>
             <Text style={styles.otherScore}>
               {mode === 'srs' ? `${item.score} từ` : `${item.timeTakenSeconds}s`}

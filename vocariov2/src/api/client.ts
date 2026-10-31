@@ -3,18 +3,29 @@ import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Cấu hình URL linh hoạt: Tự động dùng localhost cho web, 10.0.2.2 cho Android Emulator hoặc Render URL
-export const API_BASE_URL = Platform.select({
-  android: 'http://10.0.2.2:8080',
-  ios: 'http://localhost:8080',
-  default: 'http://localhost:8080',
-});
+// Cấu hình URL linh hoạt: Tự động dùng localhost:8088 cho local dev, hoặc Render Production URL
+export const PRODUCTION_API_URL = 'https://vocario-backend.onrender.com';
+export const PRODUCTION_AI_URL = 'https://vocario-ai.onrender.com';
 
-export const AI_VISION_URL = Platform.select({
-  android: 'http://10.0.2.2:8000',
-  ios: 'http://localhost:8000',
-  default: 'http://localhost:8000',
-});
+// Nếu là dev trên Android Emulator dùng 10.0.2.2:8088, Web/iOS dùng localhost:8088
+// Đổi USE_PRODUCTION = true khi build APK preview kiểm thử trên thiết bị thật
+export const USE_PRODUCTION = false;
+
+export const API_BASE_URL = USE_PRODUCTION
+  ? PRODUCTION_API_URL
+  : Platform.select({
+      android: 'http://10.0.2.2:8088',
+      ios: 'http://localhost:8088',
+      default: 'http://localhost:8088',
+    });
+
+export const AI_VISION_URL = USE_PRODUCTION
+  ? PRODUCTION_AI_URL
+  : Platform.select({
+      android: 'http://10.0.2.2:8001',
+      ios: 'http://localhost:8001',
+      default: 'http://localhost:8001',
+    });
 
 const TOKEN_KEY = 'vocario_auth_token';
 const USER_KEY = 'vocario_user_data';
