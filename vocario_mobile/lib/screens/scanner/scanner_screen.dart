@@ -684,20 +684,22 @@ class _ScannerScreenState extends State<ScannerScreen> with SingleTickerProvider
             // NỘI DUNG VIEWPORT: ẢNH VÀ BOUNDING BOXES ĐỒNG BỘ 1:1
             if (_customImageBytes != null)
               Center(
-                child: FittedBox(
-                  fit: BoxFit.contain,
-                  child: SizedBox(
-                    width: _imageWidth ?? 640,
-                    height: _imageHeight ?? 480,
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Image.memory(
-                          _customImageBytes!,
-                          width: _imageWidth ?? 640,
-                          height: _imageHeight ?? 480,
-                          fit: BoxFit.fill,
-                        ),
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: FittedBox(
+                    fit: BoxFit.contain,
+                    child: SizedBox(
+                      width: _imageWidth ?? 640,
+                      height: _imageHeight ?? 480,
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Image.memory(
+                            _customImageBytes!,
+                            width: _imageWidth ?? 640,
+                            height: _imageHeight ?? 480,
+                            fit: BoxFit.fill,
+                          ),
                         if (_hasScanned && _detectedItems.isNotEmpty)
                           ..._detectedItems.asMap().entries.map((entry) {
                             final idx = entry.key;
@@ -779,7 +781,8 @@ class _ScannerScreenState extends State<ScannerScreen> with SingleTickerProvider
                     ),
                   ),
                 ),
-              )
+              ),
+            )
             else if (_activeStudioTab == 'camera') ...[
               // Trạng thái chuẩn bị camera
               Positioned.fill(
