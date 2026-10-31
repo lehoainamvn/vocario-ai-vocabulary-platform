@@ -364,7 +364,8 @@ class ApiService {
 
   /// Gửi kết quả chấm điểm phát âm AI Speech Scorer vào SM-2
   Future<Map<String, dynamic>?> submitPronunciationReview({
-    required String progressId,
+    String? progressId,
+    String? wordText,
     required int ratingGrade,
     required double speechScore,
     int responseTimeMs = 2500,
@@ -373,16 +374,23 @@ class ApiService {
       final prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('vocario_user_id');
 
+      final body = <String, dynamic>{
+        'ratingGrade': ratingGrade,
+        'reviewType': 'PRONUNCIATION',
+        'speechScore': speechScore,
+        'responseTimeMs': responseTimeMs,
+      };
+      if (progressId != null && progressId.isNotEmpty) {
+        body['progressId'] = progressId;
+      }
+      if (wordText != null && wordText.isNotEmpty) {
+        body['wordText'] = wordText;
+      }
+
       final response = await _dio.post(
         '/api/srs/review',
         queryParameters: userId != null && userId.isNotEmpty ? {'userId': userId} : null,
-        data: {
-          'progressId': progressId,
-          'ratingGrade': ratingGrade,
-          'reviewType': 'PRONUNCIATION',
-          'speechScore': speechScore,
-          'responseTimeMs': responseTimeMs,
-        },
+        data: body,
       );
       if (response.data is Map<String, dynamic>) {
         return response.data as Map<String, dynamic>;

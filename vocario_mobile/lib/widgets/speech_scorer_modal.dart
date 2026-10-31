@@ -215,21 +215,28 @@ class _SpeechScorerModalState extends State<SpeechScorerModal> with SingleTicker
   }
 
   Future<void> _submitReview() async {
-    if (widget.progressId == null || widget.progressId!.isEmpty) {
-      Navigator.pop(context);
-      return;
-    }
-
     setState(() => _isSubmitting = true);
     final grade = (_score ?? 70) >= 85 ? 5 : ((_score ?? 70) >= 70 ? 4 : 3);
-    await ApiService().submitPronunciationReview(
-      progressId: widget.progressId!,
+    final res = await ApiService().submitPronunciationReview(
+      progressId: widget.progressId,
+      wordText: widget.word,
       ratingGrade: grade,
       speechScore: _score ?? 75.0,
     );
 
     if (mounted) {
       Navigator.pop(context);
+      final streak = res != null ? res['streakCount'] : null;
+      final msg = streak != null
+          ? 'Đã ghi nhận phát âm! 🔥 Chuỗi học: $streak ngày'
+          : 'Đã hoàn tất bài luyện phát âm cho "${widget.word}"!';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(msg),
+          duration: const Duration(seconds: 3),
+          backgroundColor: const Color(0xFF7D6853),
+        ),
+      );
     }
   }
 

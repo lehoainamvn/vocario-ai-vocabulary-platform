@@ -54,6 +54,7 @@ class LeaderboardScreen extends StatefulWidget {
 }
 
 class _LeaderboardScreenState extends State<LeaderboardScreen> {
+  String _activeTab = 'SM2'; // 'SM2' = Thẻ từ SM-2, 'ARENA' = Đấu trường tốc độ
   late String _selectedPeriod; // 'weekly' hoặc 'all-time'
   String _selectedLevel = 'ALL'; // 'ALL', 'A1', 'A2', 'B1', 'B2', 'C1'
   int _currentPage = 0;
@@ -65,6 +66,17 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   List<LeaderboardUser> _rankedList = [];
   LeaderboardUser? _currentUserRank;
   String? _nextTargetSuggestion;
+
+  // Dữ liệu Bảng xếp hạng Đấu trường Tốc độ
+  List<Map<String, dynamic>> _arenaRecords = [];
+  bool _isLoadingArena = false;
+  String _selectedArenaStageId = 'stage-admin-kitchen';
+
+  final List<Map<String, String>> _arenaOfficialStages = const [
+    {'id': 'stage-admin-kitchen', 'title': 'Gian Bếp Đời Thực (Tuần)'},
+    {'id': 'stage-admin-study', 'title': 'Góc Học Tập & Công Việc'},
+    {'id': 'stage-admin-living', 'title': 'Phòng Khách Ấm Cúng'},
+  ];
 
   final List<Map<String, String>> _cefrLevels = const [
     {'id': 'ALL', 'label': 'Tất cả'},
@@ -195,6 +207,25 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     }
   }
 
+  /// Đồng bộ trực tiếp từ Spring Boot API `/api/arena/stages/{stageId}/leaderboard`
+  Future<void> _fetchArenaLeaderboard() async {
+    setState(() => _isLoadingArena = true);
+    try {
+      final res = await ApiService().getStageLeaderboard(
+        _selectedArenaStageId,
+        period: _selectedPeriod == 'weekly' ? 'weekly' : 'all',
+      );
+      if (mounted) {
+        setState(() {
+          _arenaRecords = res.map((e) => e is Map<String, dynamic> ? e : <String, dynamic>{}).toList();
+          _isLoadingArena = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _isLoadingArena = false);
+    }
+  }
+
   String _getInitials(String name) {
     final parts = name.trim().split(' ').where((p) => p.isNotEmpty).toList();
     if (parts.isEmpty) return 'HV';
@@ -244,28 +275,53 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                       ),
                       const SizedBox(height: 16),
 
-                      // Period Switcher Bar (Tuần này / Toàn thời gian)
-                      _buildPeriodSwitcher(),
+                      // Mode Switcher: SM-2 vs Đấu trường Tốc độ
+                      _buildMainTabSwitcher(),
                       const SizedBox(height: 14),
 
-                      // Personal Record Card (Thành tích của bạn)
-                      _buildPersonalRecordCard(),
-                      const SizedBox(height: 18),
+                      if (_activeTab == 'SM2') ...[
+                        // Period Switcher Bar (Tuần này / Toàn thời gian)
+                        _buildPeriodSwitcher(),
+                        const SizedBox(height: 14),
 
-                      // CEFR Horizontal Filter Pills
-                      _buildCefrFilterPills(),
-                      const SizedBox(height: 12),
+                        // Personal Record Card (Thành tích của bạn)
+                        _buildPersonalRecordCard(),
+                        const SizedBox(height: 18),
 
-                      // Honors Ledger Table
-                      _buildHonorsLedgerTable(),
-                      const SizedBox(height: 14),
+                        // CEFR Horizontal Filter Pills
+                        _buildCefrFilterPills(),
+                        const SizedBox(height: 12),
 
-                      // Pagination Controls
-                      if (_totalPages > 1) _buildPaginationControls(),
+                        // Honors Ledger Table
+                        _buildHonorsLedgerTable(),
+                        const SizedBox(height: 14),
 
-                      const SizedBox(height: 18),
-                      // Scoring Mechanics Card
-                      _buildScoringMechanicsCard(),
+                        // Pagination Controls
+                        if (_totalPages > 1) _buildPaginationControls(),
+
+                        const SizedBox(height: 18),
+                        // Scoring Mechanics Card
+                        _buildScoringMechanicsCard(),
+                      ] else ...[
+                        // Period Switcher Bar
+                        _buildPeriodSwitcher(),
+                        const SizedBox(height: 14),
+
+                        // Arena Stage Selector
+                        _buildArenaStageSelector(),
+                        const SizedBox(height: 16),
+
+                        // Arena Speedrun Podium
+                        _buildArenaSpeedrunPodium(),
+                        const SizedBox(height: 16),
+
+                        // Arena Honors Ledger Table
+                        _buildArenaHonorsLedgerTable(),
+                        const SizedBox(height: 16),
+
+                        // Arena Action Card
+                        _buildArenaActionCard(),
+                      ],
                       const SizedBox(height: 24),
                     ],
                   ),
@@ -378,7 +434,11 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
             _selectedPeriod = periodKey;
             _currentPage = 0;
           });
-          _fetchLeaderboardData();
+          if (_activeTab == 'ARENA') {
+            _fetchArenaLeaderboard();
+          } else {
+            _fetchLeaderboardData();
+          }
         }
       },
       borderRadius: BorderRadius.circular(8),
@@ -937,5 +997,419 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
         ],
       ),
     );
+  }
+
+  // ==========================================================================
+  // ARENA SPEEDRUN LEADERBOARD WIDGETS
+  // ==========================================================================
+  Widget _buildMainTabSwitcher() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: VocarioTokens.field,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: VocarioTokens.border),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildMainTabItem(
+              title: 'Thẻ Từ SM-2',
+              subtitle: 'Điểm tích lũy XP',
+              tabKey: 'SM2',
+              icon: Icons.layers_outlined,
+            ),
+          ),
+          Expanded(
+            child: _buildMainTabItem(
+              title: 'Đấu Trường Tốc Độ',
+              subtitle: 'Kỷ lục Speedrun',
+              tabKey: 'ARENA',
+              icon: Icons.speed_rounded,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMainTabItem({
+    required String title,
+    required String subtitle,
+    required String tabKey,
+    required IconData icon,
+  }) {
+    final isSelected = _activeTab == tabKey;
+    return InkWell(
+      onTap: () {
+        if (_activeTab != tabKey) {
+          setState(() => _activeTab = tabKey);
+          if (tabKey == 'ARENA') {
+            _fetchArenaLeaderboard();
+          } else {
+            _fetchLeaderboardData();
+          }
+        }
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? VocarioTokens.surface : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: isSelected ? VocarioTokens.cardShadow : null,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 16,
+              color: isSelected ? VocarioTokens.brand : VocarioTokens.muted,
+            ),
+            const SizedBox(width: 6),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                    color: isSelected ? VocarioTokens.ink : VocarioTokens.muted,
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  style: VocarioTokens.monoSmall.copyWith(
+                    fontSize: 8,
+                    color: isSelected ? VocarioTokens.brand : VocarioTokens.muted,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildArenaStageSelector() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: VocarioTokens.surface,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: VocarioTokens.border),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.stadium_outlined, size: 16, color: VocarioTokens.brand),
+          const SizedBox(width: 8),
+          const Text(
+            'Phòng thi đấu: ',
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: VocarioTokens.ink),
+          ),
+          Expanded(
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: _selectedArenaStageId,
+                isExpanded: true,
+                icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: VocarioTokens.muted),
+                style: const TextStyle(fontSize: 11, color: VocarioTokens.brand, fontWeight: FontWeight.w600),
+                items: _arenaOfficialStages.map((s) {
+                  return DropdownMenuItem<String>(
+                    value: s['id']!,
+                    child: Text(s['title']!, overflow: TextOverflow.ellipsis),
+                  );
+                }).toList(),
+                onChanged: (val) {
+                  if (val != null && val != _selectedArenaStageId) {
+                    setState(() => _selectedArenaStageId = val);
+                    _fetchArenaLeaderboard();
+                  }
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildArenaSpeedrunPodium() {
+    if (_isLoadingArena) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 24),
+        child: Center(child: CircularProgressIndicator(color: VocarioTokens.brand, strokeWidth: 2)),
+      );
+    }
+
+    if (_arenaRecords.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+        decoration: BoxDecoration(
+          color: VocarioTokens.surface,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: VocarioTokens.border),
+        ),
+        alignment: Alignment.center,
+        child: Column(
+          children: [
+            const Icon(Icons.timer_off_outlined, size: 32, color: VocarioTokens.muted),
+            const SizedBox(height: 8),
+            const Text(
+              'Chưa có kỷ lục trong khoảng thời gian này',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: VocarioTokens.ink),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Hãy là người đầu tiên thiết lập kỷ lục tốc độ phản xạ trên đấu trường!',
+              style: TextStyle(fontSize: 10.5, color: VocarioTokens.muted),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    final top3 = _arenaRecords.take(3).toList();
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        // #2 Bạc
+        Expanded(
+          child: top3.length > 1
+              ? _buildArenaPodiumCard(top3[1], rank: 2, height: 135, badgeColor: const Color(0xFFC0C0C0))
+              : const SizedBox.shrink(),
+        ),
+        const SizedBox(width: 8),
+        // #1 Vàng
+        Expanded(
+          child: _buildArenaPodiumCard(top3[0], rank: 1, height: 155, badgeColor: VocarioTokens.goldAccent),
+        ),
+        const SizedBox(width: 8),
+        // #3 Đồng
+        Expanded(
+          child: top3.length > 2
+              ? _buildArenaPodiumCard(top3[2], rank: 3, height: 120, badgeColor: const Color(0xFFCD7F32))
+              : const SizedBox.shrink(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildArenaPodiumCard(
+    Map<String, dynamic> record, {
+    required int rank,
+    required double height,
+    required Color badgeColor,
+  }) {
+    final name = record['userName']?.toString() ?? 'Học viên';
+    final completionMs = (record['completionTimeMs'] as num?)?.toInt() ?? 0;
+    final timeStr = _formatMs(completionMs);
+    final acc = (record['accuracyPct'] as num?)?.toDouble() ?? 100.0;
+    final combo = (record['maxCombo'] as num?)?.toInt() ?? 1;
+
+    return Container(
+      height: height,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+      decoration: BoxDecoration(
+        color: VocarioTokens.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: rank == 1 ? VocarioTokens.goldAccent : VocarioTokens.border, width: rank == 1 ? 1.5 : 1.0),
+        boxShadow: rank == 1 ? VocarioTokens.cardShadow : null,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: badgeColor.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(color: badgeColor, width: 1),
+            ),
+            child: Text(
+              '#$rank',
+              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: badgeColor),
+            ),
+          ),
+          Text(
+            name,
+            style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: VocarioTokens.ink),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          Text(
+            timeStr,
+            style: VocarioTokens.monoSmall.copyWith(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: rank == 1 ? VocarioTokens.brand : VocarioTokens.ink,
+            ),
+          ),
+          Text(
+            '${acc.toStringAsFixed(0)}% · $combo x combo',
+            style: TextStyle(fontSize: 8.5, color: VocarioTokens.muted),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildArenaHonorsLedgerTable() {
+    if (_isLoadingArena || _arenaRecords.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      decoration: BoxDecoration(
+        color: VocarioTokens.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: VocarioTokens.border),
+      ),
+      child: Column(
+        children: [
+          // Header
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: VocarioTokens.field,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
+              border: const Border(bottom: BorderSide(color: VocarioTokens.border)),
+            ),
+            child: Row(
+              children: const [
+                SizedBox(width: 28, child: Text('#', style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: VocarioTokens.muted))),
+                Expanded(child: Text('HỌC VIÊN', style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: VocarioTokens.muted))),
+                SizedBox(width: 60, child: Text('THỜI GIAN', textAlign: TextAlign.right, style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: VocarioTokens.muted))),
+                SizedBox(width: 50, child: Text('CHÍNH XÁC', textAlign: TextAlign.right, style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: VocarioTokens.muted))),
+              ],
+            ),
+          ),
+          // Rows
+          ..._arenaRecords.asMap().entries.map((entry) {
+            final idx = entry.key;
+            final r = entry.value;
+            final isCurrentUser = r['isCurrentUser'] == true;
+            final name = r['userName']?.toString() ?? 'Học viên';
+            final ms = (r['completionTimeMs'] as num?)?.toInt() ?? 0;
+            final acc = (r['accuracyPct'] as num?)?.toDouble() ?? 100.0;
+
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: isCurrentUser ? VocarioTokens.brand.withValues(alpha: 0.06) : Colors.transparent,
+                border: const Border(bottom: BorderSide(color: VocarioTokens.border, width: 0.5)),
+              ),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 28,
+                    child: Text(
+                      '#${idx + 1}',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: idx == 0 ? VocarioTokens.goldAccent : VocarioTokens.muted,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      '$name${isCurrentUser ? ' (Bạn)' : ''}',
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        fontWeight: isCurrentUser ? FontWeight.bold : FontWeight.w500,
+                        color: isCurrentUser ? VocarioTokens.brand : VocarioTokens.ink,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 60,
+                    child: Text(
+                      _formatMs(ms),
+                      textAlign: TextAlign.right,
+                      style: VocarioTokens.monoSmall.copyWith(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: idx == 0 ? VocarioTokens.brand : VocarioTokens.ink,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 50,
+                    child: Text(
+                      '${acc.toStringAsFixed(0)}%',
+                      textAlign: TextAlign.right,
+                      style: TextStyle(fontSize: 10, color: VocarioTokens.muted),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildArenaActionCard() {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: VocarioTokens.surface,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: VocarioTokens.border),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Sẵn sàng phá kỷ lục tốc độ?',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: VocarioTokens.ink),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Thi đấu trên đấu trường thị giác và ghi danh vào bảng vinh danh.',
+                  style: TextStyle(fontSize: 10, color: VocarioTokens.muted),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          ElevatedButton.icon(
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => ArenaScreen(initialStageId: _selectedArenaStageId)),
+            ).then((_) => _fetchArenaLeaderboard()),
+            icon: const Icon(Icons.flash_on_rounded, size: 14),
+            label: const Text('Thi đấu ngay', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: VocarioTokens.brand,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatMs(num? ms) {
+    if (ms == null || ms <= 0) return '--.--s';
+    final sec = ms / 1000.0;
+    return '${sec.toStringAsFixed(2)}s';
   }
 }

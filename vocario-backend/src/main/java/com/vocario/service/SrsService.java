@@ -24,6 +24,7 @@ public class SrsService {
     private final UserRepository userRepository;
     private final AdminService adminService;
     private final WordService wordService;
+    private final CertificateTypeRepository certificateTypeRepository;
 
     public static class StreakUpdateResult {
         public int streakCount;
@@ -43,7 +44,8 @@ public class SrsService {
             Sm2Service sm2Service,
             UserRepository userRepository,
             AdminService adminService,
-            WordService wordService
+            WordService wordService,
+            CertificateTypeRepository certificateTypeRepository
     ) {
         this.progressRepository = progressRepository;
         this.reviewLogRepository = reviewLogRepository;
@@ -51,6 +53,7 @@ public class SrsService {
         this.userRepository = userRepository;
         this.adminService = adminService;
         this.wordService = wordService;
+        this.certificateTypeRepository = certificateTypeRepository;
     }
 
     /**
@@ -426,8 +429,7 @@ public class SrsService {
         long masteredWordsAtLevel = currentLevelWords.stream().filter(w -> "MASTERED".equalsIgnoreCase(w.getStatus())).count();
         long learningWordsAtLevel = totalWordsAtLevel - masteredWordsAtLevel;
 
-        // Ngưỡng vốn từ vựng chuẩn theo khung tham chiếu châu Âu CEFR & Cambridge EVP:
-        // A1: 500 từ | A2: 1.000 từ | B1: 2.000 từ | B2: 4.000 từ | C1: 8.000 từ
+        // Ngưỡng vốn từ vựng chuẩn lấy động từ cấu hình Admin (bảng certificate_types) hoặc fallback theo EVP
         Map<String, Integer> cefrThresholds = Map.of(
                 "A1", 500,
                 "A2", 1000,
@@ -435,7 +437,9 @@ public class SrsService {
                 "B2", 4000,
                 "C1", 8000
         );
-        int masteryThreshold = cefrThresholds.getOrDefault(currentLevel, 1000);
+        int masteryThreshold = certificateTypeRepository.findByCefrLevel(currentLevel)
+                .map(t -> t.getRequiredWords() != null && t.getRequiredWords() > 0 ? t.getRequiredWords() : cefrThresholds.getOrDefault(currentLevel, 1000))
+                .orElseGet(() -> cefrThresholds.getOrDefault(currentLevel, 1000));
         boolean canLevelUp = false;
         int completionPercentage = 0;
 

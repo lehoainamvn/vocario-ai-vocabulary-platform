@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
@@ -34,6 +35,8 @@ class _ScannerScreenState extends State<ScannerScreen> with SingleTickerProvider
   Uint8List? _customImageBytes;
   String _customImageName = '';
   String? _customImageDataUrl;
+  double? _imageWidth;
+  double? _imageHeight;
   int _activePresetIndex = 0;
 
   // Danh sách các ảnh bối cảnh mẫu chất lượng cao
@@ -102,6 +105,19 @@ class _ScannerScreenState extends State<ScannerScreen> with SingleTickerProvider
     });
   }
 
+  Future<void> _resolveImageDimensions(Uint8List bytes) async {
+    try {
+      final codec = await ui.instantiateImageCodec(bytes);
+      final frame = await codec.getNextFrame();
+      if (mounted) {
+        setState(() {
+          _imageWidth = frame.image.width.toDouble();
+          _imageHeight = frame.image.height.toDouble();
+        });
+      }
+    } catch (_) {}
+  }
+
   void _switchStudioTab(String tab) {
     if (_activeStudioTab == tab) return;
     setState(() {
@@ -111,6 +127,8 @@ class _ScannerScreenState extends State<ScannerScreen> with SingleTickerProvider
       _customImageBytes = null;
       _customImageDataUrl = null;
       _customImageName = '';
+      _imageWidth = null;
+      _imageHeight = null;
     });
   }
 
@@ -126,6 +144,7 @@ class _ScannerScreenState extends State<ScannerScreen> with SingleTickerProvider
         _hasScanned = false;
         _detectedItems = [];
       });
+      _resolveImageDimensions(picked.bytes);
       _showToast('Đã nạp ảnh thành công: ${picked.name}');
     } catch (e) {
       _showToast('Lỗi chọn ảnh: $e');
@@ -158,6 +177,7 @@ class _ScannerScreenState extends State<ScannerScreen> with SingleTickerProvider
           _customImageBytes = bytes;
           _customImageName = 'preset_${_activePresetIndex}.jpg';
         });
+        _resolveImageDimensions(bytes);
         await _executeAiScan(
           bytes: bytes,
           filename: 'preset_${_activePresetIndex}.jpg',
@@ -175,16 +195,38 @@ class _ScannerScreenState extends State<ScannerScreen> with SingleTickerProvider
       _hasScanned = false;
     });
 
-    final theme = _presetScenes[_activePresetIndex]['theme'] ?? 'Bối Cảnh Đời Sống';
+    if (_imageWidth == null || _imageHeight == null) {
+      await _resolveImageDimensions(bytes);
+    }
+
+    // Với ảnh do người dùng tải lên/chụp thực tế, luôn dùng 'auto' để kích hoạt phân loại Places365 ResNet-18
+    final theme = _customImageBytes != null ? 'auto' : (_presetScenes[_activePresetIndex]['theme'] ?? 'auto');
 
     try {
       // BƯỚC 1: Gọi mô hình YOLO-World v2 (Port 8001) nhận diện vật thể
-      final aiRes = await ApiService().detectObjectsWithYolo(
+      var aiRes = await ApiService().detectObjectsWithYolo(
         imageBytes: bytes,
         filename: filename,
         sceneTheme: theme,
         confidenceThreshold: 0.15,
       );
+
+      // Nếu lần 1 không tìm thấy vật thể, tự động quét lần 2 với ngưỡng thư giãn (0.08) và theme tự động
+      if (aiRes['success'] != true ||
+          aiRes['detectedObjects'] is! List ||
+          (aiRes['detectedObjects'] as List).isEmpty) {
+        final retryRes = await ApiService().detectObjectsWithYolo(
+          imageBytes: bytes,
+          filename: filename,
+          sceneTheme: 'auto',
+          confidenceThreshold: 0.08,
+        );
+        if (retryRes['success'] == true &&
+            retryRes['detectedObjects'] is List &&
+            (retryRes['detectedObjects'] as List).isNotEmpty) {
+          aiRes = retryRes;
+        }
+      }
 
       if (aiRes['success'] == true && aiRes['detectedObjects'] is List) {
         final rawList = aiRes['detectedObjects'] as List;
@@ -205,10 +247,10 @@ class _ScannerScreenState extends State<ScannerScreen> with SingleTickerProvider
               'exampleVi': raw['exampleVi']?.toString() ?? raw['exampleSentenceVi']?.toString() ?? '',
               'confidence': (raw['confidence'] as num?)?.toDouble() ?? 0.85,
               'rect': Rect.fromLTWH(
-                l.clamp(0.02, 0.85),
-                t.clamp(0.02, 0.85),
-                w.clamp(0.08, 0.90),
-                h.clamp(0.08, 0.90),
+                l.clamp(0.0, 1.0),
+                t.clamp(0.0, 1.0),
+                w.clamp(0.01, 1.0),
+                h.clamp(0.01, 1.0),
               ),
             };
           }).toList();
@@ -225,7 +267,7 @@ class _ScannerScreenState extends State<ScannerScreen> with SingleTickerProvider
             }).toList();
           }
 
-          final finalTheme = aiRes['sceneTitle']?.toString() ?? theme;
+          final finalTheme = aiRes['sceneTitle']?.toString() ?? (theme == 'auto' ? 'Bối Cảnh Tự Nhiên' : theme);
 
           if (!mounted) return;
           setState(() {
@@ -258,7 +300,12 @@ class _ScannerScreenState extends State<ScannerScreen> with SingleTickerProvider
         _hasScanned = false;
         _isScanning = false;
       });
-      _showToast('Chưa nhận diện được vật thể rõ ràng. Hãy thử chụp gần hơn!');
+      final errMsg = aiRes['error']?.toString();
+      if (errMsg != null && errMsg.isNotEmpty) {
+        _showToast('Máy chủ AI: $errMsg');
+      } else {
+        _showToast('Chưa nhận diện được vật thể rõ ràng. Hãy thử góc sáng hơn!');
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -266,7 +313,7 @@ class _ScannerScreenState extends State<ScannerScreen> with SingleTickerProvider
         _hasScanned = false;
         _isScanning = false;
       });
-      _showToast('Lỗi nhận diện AI (Port 8001): $e');
+      _showToast('Không thể kết nối máy chủ AI Vision (Port 8001): $e');
     }
   }
 
@@ -277,6 +324,8 @@ class _ScannerScreenState extends State<ScannerScreen> with SingleTickerProvider
       _customImageBytes = null;
       _customImageDataUrl = null;
       _customImageName = '';
+      _imageWidth = null;
+      _imageHeight = null;
       _selectedWordIndex = 0;
       _dialogueTurns = [];
     });
@@ -632,195 +681,185 @@ class _ScannerScreenState extends State<ScannerScreen> with SingleTickerProvider
                 ),
               ),
 
-            // TAB 1: LIVE CAMERA VIEW
-            if (_activeStudioTab == 'camera') ...[
-              if (_customImageBytes == null)
-                // Trạng thái chuẩn bị camera
-                Positioned.fill(
-                  child: Image.network(
-                    _presetScenes[_activePresetIndex]['url']!,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      color: const Color(0xFF1C1A17),
-                      alignment: Alignment.center,
-                      child: const Icon(Icons.videocam_outlined, size: 48, color: Colors.white38),
+            // NỘI DUNG VIEWPORT: ẢNH VÀ BOUNDING BOXES ĐỒNG BỘ 1:1
+            if (_customImageBytes != null)
+              Center(
+                child: FittedBox(
+                  fit: BoxFit.contain,
+                  child: SizedBox(
+                    width: _imageWidth ?? 640,
+                    height: _imageHeight ?? 480,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Image.memory(
+                          _customImageBytes!,
+                          width: _imageWidth ?? 640,
+                          height: _imageHeight ?? 480,
+                          fit: BoxFit.fill,
+                        ),
+                        if (_hasScanned && _detectedItems.isNotEmpty)
+                          ..._detectedItems.asMap().entries.map((entry) {
+                            final idx = entry.key;
+                            final item = entry.value;
+                            final rect = item['rect'] as Rect;
+                            final isSelected = idx == _selectedWordIndex;
+
+                            final canvasW = _imageWidth ?? 640.0;
+                            final canvasH = _imageHeight ?? 480.0;
+                            final left = rect.left * canvasW;
+                            final top = rect.top * canvasH;
+                            final width = rect.width * canvasW;
+                            final height = rect.height * canvasH;
+
+                            return Positioned(
+                              left: left,
+                              top: top,
+                              width: width,
+                              height: height,
+                              child: GestureDetector(
+                                onTap: () => setState(() => _selectedWordIndex = idx),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 180),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: isSelected ? VocarioTokens.goldAccent : Colors.white.withValues(alpha: 0.85),
+                                      width: isSelected ? 2.5 : 1.5,
+                                    ),
+                                    color: isSelected
+                                        ? VocarioTokens.goldAccent.withValues(alpha: 0.28)
+                                        : Colors.black.withValues(alpha: 0.08),
+                                    borderRadius: BorderRadius.circular(3),
+                                  ),
+                                  child: Stack(
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      // Label Tag
+                                      Positioned(
+                                        top: -24,
+                                        left: -2,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                                          decoration: BoxDecoration(
+                                            color: isSelected ? VocarioTokens.goldAccent : Colors.white,
+                                            borderRadius: BorderRadius.circular(2),
+                                            boxShadow: VocarioTokens.cardShadow,
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                item['word'] as String,
+                                                style: const TextStyle(
+                                                  fontSize: 10.5,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: VocarioTokens.ink,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                '${((item['confidence'] as double) * 100).toInt()}%',
+                                                style: VocarioTokens.monoSmall.copyWith(
+                                                  fontSize: 8.5,
+                                                  color: VocarioTokens.brand,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
+                      ],
                     ),
                   ),
-                )
-              else
-                // Ảnh vừa chụp Preview
-                Positioned.fill(
-                  child: Image.memory(
-                    _customImageBytes!,
-                    fit: BoxFit.contain,
+                ),
+              )
+            else if (_activeStudioTab == 'camera') ...[
+              // Trạng thái chuẩn bị camera
+              Positioned.fill(
+                child: Image.network(
+                  _presetScenes[_activePresetIndex]['url']!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(
+                    color: const Color(0xFF1C1A17),
+                    alignment: Alignment.center,
+                    child: const Icon(Icons.videocam_outlined, size: 48, color: Colors.white38),
                   ),
                 ),
-
-              // 4 Khung ngắm Viewfinder Corners
+              ),
               Positioned.fill(
                 child: CustomPaint(
                   painter: _FocusCornersPainter(),
                 ),
               ),
-            ],
-
-            // TAB 2: UPLOAD IMAGE VIEW
-            if (_activeStudioTab == 'upload') ...[
-              if (_customImageBytes == null)
-                // Vùng chọn tệp
-                Center(
-                  child: InkWell(
-                    onTap: _pickImageFromDevice,
-                    borderRadius: BorderRadius.circular(8),
-                    child: Container(
-                      padding: const EdgeInsets.all(24),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 48,
-                            height: 48,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.08),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
-                            ),
-                            child: const Icon(Icons.upload_file_rounded, size: 24, color: Colors.white70),
+            ] else if (_activeStudioTab == 'upload') ...[
+              // Vùng chọn tệp
+              Center(
+                child: InkWell(
+                  onTap: _pickImageFromDevice,
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
                           ),
-                          const SizedBox(height: 12),
-                          const Text(
-                            'Tải file ảnh từ máy của bạn',
+                          child: const Icon(Icons.upload_file_rounded, size: 24, color: Colors.white70),
+                        ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Tải file ảnh từ máy của bạn',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Nhấp để chọn tệp hình ảnh từ thiết bị\n(JPG, PNG, WEBP tối đa 15MB)',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.white.withValues(alpha: 0.65),
+                            height: 1.4,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: VocarioTokens.brand,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            'Chọn tệp từ máy',
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 12,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
                           ),
-                          const SizedBox(height: 6),
-                          Text(
-                            'Nhấp để chọn tệp hình ảnh từ thiết bị\n(JPG, PNG, WEBP tối đa 15MB)',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Colors.white.withValues(alpha: 0.65),
-                              height: 1.4,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: VocarioTokens.brand,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: const Text(
-                              'Chọn tệp từ máy',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-                )
-              else
-                // Ảnh vừa tải lên Preview
-                Positioned.fill(
-                  child: Image.memory(
-                    _customImageBytes!,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-            ],
-
-            // YOLO-World v2 Bounding Boxes Overlay (khi đã quét thành công)
-            if (_hasScanned && _detectedItems.isNotEmpty)
-              Positioned.fill(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    return Stack(
-                      children: _detectedItems.asMap().entries.map((entry) {
-                        final idx = entry.key;
-                        final item = entry.value;
-                        final rect = item['rect'] as Rect;
-                        final isSelected = idx == _selectedWordIndex;
-
-                        final left = rect.left * constraints.maxWidth;
-                        final top = rect.top * constraints.maxHeight;
-                        final width = rect.width * constraints.maxWidth;
-                        final height = rect.height * constraints.maxHeight;
-
-                        return Positioned(
-                          left: left,
-                          top: top,
-                          width: width,
-                          height: height,
-                          child: GestureDetector(
-                            onTap: () => setState(() => _selectedWordIndex = idx),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 180),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: isSelected ? VocarioTokens.goldAccent : Colors.white.withValues(alpha: 0.85),
-                                  width: isSelected ? 2.5 : 1.5,
-                                ),
-                                color: isSelected
-                                    ? VocarioTokens.goldAccent.withValues(alpha: 0.28)
-                                    : Colors.black.withValues(alpha: 0.08),
-                                borderRadius: BorderRadius.circular(3),
-                              ),
-                              child: Stack(
-                                clipBehavior: Clip.none,
-                                children: [
-                                  // Label Tag
-                                  Positioned(
-                                    top: -24,
-                                    left: -2,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
-                                      decoration: BoxDecoration(
-                                        color: isSelected ? VocarioTokens.goldAccent : Colors.white,
-                                        borderRadius: BorderRadius.circular(2),
-                                        boxShadow: VocarioTokens.cardShadow,
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            item['word'] as String,
-                                            style: TextStyle(
-                                              fontSize: 10.5,
-                                              fontWeight: FontWeight.bold,
-                                              color: VocarioTokens.ink,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            '${((item['confidence'] as double) * 100).toInt()}%',
-                                            style: VocarioTokens.monoSmall.copyWith(
-                                              fontSize: 8.5,
-                                              color: VocarioTokens.brand,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    );
-                  },
                 ),
               ),
+            ],
 
             // Laser Scan Line Animation khi đang chạy AI
             if (_isScanning)

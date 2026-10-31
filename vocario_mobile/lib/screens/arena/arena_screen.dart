@@ -150,7 +150,7 @@ class _ArenaScreenState extends State<ArenaScreen> with SingleTickerProviderStat
   String _stageFilter = 'ADMIN'; // 'ADMIN' = Đấu trường hệ thống (Mặc định chuẩn Web), 'USER' = Ảnh của bạn
 
   // Danh sách các sàn đấu chính thức (Chuẩn hóa từ Web Vocario)
-  late List<ArenaStage> _officialStages;
+  List<ArenaStage> _officialStages = _buildDefaultOfficialStages();
   List<ArenaStage> _userStages = [];
   bool _isLoadingUserStages = false;
 
@@ -229,8 +229,8 @@ class _ArenaScreenState extends State<ArenaScreen> with SingleTickerProviderStat
   }
 
   /// Khởi tạo các Đấu trường chuẩn hóa hệ thống (Khớp 100% web Angular QuizStageService)
-  void _initOfficialStages() {
-    _officialStages = [
+  static List<ArenaStage> _buildDefaultOfficialStages() {
+    return [
       // 1. Gian Bếp Đời Thực (Đấu trường tuần chính thức)
       const ArenaStage(
         id: 'stage-admin-kitchen',
@@ -415,6 +415,10 @@ class _ArenaScreenState extends State<ArenaScreen> with SingleTickerProviderStat
         ],
       ),
     ];
+  }
+
+  void _initOfficialStages() {
+    _officialStages = _buildDefaultOfficialStages();
   }
 
   /// Tải các ảnh bối cảnh người dùng chụp từ bảng `captures`
@@ -1126,6 +1130,9 @@ class _ArenaScreenState extends State<ArenaScreen> with SingleTickerProviderStat
   // 1. SELECT STAGE VIEW (Màn hình chọn bối cảnh)
   // ==========================================================================
   Widget _buildSelectStageView() {
+    if (_officialStages.isEmpty) {
+      _officialStages = _buildDefaultOfficialStages();
+    }
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),

@@ -98,8 +98,10 @@ public class CertificateService {
                 })
                 .count();
 
-        // Tiêu chuẩn bắt buộc: Phải làm chủ tối thiểu 10 từ (MASTERED) để đạt 100% cấp độ
-        int requiredMasteredWords = 10;
+        // Tiêu chuẩn bắt buộc: Lấy số lượng từ yêu cầu động từ bảng certificate_types do Admin thiết lập
+        int requiredMasteredWords = certificateTypeRepository.findByCefrLevel(finalLevel)
+                .map(t -> t.getRequiredWords() != null && t.getRequiredWords() > 0 ? t.getRequiredWords() : 10)
+                .orElse(10);
         if (masteredCountAtLevel < requiredMasteredWords) {
             log.warn("⛔ [CERTIFICATE DENIED] Học viên ID {} chưa đủ điều kiện nhận chứng chỉ {}. Đã thành thạo: {}/{}",
                     userId, finalLevel, masteredCountAtLevel, requiredMasteredWords);
