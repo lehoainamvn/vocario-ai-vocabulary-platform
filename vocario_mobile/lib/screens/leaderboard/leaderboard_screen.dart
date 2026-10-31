@@ -66,65 +66,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   LeaderboardUser? _currentUserRank;
   String? _nextTargetSuggestion;
 
-  // Authentic fallback data khớp CSDL PostgreSQL Vocario
-  final List<LeaderboardUser> _fallbackWeeklyUsers = const [
-    LeaderboardUser(
-      rank: 1,
-      userId: 'u-1',
-      fullName: 'Minh Hoàng',
-      username: 'minhhoang',
-      targetLevel: 'B2',
-      masteredWords: 86,
-      streakCount: 7,
-      xp: 1420,
-      isCurrentUser: false,
-    ),
-    LeaderboardUser(
-      rank: 2,
-      userId: 'u-2',
-      fullName: 'Phương Thảo',
-      username: 'phuongthao',
-      targetLevel: 'A2',
-      masteredWords: 64,
-      streakCount: 5,
-      xp: 1280,
-      isCurrentUser: false,
-    ),
-    LeaderboardUser(
-      rank: 3,
-      userId: 'u-3',
-      fullName: 'Lê Hoài Nam',
-      username: 'nam23',
-      targetLevel: 'B1',
-      masteredWords: 52,
-      streakCount: 7,
-      xp: 960,
-      isCurrentUser: true,
-    ),
-    LeaderboardUser(
-      rank: 4,
-      userId: 'u-4',
-      fullName: 'Gia Bảo',
-      username: 'giabao',
-      targetLevel: 'B1',
-      masteredWords: 48,
-      streakCount: 4,
-      xp: 840,
-      isCurrentUser: false,
-    ),
-    LeaderboardUser(
-      rank: 5,
-      userId: 'u-5',
-      fullName: 'Thu Trang',
-      username: 'thutrang',
-      targetLevel: 'A1',
-      masteredWords: 38,
-      streakCount: 3,
-      xp: 680,
-      isCurrentUser: false,
-    ),
-  ];
-
   final List<Map<String, String>> _cefrLevels = const [
     {'id': 'ALL', 'label': 'Tất cả'},
     {'id': 'A1', 'label': 'A1 · Khởi đầu'},
@@ -173,53 +114,85 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
 
         all.sort((a, b) => ((a['rank'] as num?)?.toInt() ?? 99).compareTo((b['rank'] as num?)?.toInt() ?? 99));
 
-        setState(() {
-          if (all.isNotEmpty) {
-            _rankedList = all.asMap().entries.map((e) => LeaderboardUser.fromJson(e.value, e.key + 1)).toList();
-          } else {
-            _rankedList = _filterFallbackList();
+        LeaderboardUser? currentUser;
+        if (rankRes != null) {
+          currentUser = LeaderboardUser.fromJson(rankRes, (rankRes['rank'] as num?)?.toInt() ?? 1);
+        } else {
+          try {
+            currentUser = all.isNotEmpty
+                ? all.asMap().entries
+                    .map((e) => LeaderboardUser.fromJson(e.value, e.key + 1))
+                    .firstWhere((u) => u.isCurrentUser)
+                : null;
+          } catch (_) {
+            currentUser = null;
           }
+        }
 
-          if (rankRes != null) {
-            _currentUserRank = LeaderboardUser.fromJson(rankRes, 3);
-          } else {
-            _currentUserRank = _rankedList.firstWhere(
-              (u) => u.isCurrentUser,
-              orElse: () => _fallbackWeeklyUsers[2],
+        if (currentUser == null) {
+          final user = await ApiService().getUserProfile();
+          if (user != null) {
+            currentUser = LeaderboardUser(
+              rank: 0,
+              userId: user['id']?.toString() ?? '',
+              fullName: user['fullName'] ?? user['username'] ?? 'Học viên Vocario',
+              username: user['username'] ?? '',
+              targetLevel: user['targetLevel'] ?? 'A2',
+              masteredWords: 0,
+              streakCount: (user['streakCount'] as num?)?.toInt() ?? 0,
+              xp: 0,
+              isCurrentUser: true,
             );
           }
+        }
 
-          final nextTarget = res['nextTarget'] as Map<String, dynamic>?;
+        final nextTarget = res['nextTarget'] as Map<String, dynamic>?;
+
+        setState(() {
+          _rankedList = all.isNotEmpty
+              ? all.asMap().entries.map((e) => LeaderboardUser.fromJson(e.value, e.key + 1)).toList()
+              : [];
+          _currentUserRank = currentUser;
           _nextTargetSuggestion = nextTarget?['suggestion']?.toString() ??
-              'Bạn cần thêm 320 XP để vượt qua @phuongthao vươn lên hạng #2!';
+              'Duy trì chuỗi ôn tập thẻ và thi đấu Arena để thăng hạng trong tuần này.';
 
           _totalPages = (res['totalPages'] as num?)?.toInt() ?? 1;
           _totalElements = (res['totalElements'] as num?)?.toInt() ?? _rankedList.length;
           _isLoading = false;
         });
       } else {
+        final user = await ApiService().getUserProfile();
         setState(() {
-          _rankedList = _filterFallbackList();
-          _currentUserRank = _fallbackWeeklyUsers[2];
-          _nextTargetSuggestion = 'Bạn cần thêm 320 XP để vượt qua @phuongthao vươn lên hạng #2!';
+          _rankedList = [];
+          if (user != null) {
+            _currentUserRank = LeaderboardUser(
+              rank: 0,
+              userId: user['id']?.toString() ?? '',
+              fullName: user['fullName'] ?? user['username'] ?? 'Học viên Vocario',
+              username: user['username'] ?? '',
+              targetLevel: user['targetLevel'] ?? 'A2',
+              masteredWords: 0,
+              streakCount: (user['streakCount'] as num?)?.toInt() ?? 0,
+              xp: 0,
+              isCurrentUser: true,
+            );
+          } else {
+            _currentUserRank = null;
+          }
+          _nextTargetSuggestion = null;
           _isLoading = false;
         });
       }
     } catch (_) {
       if (mounted) {
         setState(() {
-          _rankedList = _filterFallbackList();
-          _currentUserRank = _fallbackWeeklyUsers[2];
-          _nextTargetSuggestion = 'Bạn cần thêm 320 XP để vượt qua @phuongthao vươn lên hạng #2!';
+          _rankedList = [];
+          _currentUserRank = null;
+          _nextTargetSuggestion = null;
           _isLoading = false;
         });
       }
     }
-  }
-
-  List<LeaderboardUser> _filterFallbackList() {
-    if (_selectedLevel == 'ALL') return _fallbackWeeklyUsers;
-    return _fallbackWeeklyUsers.where((u) => u.targetLevel == _selectedLevel).toList();
   }
 
   String _getInitials(String name) {
@@ -434,7 +407,10 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   // 2. PERSONAL RECORD CARD (THÀNH TÍCH CỦA BẠN)
   // ==========================================================================
   Widget _buildPersonalRecordCard() {
-    final me = _currentUserRank ?? _fallbackWeeklyUsers[2];
+    final me = _currentUserRank;
+    if (me == null) {
+      return const SizedBox.shrink();
+    }
 
     return Container(
       width: double.infinity,

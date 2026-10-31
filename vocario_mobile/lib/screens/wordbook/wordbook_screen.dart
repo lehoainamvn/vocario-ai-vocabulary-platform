@@ -3,6 +3,13 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../core/constants/tokens.dart';
 import '../../core/services/api_service.dart';
+import '../../core/utils/image_picker_helper.dart';
+import '../../widgets/speech_scorer_modal.dart';
+import '../collection/collection_screen.dart';
+import '../arena/arena_screen.dart';
+import '../scanner/scanner_screen.dart';
+import '../profile/profile_screen.dart';
+import '../home/home_screen.dart';
 
 class WordbookScreen extends StatefulWidget {
   final int initialTabIndex; // 0 = Sổ từ vựng, 1 = Luyện Flashcard
@@ -32,100 +39,6 @@ class _WordbookScreenState extends State<WordbookScreen> with SingleTickerProvid
   // Real-world Synced Data from PostgreSQL
   List<Map<String, dynamic>> _savedWords = [];
   List<Map<String, dynamic>> _dueCards = [];
-
-  // Authentic Fallback Data matching Vocario's Database & CEFR Standard
-  final List<Map<String, dynamic>> _fallbackWords = [
-    {
-      'id': 'w1',
-      'word': 'refrigerator',
-      'ipa': '/rɪˈfrɪdʒəreɪtər/',
-      'level': 'A2',
-      'partOfSpeech': 'Noun',
-      'vietnamese': 'tủ lạnh bảo quản thực phẩm',
-      'exampleEn': 'Keep milk and vegetables inside the refrigerator to stay fresh.',
-      'exampleVi': 'Giữ sữa và rau củ trong tủ lạnh để luôn tươi ngon.',
-      'status': 'REVIEWING',
-      'ef': 2.60,
-      'intervalDays': 6,
-      'scene': 'Gian bếp gia đình',
-      'isDue': true,
-    },
-    {
-      'id': 'w2',
-      'word': 'mechanical keyboard',
-      'ipa': '/mɪˈkænɪkl ˈkiːbɔːrd/',
-      'level': 'B1',
-      'partOfSpeech': 'Noun',
-      'vietnamese': 'bàn phím cơ phản hồi xúc giác',
-      'exampleEn': 'A mechanical keyboard offers satisfying tactile feedback while typing code.',
-      'exampleVi': 'Bàn phím cơ mang lại cảm giác phản hồi xúc giác êm ái khi gõ mã nguồn.',
-      'status': 'LEARNING',
-      'ef': 2.50,
-      'intervalDays': 1,
-      'scene': 'Góc bàn học & Làm việc',
-      'isDue': true,
-    },
-    {
-      'id': 'w3',
-      'word': 'study lamp',
-      'ipa': '/ˈstʌdi læmp/',
-      'level': 'A1',
-      'partOfSpeech': 'Noun',
-      'vietnamese': 'đèn bàn học điều chỉnh góc',
-      'exampleEn': 'The warm light from the study lamp brightens the workstation.',
-      'exampleVi': 'Ánh sáng ấm từ chiếc đèn bàn học làm bừng sáng góc làm việc.',
-      'status': 'MASTERED',
-      'ef': 2.80,
-      'intervalDays': 32,
-      'scene': 'Góc bàn học & Làm việc',
-      'isDue': false,
-    },
-    {
-      'id': 'w4',
-      'word': 'coffee mug',
-      'ipa': '/ˈkɒfi mʌɡ/',
-      'level': 'A2',
-      'partOfSpeech': 'Noun',
-      'vietnamese': 'tách / cốc cà phê quai cầm',
-      'exampleEn': 'He poured hot brew into his ceramic coffee mug.',
-      'exampleVi': 'Anh ấy rót cà phê nóng vào chiếc tách gốm sứ.',
-      'status': 'REVIEWING',
-      'ef': 2.50,
-      'intervalDays': 6,
-      'scene': 'Góc bàn học & Làm việc',
-      'isDue': true,
-    },
-    {
-      'id': 'w5',
-      'word': 'air conditioner',
-      'ipa': '/ˈeə kənˌdɪʃənər/',
-      'level': 'B1',
-      'partOfSpeech': 'Noun',
-      'vietnamese': 'máy điều hòa nhiệt độ',
-      'exampleEn': 'Set the air conditioner to twenty-six degrees for energy saving.',
-      'exampleVi': 'Đặt máy điều hòa ở hai mươi sáu độ để tiết kiệm điện.',
-      'status': 'LEARNING',
-      'ef': 2.40,
-      'intervalDays': 1,
-      'scene': 'Phòng khách ấm cúng',
-      'isDue': true,
-    },
-    {
-      'id': 'w6',
-      'word': 'ergonomic chair',
-      'ipa': '/ˌɜːɡəˈnɒmɪk tʃeər/',
-      'level': 'B2',
-      'partOfSpeech': 'Noun',
-      'vietnamese': 'ghế làm việc công thái học',
-      'exampleEn': 'An ergonomic chair supports proper lumbar posture throughout long work hours.',
-      'exampleVi': 'Ghế công thái học nâng đỡ cột sống đúng tư thế trong suốt nhiều giờ làm việc.',
-      'status': 'NEW',
-      'ef': 2.50,
-      'intervalDays': 0,
-      'scene': 'Văn phòng hiện đại',
-      'isDue': false,
-    },
-  ];
 
   @override
   void initState() {
@@ -183,7 +96,7 @@ class _WordbookScreenState extends State<WordbookScreen> with SingleTickerProvid
             };
           }).toList();
         } else {
-          _savedWords = List.from(_fallbackWords);
+          _savedWords = [];
         }
 
         if (dueCardsRes.isNotEmpty) {
@@ -205,10 +118,7 @@ class _WordbookScreenState extends State<WordbookScreen> with SingleTickerProvid
             };
           }).toList();
         } else {
-          _dueCards = _savedWords.where((w) => w['isDue'] == true).toList();
-          if (_dueCards.isEmpty) {
-            _dueCards = _fallbackWords.where((w) => w['isDue'] == true).toList();
-          }
+          _dueCards = [];
         }
 
         _isLoading = false;
@@ -216,8 +126,8 @@ class _WordbookScreenState extends State<WordbookScreen> with SingleTickerProvid
     } catch (_) {
       if (mounted) {
         setState(() {
-          _savedWords = List.from(_fallbackWords);
-          _dueCards = _fallbackWords.where((w) => w['isDue'] == true).toList();
+          _savedWords = [];
+          _dueCards = [];
           _isLoading = false;
         });
       }
@@ -243,6 +153,7 @@ class _WordbookScreenState extends State<WordbookScreen> with SingleTickerProvid
 
   void _playWordAudio(String word) {
     setState(() => _isSpeaking = true);
+    speakTextBrowser(word);
     _showToast('Đang phát âm: $word');
     Timer(const Duration(milliseconds: 900), () {
       if (mounted) setState(() => _isSpeaking = false);
@@ -256,9 +167,14 @@ class _WordbookScreenState extends State<WordbookScreen> with SingleTickerProvid
     final progressId = currentCard['progressId'] as String?;
     final word = currentCard['word'] as String;
 
-    // Phản hồi tức thì cho học viên
-    final gradeNames = ['Quên sạch', 'Nhầm lẫn', 'Chưa chắc', 'Đạt yêu cầu', 'Nhớ tốt', 'Hoàn hảo'];
-    _showToast('Đánh giá: $grade - ${gradeNames[grade]} cho "$word"');
+    // Phản hồi tức thì khớp 100% Web: 1 (Lại), 3 (Khó), 4 (Tốt), 5 (Dễ)
+    final gradeNames = {
+      1: 'Lại (< 1 ngày)',
+      3: 'Khó (3 ngày)',
+      4: 'Tốt (7 ngày)',
+      5: 'Dễ (14 ngày)',
+    };
+    _showToast('Đã ghi nhận: ${gradeNames[grade] ?? 'Đạt'} cho "$word"');
 
     // Gọi API Spring Boot backend SM-2
     ApiService().submitReview(
@@ -283,6 +199,81 @@ class _WordbookScreenState extends State<WordbookScreen> with SingleTickerProvid
         _isSessionFinished = true;
       }
     });
+  }
+
+  /// Đánh dấu thuộc từ ngay lập tức qua `POST /api/srs/mark-mastered`
+  Future<void> _markWordAsMastered(String? progressId, String word) async {
+    try {
+      final res = await ApiService().markWordAsMastered(progressId: progressId, wordText: word);
+      if (res != null) {
+        setState(() {
+          final item = _savedWords.firstWhere(
+            (w) => w['word'] == word || w['id'] == progressId,
+            orElse: () => <String, dynamic>{},
+          );
+          if (item.isNotEmpty) {
+            item['status'] = 'MASTERED';
+          }
+          _dueCards.removeWhere((w) => w['word'] == word || w['id'] == progressId);
+        });
+        _showToast('Đã đánh dấu "$word" thuộc thành thạo ngay lập tức!');
+      } else {
+        _showToast('Không thể cập nhật trạng thái từ vựng.');
+      }
+    } catch (_) {
+      _showToast('Lỗi cập nhật trạng thái từ vựng.');
+    }
+  }
+
+  /// Xóa từ vựng khỏi sổ tay SM-2 qua `DELETE /api/srs/progress/{id}`
+  Future<void> _deleteWord(String? progressId, String word) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: VocarioTokens.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        title: Text(
+          'Xóa từ vựng?',
+          style: VocarioTokens.serifHeadline.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          'Bạn có chắc chắn muốn xóa "$word" khỏi Sổ từ vựng và chu kỳ ôn tập SuperMemo SM-2?',
+          style: const TextStyle(fontSize: 12, color: VocarioTokens.muted, height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Hủy', style: TextStyle(color: VocarioTokens.muted)),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFDC2626),
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text('Xóa từ'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      bool ok = true;
+      if (progressId != null && progressId.isNotEmpty && !progressId.startsWith('w-')) {
+        ok = await ApiService().deleteWordFromSrs(progressId);
+      }
+      if (ok) {
+        setState(() {
+          _savedWords.removeWhere((w) => w['id'] == progressId || w['word'] == word);
+          _dueCards.removeWhere((w) => w['id'] == progressId || w['word'] == word);
+        });
+        _showToast('Đã xóa "$word" khỏi Sổ từ vựng SM-2!');
+      } else {
+        _showToast('Không thể xóa từ vựng. Vui lòng thử lại!');
+      }
+    }
   }
 
   List<Map<String, dynamic>> get _filteredWords {
@@ -372,28 +363,62 @@ class _WordbookScreenState extends State<WordbookScreen> with SingleTickerProvid
                   ),
                 ],
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: VocarioTokens.field,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: VocarioTokens.border),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.psychology_outlined, size: 14, color: VocarioTokens.brand),
-                    const SizedBox(width: 4),
-                    Text(
-                      'SM-2 Active',
-                      style: VocarioTokens.monoSmall.copyWith(fontSize: 9, color: VocarioTokens.brand),
+              Row(
+                children: [
+                  InkWell(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const CollectionScreen()),
+                    ).then((_) => _fetchWordbookData()),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: VocarioTokens.surface,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: VocarioTokens.border),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.photo_library_outlined, size: 13, color: VocarioTokens.brand),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Bộ sưu tập',
+                            style: VocarioTokens.sansLabel.copyWith(
+                              fontSize: 10,
+                              color: VocarioTokens.brand,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: VocarioTokens.field,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: VocarioTokens.border),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.psychology_outlined, size: 14, color: VocarioTokens.brand),
+                        const SizedBox(width: 4),
+                        Text(
+                          'SM-2 Active',
+                          style: VocarioTokens.monoSmall.copyWith(fontSize: 9, color: VocarioTokens.brand),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
           const SizedBox(height: 12),
-          // Editorial Segmented Switcher (Sổ từ vựng vs Luyện Flashcard)
+          // Editorial Segmented Switcher (Sổ từ vựng vs Luyện Flashcard vs Bộ sưu tập)
           Container(
             height: 40,
             padding: const EdgeInsets.all(2.5),
@@ -406,15 +431,46 @@ class _WordbookScreenState extends State<WordbookScreen> with SingleTickerProvid
               children: [
                 Expanded(
                   child: _buildSegmentButton(
-                    label: 'Sổ từ đã lưu (${_savedWords.length})',
+                    label: 'Sổ từ (${_savedWords.length})',
                     index: 0,
                   ),
                 ),
                 Expanded(
                   child: _buildSegmentButton(
-                    label: 'Luyện Flashcard (${_dueCards.length})',
+                    label: 'Flashcard (${_dueCards.length})',
                     index: 1,
                     hasBadge: _dueCards.isNotEmpty,
+                  ),
+                ),
+                Expanded(
+                  child: InkWell(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const CollectionScreen()),
+                    ).then((_) => _fetchWordbookData()),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      height: 35,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.photo_library_outlined, size: 12, color: VocarioTokens.muted),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Bộ sưu tập',
+                            style: VocarioTokens.sansLabel.copyWith(
+                              fontSize: 10.5,
+                              color: VocarioTokens.muted,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -578,29 +634,41 @@ class _WordbookScreenState extends State<WordbookScreen> with SingleTickerProvid
               ),
             ],
           ),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                _activeViewIndex = 1;
-                _isSessionFinished = false;
-                _currentCardIndex = 0;
-              });
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: VocarioTokens.goldAccent,
-              foregroundColor: VocarioTokens.ink,
-              elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            ),
-            child: Row(
-              children: const [
-                Text('Ôn ngay', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold)),
-                SizedBox(width: 4),
-                Icon(Icons.arrow_forward_rounded, size: 14),
-              ],
-            ),
-          ),
+          _dueCards.isNotEmpty
+              ? ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _activeViewIndex = 1;
+                      _isSessionFinished = false;
+                      _currentCardIndex = 0;
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: VocarioTokens.goldAccent,
+                    foregroundColor: VocarioTokens.ink,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: Row(
+                    children: const [
+                      Text('Ôn ngay', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold)),
+                      SizedBox(width: 4),
+                      Icon(Icons.arrow_forward_rounded, size: 14),
+                    ],
+                  ),
+                )
+              : Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: const Text(
+                    'Đã hoàn tất',
+                    style: TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                ),
         ],
       ),
     );
@@ -737,19 +805,77 @@ class _WordbookScreenState extends State<WordbookScreen> with SingleTickerProvid
                   ),
                 ],
               ),
-              InkWell(
-                onTap: () => _playWordAudio(word),
-                borderRadius: BorderRadius.circular(6),
-                child: Container(
-                  width: 28,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    color: VocarioTokens.field,
+              Row(
+                children: [
+                  InkWell(
+                    onTap: () => _playWordAudio(word),
                     borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: VocarioTokens.border),
+                    child: Container(
+                      width: 28,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        color: VocarioTokens.field,
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: VocarioTokens.border),
+                      ),
+                      child: const Icon(Icons.volume_up_rounded, size: 15, color: VocarioTokens.brand),
+                    ),
                   ),
-                  child: const Icon(Icons.volume_up_rounded, size: 15, color: VocarioTokens.brand),
-                ),
+                  const SizedBox(width: 6),
+                  InkWell(
+                    onTap: () => SpeechScorerModal.show(
+                      context,
+                      word: word,
+                      ipa: ipa,
+                      vietnamese: vietnamese,
+                      progressId: item['id'] as String?,
+                      contextTitle: 'Sổ từ vựng',
+                    ),
+                    borderRadius: BorderRadius.circular(6),
+                    child: Container(
+                      width: 28,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        color: VocarioTokens.field,
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: VocarioTokens.border),
+                      ),
+                      child: const Icon(Icons.mic_none_rounded, size: 15, color: VocarioTokens.brand),
+                    ),
+                  ),
+                  if (status != 'MASTERED') ...[
+                    const SizedBox(width: 6),
+                    InkWell(
+                      onTap: () => _markWordAsMastered(item['id'] as String?, word),
+                      borderRadius: BorderRadius.circular(6),
+                      child: Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF0FDF4),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: const Color(0xFF86EFAC)),
+                        ),
+                        child: const Icon(Icons.check_circle_outline_rounded, size: 15, color: Color(0xFF16A34A)),
+                      ),
+                    ),
+                  ],
+                  const SizedBox(width: 6),
+                  InkWell(
+                    onTap: () => _deleteWord(item['id'] as String?, word),
+                    borderRadius: BorderRadius.circular(6),
+                    child: Container(
+                      width: 28,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFEF2F2),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: const Color(0xFFFECACA)),
+                      ),
+                      child: const Icon(Icons.delete_outline_rounded, size: 15, color: Color(0xFFDC2626)),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -974,22 +1100,52 @@ class _WordbookScreenState extends State<WordbookScreen> with SingleTickerProvid
                 ),
               ),
               const SizedBox(height: 14),
-              GestureDetector(
-                onTap: () => _playWordAudio(card['word'] as String),
-                child: Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: VocarioTokens.field,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: VocarioTokens.border),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () => _playWordAudio(card['word'] as String),
+                    child: Container(
+                      width: 46,
+                      height: 46,
+                      decoration: BoxDecoration(
+                        color: VocarioTokens.field,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: VocarioTokens.border),
+                      ),
+                      child: Icon(
+                        Icons.volume_up_rounded,
+                        size: 20,
+                        color: _isSpeaking ? VocarioTokens.amber : VocarioTokens.brand,
+                      ),
+                    ),
                   ),
-                  child: Icon(
-                    Icons.volume_up_rounded,
-                    size: 20,
-                    color: _isSpeaking ? VocarioTokens.amber : VocarioTokens.brand,
+                  const SizedBox(width: 14),
+                  GestureDetector(
+                    onTap: () => SpeechScorerModal.show(
+                      context,
+                      word: card['word'] as String,
+                      ipa: card['ipa'] as String,
+                      vietnamese: card['vietnamese'] as String,
+                      progressId: card['progressId'] as String?,
+                      contextTitle: 'Ôn tập thẻ Flashcard SM-2',
+                    ),
+                    child: Container(
+                      width: 46,
+                      height: 46,
+                      decoration: BoxDecoration(
+                        color: VocarioTokens.brand,
+                        shape: BoxShape.circle,
+                        boxShadow: VocarioTokens.cardShadow,
+                      ),
+                      child: const Icon(
+                        Icons.mic_rounded,
+                        size: 20,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ],
           ),
@@ -1120,54 +1276,94 @@ class _WordbookScreenState extends State<WordbookScreen> with SingleTickerProvid
 
   Widget _buildGradeActionMatrix() {
     final grades = [
-      {'grade': 0, 'label': '0: Quên sạch', 'bg': const Color(0xFFFFF5F5), 'border': const Color(0xFFFCA5A5), 'text': const Color(0xFFB91C1C)},
-      {'grade': 1, 'label': '1: Nhầm lẫn', 'bg': const Color(0xFFFFF7ED), 'border': const Color(0xFFFDBA74), 'text': const Color(0xFFC2410C)},
-      {'grade': 2, 'label': '2: Chưa chắc', 'bg': const Color(0xFFFFFBEB), 'border': const Color(0xFFFCD34D), 'text': const Color(0xFFB45309)},
-      {'grade': 3, 'label': '3: Đạt', 'bg': VocarioTokens.field, 'border': VocarioTokens.border, 'text': VocarioTokens.ink},
-      {'grade': 4, 'label': '4: Nhớ tốt', 'bg': const Color(0xFFF2F9F4), 'border': const Color(0xFFA7F3D0), 'text': const Color(0xFF047857)},
-      {'grade': 5, 'label': '5: Hoàn hảo', 'bg': const Color(0xFFECFDF5), 'border': const Color(0xFF6EE7B7), 'text': const Color(0xFF065F46)},
+      {
+        'grade': 1,
+        'label': 'Lại',
+        'sub': '< 1 ngày',
+        'bg': const Color(0xFFFFF1F2), // rose-50
+        'border': const Color(0xFFFECDD3), // rose-200
+        'text': const Color(0xFF9F1239), // rose-800
+      },
+      {
+        'grade': 3,
+        'label': 'Khó',
+        'sub': '3 ngày',
+        'bg': const Color(0xFFFFFBEB), // amber-50
+        'border': const Color(0xFFFDE68A), // amber-200
+        'text': const Color(0xFF92400E), // amber-800
+      },
+      {
+        'grade': 4,
+        'label': 'Tốt',
+        'sub': '7 ngày',
+        'bg': const Color(0xFFECFDF5), // emerald-50
+        'border': const Color(0xFFA7F3D0), // emerald-200
+        'text': const Color(0xFF065F46), // emerald-800
+      },
+      {
+        'grade': 5,
+        'label': 'Dễ',
+        'sub': '14 ngày',
+        'bg': const Color(0xFFF0F9FF), // sky-50
+        'border': const Color(0xFFBAE6FD), // sky-200
+        'text': const Color(0xFF0369A1), // sky-800
+      },
     ];
 
     return Column(
       children: [
-        const Text(
-          'Bạn nhớ từ này ở mức độ nào?',
-          style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500, color: VocarioTokens.muted),
+        Text(
+          'MỨC ĐỘ GHI NHỚ THEO THUẬT TOÁN SM-2:',
+          style: VocarioTokens.monoSmall.copyWith(
+            fontSize: 9,
+            color: const Color(0xFF746B60),
+            letterSpacing: 0.8,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 10),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8,
-            childAspectRatio: 2.3,
-          ),
-          itemCount: grades.length,
-          itemBuilder: (context, index) {
-            final g = grades[index];
-            return InkWell(
-              onTap: () => _handleGradeSelect(g['grade'] as int),
-              borderRadius: BorderRadius.circular(10),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: g['bg'] as Color,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: g['border'] as Color),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  g['label'] as String,
-                  style: TextStyle(
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.bold,
-                    color: g['text'] as Color,
+        Row(
+          children: grades.map((g) {
+            return Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 3),
+                child: InkWell(
+                  onTap: () => _handleGradeSelect(g['grade'] as int),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 9),
+                    decoration: BoxDecoration(
+                      color: g['bg'] as Color,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: g['border'] as Color),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          g['label'] as String,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: g['text'] as Color,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          g['sub'] as String,
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w500,
+                            color: (g['text'] as Color).withValues(alpha: 0.8),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             );
-          },
+          }).toList(),
         ),
       ],
     );
@@ -1247,9 +1443,26 @@ class _WordbookScreenState extends State<WordbookScreen> with SingleTickerProvid
                 child: InkWell(
                   onTap: () {
                     if (label == 'Trang chủ') {
-                      Navigator.maybePop(context);
-                    } else if (label != 'Sổ từ vựng') {
-                      _showToast('$label đang được chuẩn bị.');
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (_) => const HomeScreen()),
+                        (route) => false,
+                      );
+                    } else if (label == 'Thu nạp AI') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const ScannerScreen()),
+                      );
+                    } else if (label == 'Đấu trường') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const ArenaScreen()),
+                      ).then((_) => _fetchWordbookData());
+                    } else if (label == 'Hồ sơ') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                      ).then((_) => _fetchWordbookData());
                     }
                   },
                   child: SizedBox(

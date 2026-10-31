@@ -3,7 +3,7 @@ services:
   # 1. PostgreSQL Database Server
   # ---------------------------------------------------------------------------
   postgres:
-    image: postgres:17-alpine
+    image: postgres:16-alpine
     container_name: vocario-postgres
     restart: always
     environment:

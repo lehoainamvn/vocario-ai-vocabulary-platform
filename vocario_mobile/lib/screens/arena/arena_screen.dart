@@ -1,8 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../core/constants/tokens.dart';
 import '../../core/services/api_service.dart';
 import '../leaderboard/leaderboard_screen.dart';
+import '../scanner/scanner_screen.dart';
 
 /// Dữ liệu một vật thể trong đấu trường thị giác
 class ArenaWord {
@@ -31,26 +35,50 @@ class ArenaWord {
   });
 
   factory ArenaWord.fromJson(Map<String, dynamic> json, int index) {
-    final box = json['box'] as Map<String, dynamic>?;
+    final box = json['box'] ?? json['coordinates'];
+    double top = 20.0 + (index * 14) % 55;
+    double left = 15.0 + (index * 18) % 65;
+    double width = 25.0;
+    double height = 18.0;
+
+    if (json['topPercent'] != null) {
+      top = (json['topPercent'] as num).toDouble();
+      left = (json['leftPercent'] as num?)?.toDouble() ?? left;
+      width = (json['widthPercent'] as num?)?.toDouble() ?? width;
+      height = (json['heightPercent'] as num?)?.toDouble() ?? height;
+    } else if (box is Map<String, dynamic>) {
+      top = (box['top'] as num?)?.toDouble() ?? top;
+      left = (box['left'] as num?)?.toDouble() ?? left;
+      width = (box['width'] as num?)?.toDouble() ?? width;
+      height = (box['height'] as num?)?.toDouble() ?? height;
+    } else if (box is List && box.length >= 4) {
+      double b0 = (box[0] as num).toDouble();
+      double b1 = (box[1] as num).toDouble();
+      double b2 = (box[2] as num).toDouble();
+      double b3 = (box[3] as num).toDouble();
+      if (b0 <= 1.0 && b2 <= 1.0 && b1 <= 1.0 && b3 <= 1.0) {
+        b0 *= 100;
+        b1 *= 100;
+        b2 *= 100;
+        b3 *= 100;
+      }
+      top = b0;
+      left = b1;
+      width = (b2 - b1).abs();
+      height = (b3 - b0).abs();
+    }
+
     return ArenaWord(
       id: json['id']?.toString() ?? 'obj-$index',
-      word: json['word']?.toString() ?? 'object',
+      word: json['word']?.toString() ?? json['english']?.toString() ?? 'object',
       ipa: json['ipa']?.toString() ?? '/.../',
       vietnamese: json['vietnamese']?.toString() ?? json['meaning']?.toString() ?? 'vật thể đời sống',
-      level: json['level']?.toString() ?? 'A2',
+      level: (json['level'] ?? json['cefr'] ?? 'A2').toString().toUpperCase(),
       partOfSpeech: json['partOfSpeech']?.toString() ?? 'noun',
-      topPercent: (json['topPercent'] as num?)?.toDouble() ??
-          (box?['top'] as num?)?.toDouble() ??
-          (20.0 + (index * 14) % 55),
-      leftPercent: (json['leftPercent'] as num?)?.toDouble() ??
-          (box?['left'] as num?)?.toDouble() ??
-          (15.0 + (index * 18) % 65),
-      widthPercent: (json['widthPercent'] as num?)?.toDouble() ??
-          (box?['width'] as num?)?.toDouble() ??
-          25.0,
-      heightPercent: (json['heightPercent'] as num?)?.toDouble() ??
-          (box?['height'] as num?)?.toDouble() ??
-          18.0,
+      topPercent: top.clamp(5.0, 85.0),
+      leftPercent: left.clamp(5.0, 85.0),
+      widthPercent: width.clamp(10.0, 60.0),
+      heightPercent: height.clamp(8.0, 60.0),
     );
   }
 }
@@ -79,9 +107,31 @@ class ArenaStage {
     required this.words,
     this.isOfficial = true,
     this.isWeekly = false,
-    this.bestRecordStr = '00:05.82',
-    this.bestRecordHolder = 'Minh Hoàng',
+    this.bestRecordStr = 'Chưa có kỷ lục',
+    this.bestRecordHolder = 'Học viên',
   });
+
+  ArenaStage copyWith({
+    String? title,
+    String? subtitle,
+    String? bestRecordStr,
+    String? bestRecordHolder,
+    List<ArenaWord>? words,
+  }) {
+    return ArenaStage(
+      id: id,
+      title: title ?? this.title,
+      subtitle: subtitle ?? this.subtitle,
+      category: category,
+      badge: badge,
+      imageUrl: imageUrl,
+      words: words ?? this.words,
+      isOfficial: isOfficial,
+      isWeekly: isWeekly,
+      bestRecordStr: bestRecordStr ?? this.bestRecordStr,
+      bestRecordHolder: bestRecordHolder ?? this.bestRecordHolder,
+    );
+  }
 }
 
 class ArenaScreen extends StatefulWidget {
@@ -97,7 +147,7 @@ class _ArenaScreenState extends State<ArenaScreen> with SingleTickerProviderStat
   // Trạng thái màn chơi (Tương đương 3 chế độ trên Web Angular)
   // 'SELECT_STAGE' -> 'PLAYING' -> 'VICTORY'
   String _gameMode = 'SELECT_STAGE';
-  String _stageFilter = 'ADMIN'; // 'ADMIN' = Đấu trường hệ thống, 'USER' = Ảnh của bạn
+  String _stageFilter = 'ADMIN'; // 'ADMIN' = Đấu trường hệ thống (Mặc định chuẩn Web), 'USER' = Ảnh của bạn
 
   // Danh sách các sàn đấu chính thức (Chuẩn hóa từ Web Vocario)
   late List<ArenaStage> _officialStages;
@@ -152,13 +202,12 @@ class _ArenaScreenState extends State<ArenaScreen> with SingleTickerProviderStat
     _loadUserStagesFromBackend();
 
     if (widget.initialStageId != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        final found = _officialStages.firstWhere(
-          (s) => s.id == widget.initialStageId,
-          orElse: () => _officialStages.first,
-        );
-        _startStage(found);
-      });
+      final offMatch = _officialStages.where((s) => s.id == widget.initialStageId);
+      if (offMatch.isNotEmpty) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _startStage(offMatch.first);
+        });
+      }
     }
   }
 
@@ -179,52 +228,55 @@ class _ArenaScreenState extends State<ArenaScreen> with SingleTickerProviderStat
     });
   }
 
-  /// Khởi tạo các Đấu trường chuẩn hóa hệ thống (Khớp 100% web Angular)
+  /// Khởi tạo các Đấu trường chuẩn hóa hệ thống (Khớp 100% web Angular QuizStageService)
   void _initOfficialStages() {
     _officialStages = [
-      ArenaStage(
+      // 1. Gian Bếp Đời Thực (Đấu trường tuần chính thức)
+      const ArenaStage(
         id: 'stage-admin-kitchen',
         title: 'Gian Bếp Đời Thực',
         subtitle: 'Bối cảnh thi đấu chính thức tuần này dành cho toàn thể học viên',
         category: 'Đời Sống Gia Đình',
         badge: 'Đấu trường tuần',
+        imageUrl: '/kitchen_refrigerator.png',
+        isOfficial: true,
         isWeekly: true,
-        imageUrl: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=80',
-        bestRecordStr: '00:05.82',
-        bestRecordHolder: 'Minh Hoàng',
-        words: const [
+        words: [
           ArenaWord(
             id: 'k-1',
             word: 'refrigerator',
             ipa: '/rɪˈfrɪdʒəreɪtər/',
-            vietnamese: 'tủ lạnh bảo quản thực phẩm',
+            vietnamese: 'tủ lạnh',
             level: 'A2',
-            topPercent: 22.0,
-            leftPercent: 6.0,
-            widthPercent: 32.0,
-            heightPercent: 66.0,
+            partOfSpeech: 'noun',
+            topPercent: 24,
+            leftPercent: 6,
+            widthPercent: 32,
+            heightPercent: 68,
           ),
           ArenaWord(
             id: 'k-2',
             word: 'gas stove',
             ipa: '/ˈɡæs stəʊv/',
-            vietnamese: 'bếp ga nấu ăn gia đình',
+            vietnamese: 'bếp ga nấu ăn',
             level: 'A2',
-            topPercent: 56.0,
-            leftPercent: 60.0,
-            widthPercent: 28.0,
-            heightPercent: 26.0,
+            partOfSpeech: 'noun',
+            topPercent: 58,
+            leftPercent: 62,
+            widthPercent: 28,
+            heightPercent: 25,
           ),
           ArenaWord(
             id: 'k-3',
             word: 'water bottle',
             ipa: '/ˈwɔːtər ˈbɒtl/',
-            vietnamese: 'chai nước uống cá nhân',
+            vietnamese: 'chai nước uống',
             level: 'A1',
-            topPercent: 52.0,
-            leftPercent: 42.0,
-            widthPercent: 13.0,
-            heightPercent: 28.0,
+            partOfSpeech: 'noun',
+            topPercent: 54,
+            leftPercent: 44,
+            widthPercent: 12,
+            heightPercent: 28,
           ),
           ArenaWord(
             id: 'k-4',
@@ -232,122 +284,133 @@ class _ArenaScreenState extends State<ArenaScreen> with SingleTickerProviderStat
             ipa: '/ˈkɑːdbɔːd bɒks/',
             vietnamese: 'thùng các-tông đựng đồ',
             level: 'B1',
-            topPercent: 48.0,
-            leftPercent: 74.0,
-            widthPercent: 20.0,
-            heightPercent: 26.0,
+            partOfSpeech: 'noun',
+            topPercent: 62,
+            leftPercent: 78,
+            widthPercent: 20,
+            heightPercent: 34,
+          ),
+          ArenaWord(
+            id: 'k-5',
+            word: 'picture frame',
+            ipa: '/ˈpɪktʃər freɪm/',
+            vietnamese: 'khung tranh ảnh treo tường',
+            level: 'A2',
+            partOfSpeech: 'noun',
+            topPercent: 8,
+            leftPercent: 52,
+            widthPercent: 20,
+            heightPercent: 25,
           ),
         ],
       ),
-      ArenaStage(
-        id: 'stage-admin-desk',
-        title: 'Góc Bàn Học & Thiết Bị',
-        subtitle: 'Không gian làm việc công nghệ và học tập hàng ngày',
+      // 2. Góc Học Tập & Công Việc
+      const ArenaStage(
+        id: 'stage-admin-study',
+        title: 'Góc Học Tập & Công Việc',
+        subtitle: 'Bối cảnh bàn làm việc sáng tạo với đồ dùng học thuật chuẩn CEFR',
         category: 'Học Tập & Công Việc',
-        badge: 'Chuẩn hóa',
-        imageUrl: 'https://images.unsplash.com/photo-1747336754882-dfa5c49f15da?auto=format&fit=crop&w=1200&q=82',
-        bestRecordStr: '00:06.45',
-        bestRecordHolder: 'Phương Thảo',
-        words: const [
+        badge: 'Đấu trường hệ thống',
+        imageUrl: '/study_desk.png',
+        isOfficial: true,
+        isWeekly: false,
+        words: [
           ArenaWord(
-            id: 'd-1',
+            id: 'sd-1',
             word: 'laptop',
             ipa: '/ˈlæptɒp/',
-            vietnamese: 'máy tính xách tay làm việc',
+            vietnamese: 'máy tính xách tay',
             level: 'A1',
-            topPercent: 36.0,
-            leftPercent: 25.0,
-            widthPercent: 36.0,
-            heightPercent: 32.0,
+            partOfSpeech: 'noun',
+            topPercent: 32,
+            leftPercent: 34,
+            widthPercent: 28,
+            heightPercent: 26,
           ),
           ArenaWord(
-            id: 'd-2',
-            word: 'mechanical keyboard',
-            ipa: '/mɪˈkænɪkl ˈkiːbɔːrd/',
-            vietnamese: 'bàn phím cơ gõ văn bản',
-            level: 'B1',
-            topPercent: 58.0,
-            leftPercent: 22.0,
-            widthPercent: 42.0,
-            heightPercent: 20.0,
-          ),
-          ArenaWord(
-            id: 'd-3',
-            word: 'coffee mug',
-            ipa: '/ˈkɒfi mʌɡ/',
-            vietnamese: 'tách cà phê sứ',
+            id: 'sd-2',
+            word: 'desk lamp',
+            ipa: '/ˈdesk læmp/',
+            vietnamese: 'đèn học để bàn',
             level: 'A2',
-            topPercent: 44.0,
-            leftPercent: 66.0,
-            widthPercent: 15.0,
-            heightPercent: 22.0,
+            partOfSpeech: 'noun',
+            topPercent: 12,
+            leftPercent: 12,
+            widthPercent: 18,
+            heightPercent: 34,
           ),
           ArenaWord(
-            id: 'd-4',
-            word: 'study lamp',
-            ipa: '/ˈstʌdi læmp/',
-            vietnamese: 'đèn bàn học chiếu sáng',
+            id: 'sd-3',
+            word: 'chair',
+            ipa: '/tʃeər/',
+            vietnamese: 'ghế ngồi làm việc',
             level: 'A1',
-            topPercent: 12.0,
-            leftPercent: 66.0,
-            widthPercent: 25.0,
-            heightPercent: 44.0,
+            partOfSpeech: 'noun',
+            topPercent: 52,
+            leftPercent: 38,
+            widthPercent: 24,
+            heightPercent: 44,
+          ),
+          ArenaWord(
+            id: 'sd-4',
+            word: 'notebook',
+            ipa: '/ˈnəʊtbʊk/',
+            vietnamese: 'sổ tay ghi chép',
+            level: 'A1',
+            partOfSpeech: 'noun',
+            topPercent: 48,
+            leftPercent: 66,
+            widthPercent: 18,
+            heightPercent: 20,
           ),
         ],
       ),
-      ArenaStage(
-        id: 'stage-admin-living-room',
-        title: 'Phòng Khách Gia Đình',
-        subtitle: 'Bối cảnh nội thất thư giãn và sinh hoạt chung',
-        category: 'Nội Thất & Không Gian',
-        badge: 'Chuẩn hóa',
-        imageUrl: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=80',
-        bestRecordStr: '00:07.12',
-        bestRecordHolder: 'Gia Bảo',
-        words: const [
+      // 3. Phòng Khách Ấm Cúng
+      const ArenaStage(
+        id: 'stage-admin-living',
+        title: 'Phòng Khách Ấm Cúng',
+        subtitle: 'Không gian sinh hoạt gia đình và tiếp đón bạn bè thân mật',
+        category: 'Nội Thất & Tiện Nghi',
+        badge: 'Đấu trường hệ thống',
+        imageUrl: '/living_room.jpg',
+        isOfficial: true,
+        isWeekly: false,
+        words: [
           ArenaWord(
-            id: 'l-1',
+            id: 'lr-1',
             word: 'sofa',
             ipa: '/ˈsəʊfə/',
-            vietnamese: 'ghế sofa nỉ dài',
+            vietnamese: 'ghế sô-pha',
             level: 'A1',
-            topPercent: 46.0,
-            leftPercent: 16.0,
-            widthPercent: 68.0,
-            heightPercent: 38.0,
+            partOfSpeech: 'noun',
+            topPercent: 48,
+            leftPercent: 22,
+            widthPercent: 52,
+            heightPercent: 38,
           ),
           ArenaWord(
-            id: 'l-2',
-            word: 'cushion',
-            ipa: '/ˈkʊʃn/',
-            vietnamese: 'gối đệm tựa lưng',
-            level: 'A2',
-            topPercent: 48.0,
-            leftPercent: 22.0,
-            widthPercent: 20.0,
-            heightPercent: 22.0,
-          ),
-          ArenaWord(
-            id: 'l-3',
-            word: 'potted plant',
-            ipa: '/ˈpɒtɪd plɑːnt/',
-            vietnamese: 'chậu cây xanh trang trí',
-            level: 'B1',
-            topPercent: 28.0,
-            leftPercent: 78.0,
-            widthPercent: 18.0,
-            heightPercent: 46.0,
-          ),
-          ArenaWord(
-            id: 'l-4',
+            id: 'lr-2',
             word: 'coffee table',
             ipa: '/ˈkɒfi ˈteɪbl/',
             vietnamese: 'bàn trà phòng khách',
             level: 'A2',
-            topPercent: 68.0,
-            leftPercent: 32.0,
-            widthPercent: 38.0,
-            heightPercent: 24.0,
+            partOfSpeech: 'noun',
+            topPercent: 66,
+            leftPercent: 34,
+            widthPercent: 32,
+            heightPercent: 24,
+          ),
+          ArenaWord(
+            id: 'lr-3',
+            word: 'indoor plant',
+            ipa: '/ˈɪndɔː plɑːnt/',
+            vietnamese: 'chậu cây cảnh trong nhà',
+            level: 'A2',
+            partOfSpeech: 'noun',
+            topPercent: 36,
+            leftPercent: 78,
+            widthPercent: 16,
+            heightPercent: 42,
           ),
         ],
       ),
@@ -366,23 +429,41 @@ class _ArenaScreenState extends State<ArenaScreen> with SingleTickerProviderStat
         if (c is! Map<String, dynamic>) continue;
 
         final rawObjs = c['detectedObjects'];
-        List<ArenaWord> words = [];
+        List<dynamic> detectedList = [];
+
         if (rawObjs is List) {
-          words = rawObjs.asMap().entries.map((e) => ArenaWord.fromJson(e.value, e.key)).toList();
+          detectedList = rawObjs;
+        } else if (rawObjs is String && rawObjs.trim().isNotEmpty) {
+          try {
+            detectedList = jsonDecode(rawObjs);
+          } catch (_) {}
         }
 
+        final words = detectedList.asMap().entries.map((e) {
+          if (e.value is Map<String, dynamic>) {
+            return ArenaWord.fromJson(e.value as Map<String, dynamic>, e.key);
+          }
+          return ArenaWord.fromJson({}, e.key);
+        }).where((w) => w.word.isNotEmpty && w.word != 'object').toList();
+
         if (words.isNotEmpty) {
+          String imgUrl = (c['imageUrl'] ?? '').toString();
+          if (imgUrl.startsWith('/')) {
+            imgUrl = '${ApiService.defaultBaseUrl}$imgUrl';
+          }
+
+          final stageId = c['id']?.toString() ?? 'user-stage-$i';
           loaded.add(
             ArenaStage(
-              id: c['id']?.toString() ?? 'user-stage-$i',
+              id: stageId,
               title: c['sceneTheme']?.toString() ?? 'Bối cảnh đời thực #${i + 1}',
-              subtitle: 'Ảnh chụp nhận diện AI từ máy ảnh của bạn',
+              subtitle: '${words.length} vật thể bóc tách từ ảnh thực tế của bạn',
               category: 'Bộ Sưu Tập Của Bạn',
               badge: 'Ảnh của bạn',
-              imageUrl: c['imageUrl']?.toString() ?? '',
+              imageUrl: imgUrl,
               words: words,
               isOfficial: false,
-              bestRecordStr: 'Chưa có',
+              bestRecordStr: 'Chưa có kỷ lục',
               bestRecordHolder: 'Bạn',
             ),
           );
@@ -395,9 +476,320 @@ class _ArenaScreenState extends State<ArenaScreen> with SingleTickerProviderStat
           _isLoadingUserStages = false;
         });
       }
+
+      // Xử lý khi có initialStageId (ưu tiên tìm trong bối cảnh người dùng vừa tải từ CSDL hoặc đấu trường hệ thống)
+      if (widget.initialStageId != null) {
+        final userMatches = loaded.where((s) => s.id == widget.initialStageId);
+        if (userMatches.isNotEmpty && mounted) {
+          setState(() => _stageFilter = 'USER');
+          _startStage(userMatches.first);
+        } else {
+          final offMatches = _officialStages.where((s) => s.id == widget.initialStageId);
+          if (offMatches.isNotEmpty && mounted) {
+            setState(() => _stageFilter = 'ADMIN');
+            _startStage(offMatches.first);
+          }
+        }
+      }
+
+      // Tự động đồng bộ các kỷ lục phản xạ thật từ CSDL PostgreSQL
+      _fetchRealLeaderboardRecords();
     } catch (_) {
       if (mounted) setState(() => _isLoadingUserStages = false);
     }
+  }
+
+  /// Truy vấn kỷ lục Top #1 thực tế từ CSDL PostgreSQL (bảng arena_stage_records) cho từng sàn đấu
+  Future<void> _fetchRealLeaderboardRecords() async {
+    // 1. Cập nhật kỷ lục thật cho Official Stages từ CSDL
+    for (int i = 0; i < _officialStages.length; i++) {
+      final st = _officialStages[i];
+      try {
+        final records = await ApiService().getStageLeaderboard(st.id);
+        if (records.isNotEmpty) {
+          final top = records.first;
+          final ms = (top['completionTimeMs'] as num?)?.toInt() ?? 0;
+          final holder = top['userName']?.toString() ?? top['username']?.toString() ?? 'Học viên';
+          final formatted = _formatTime(ms);
+          if (mounted) {
+            setState(() {
+              _officialStages[i] = st.copyWith(
+                bestRecordStr: formatted,
+                bestRecordHolder: holder,
+              );
+            });
+          }
+        } else {
+          if (mounted) {
+            setState(() {
+              _officialStages[i] = st.copyWith(
+                bestRecordStr: 'Chưa có kỷ lục',
+                bestRecordHolder: 'Chưa có',
+              );
+            });
+          }
+        }
+      } catch (_) {}
+    }
+
+    // 2. Cập nhật kỷ lục thật cho User Stages từ CSDL
+    for (int i = 0; i < _userStages.length; i++) {
+      final st = _userStages[i];
+      try {
+        final records = await ApiService().getStageLeaderboard(st.id);
+        if (records.isNotEmpty) {
+          final top = records.first;
+          final ms = (top['completionTimeMs'] as num?)?.toInt() ?? 0;
+          final holder = top['userName']?.toString() ?? top['username']?.toString() ?? 'Bạn';
+          final formatted = _formatTime(ms);
+          if (mounted) {
+            setState(() {
+              _userStages[i] = st.copyWith(
+                bestRecordStr: formatted,
+                bestRecordHolder: holder,
+              );
+            });
+          }
+        } else {
+          if (mounted) {
+            setState(() {
+              _userStages[i] = st.copyWith(
+                bestRecordStr: 'Chưa có thành tích',
+                bestRecordHolder: 'Bạn',
+              );
+            });
+          }
+        }
+      } catch (_) {}
+    }
+  }
+
+  // ==========================================================================
+  // STAGE LEADERBOARD MODAL (BẢNG VÀNG KỶ LỤC TỪ CSDL)
+  // ==========================================================================
+  Future<void> _showStageLeaderboardModal(ArenaStage stage) async {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Container(
+          height: MediaQuery.of(ctx).size.height * 0.75,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                decoration: const BoxDecoration(
+                  border: Border(bottom: BorderSide(color: Color(0xFFE5DED3))),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'BẢNG VÀNG PHẢN XẠ',
+                          style: VocarioTokens.monoSmall.copyWith(fontSize: 9, color: VocarioTokens.brand),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          stage.title,
+                          style: VocarioTokens.serifHeadline.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded, size: 20),
+                      onPressed: () => Navigator.pop(ctx),
+                    ),
+                  ],
+                ),
+              ),
+              // Body
+              Expanded(
+                child: FutureBuilder<List<dynamic>>(
+                  future: ApiService().getStageLeaderboard(stage.id),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator(color: VocarioTokens.brand));
+                    }
+                    final records = snapshot.data ?? [];
+                    if (records.isEmpty) {
+                      return Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.emoji_events_outlined, size: 48, color: VocarioTokens.muted),
+                              const SizedBox(height: 12),
+                              const Text(
+                                'Chưa có kỷ lục nào',
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Hãy là người đầu tiên hoàn thành màn đấu này!',
+                                style: TextStyle(color: VocarioTokens.muted, fontSize: 12),
+                              ),
+                              const SizedBox(height: 16),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pop(ctx);
+                                  _startStage(stage);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: VocarioTokens.brand,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                ),
+                                child: const Text('Bắt đầu thử thách ngay'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }
+                    return ListView.separated(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: records.length,
+                      separatorBuilder: (_, __) => const Divider(height: 1, color: Color(0xFFE5DED3)),
+                      itemBuilder: (context, index) {
+                        final rec = records[index];
+                        final timeMs = (rec['completionTimeMs'] as num?)?.toInt() ?? 0;
+                        final seconds = (timeMs / 1000.0).toStringAsFixed(2);
+                        final accuracy = (rec['accuracyPct'] as num?)?.toInt() ?? 100;
+                        final username = rec['userName'] ?? rec['username'] ?? rec['userFullName'] ?? 'Học viên ẩn danh';
+                        final targetLevel = rec['targetLevel']?.toString();
+                        final isCurrentUser = rec['isCurrentUser'] == true;
+                        final isPerfect = rec['isPerfectRun'] == true;
+                        final mistakes = (rec['mistakeCount'] as num?)?.toInt() ?? 0;
+
+                        return Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                          decoration: BoxDecoration(
+                            color: isCurrentUser ? VocarioTokens.brand.withValues(alpha: 0.08) : Colors.transparent,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 28,
+                                height: 28,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: index == 0
+                                      ? const Color(0xFFFEF3C7)
+                                      : (index == 1 ? const Color(0xFFF1F5F9) : const Color(0xFFFAF8F5)),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Text(
+                                  '#${index + 1}',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 11,
+                                    color: index == 0
+                                        ? const Color(0xFFD97706)
+                                        : (index == 1 ? const Color(0xFF64748B) : VocarioTokens.ink),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            username,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 13,
+                                              color: isCurrentUser ? VocarioTokens.brand : VocarioTokens.ink,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        if (isCurrentUser) ...[
+                                          const SizedBox(width: 5),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                            decoration: BoxDecoration(
+                                              color: VocarioTokens.brand,
+                                              borderRadius: BorderRadius.circular(4),
+                                            ),
+                                            child: const Text(
+                                              'Bạn',
+                                              style: TextStyle(fontSize: 9, color: Colors.white, fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                        ],
+                                        if (targetLevel != null && targetLevel.isNotEmpty) ...[
+                                          const SizedBox(width: 5),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                            decoration: BoxDecoration(
+                                              color: VocarioTokens.field,
+                                              borderRadius: BorderRadius.circular(4),
+                                              border: Border.all(color: VocarioTokens.border),
+                                            ),
+                                            child: Text(
+                                              targetLevel,
+                                              style: VocarioTokens.monoSmall.copyWith(fontSize: 8.5, color: VocarioTokens.brand),
+                                            ),
+                                          ),
+                                        ],
+                                        if (isPerfect) ...[
+                                          const SizedBox(width: 4),
+                                          const Icon(Icons.star_rounded, size: 15, color: Color(0xFFD97706)),
+                                        ],
+                                      ],
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      'Chính xác: $accuracy% · Lỗi: $mistakes',
+                                      style: TextStyle(color: VocarioTokens.muted, fontSize: 11),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFAF8F5),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: const Color(0xFFE5DED3)),
+                                ),
+                                child: Text(
+                                  '${seconds}s',
+                                  style: VocarioTokens.monoSmall.copyWith(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: VocarioTokens.brand,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   // ==========================================================================
@@ -450,9 +842,9 @@ class _ArenaScreenState extends State<ArenaScreen> with SingleTickerProviderStat
       category: 'Đấu Trường Đỉnh Cao',
       badge: '⚡ Siêu Tốc Độ',
       isWeekly: true,
-      imageUrl: _officialStages.first.imageUrl,
-      bestRecordStr: '00:09.15',
-      bestRecordHolder: 'Thu Trang',
+      imageUrl: _officialStages.isNotEmpty ? _officialStages.first.imageUrl : (_userStages.isNotEmpty ? _userStages.first.imageUrl : ''),
+      bestRecordStr: 'Chưa có kỷ lục',
+      bestRecordHolder: 'Chưa có',
       words: blitzWords,
     );
 
@@ -689,6 +1081,9 @@ class _ArenaScreenState extends State<ArenaScreen> with SingleTickerProviderStat
           _isSubmittingRun = false;
         });
       }
+
+      // Tự động làm mới bảng kỷ lục từ CSDL để hiển thị thành tích mới nhất
+      _fetchRealLeaderboardRecords();
     } else {
       if (mounted) setState(() => _isSubmittingRun = false);
     }
@@ -828,19 +1223,23 @@ class _ArenaScreenState extends State<ArenaScreen> with SingleTickerProviderStat
           const SizedBox(height: 12),
 
           // Stages Grid / List
-          if (_stageFilter == 'ADMIN')
-            ..._officialStages.map((stage) => _buildStageCard(stage))
-          else if (_isLoadingUserStages)
+          if (_stageFilter == 'ADMIN') ...[
+            if (_officialStages.isEmpty)
+              _buildEmptyOfficialStages()
+            else
+              ..._officialStages.map((stage) => _buildStageCard(stage)),
+          ] else if (_isLoadingUserStages) ...[
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 40),
               child: Center(
                 child: CircularProgressIndicator(color: VocarioTokens.brand, strokeWidth: 2),
               ),
-            )
-          else if (_userStages.isEmpty)
-            _buildEmptyUserStages()
-          else
+            ),
+          ] else if (_userStages.isEmpty) ...[
+            _buildEmptyUserStages(),
+          ] else ...[
             ..._userStages.map((stage) => _buildStageCard(stage)),
+          ],
 
           const SizedBox(height: 16),
           // Scoring Mechanics Info Card
@@ -968,6 +1367,87 @@ class _ArenaScreenState extends State<ArenaScreen> with SingleTickerProviderStat
     );
   }
 
+  Widget _buildStagePhoto(
+    String? url, {
+    BoxFit fit = BoxFit.cover,
+    double? width,
+    double? height,
+    Widget? errorWidget,
+  }) {
+    if (url == null || url.trim().isEmpty) {
+      return errorWidget ??
+          Container(
+            color: VocarioTokens.field,
+            width: width,
+            height: height,
+            alignment: Alignment.center,
+            child: const Icon(Icons.image_outlined, size: 36, color: VocarioTokens.muted),
+          );
+    }
+
+    final trimmed = url.trim();
+
+    // 1. Base64 Data URL (từ Scanner lưu vào PostgreSQL)
+    if (trimmed.startsWith('data:image')) {
+      try {
+        final commaIdx = trimmed.indexOf(',');
+        final b64Str = commaIdx != -1 ? trimmed.substring(commaIdx + 1) : trimmed;
+        final bytes = base64Decode(b64Str);
+        return Image.memory(
+          bytes,
+          fit: fit,
+          width: width,
+          height: height,
+          errorBuilder: (_, __, ___) =>
+              errorWidget ??
+              Container(
+                color: VocarioTokens.field,
+                width: width,
+                height: height,
+                alignment: Alignment.center,
+                child: const Icon(Icons.broken_image_outlined, size: 36, color: VocarioTokens.muted),
+              ),
+        );
+      } catch (_) {
+        return errorWidget ??
+            Container(
+              color: VocarioTokens.field,
+              width: width,
+              height: height,
+              alignment: Alignment.center,
+              child: const Icon(Icons.broken_image_outlined, size: 36, color: VocarioTokens.muted),
+            );
+      }
+    }
+
+    // 2. Relative URL
+    String fullUrl = trimmed;
+    if (fullUrl.startsWith('/')) {
+      if (kIsWeb) {
+        fullUrl = trimmed;
+      } else {
+        fullUrl = '${ApiService.defaultBaseUrl}$trimmed';
+      }
+    }
+
+    // 3. Network URL kèm Fallback bối cảnh dự phòng
+    return Image.network(
+      fullUrl,
+      fit: fit,
+      width: width,
+      height: height,
+      errorBuilder: (_, __, ___) =>
+          errorWidget ??
+          Container(
+            color: VocarioTokens.field,
+            width: width,
+            height: height,
+            alignment: Alignment.center,
+            child: const Icon(Icons.broken_image_outlined, size: 36, color: VocarioTokens.muted),
+          ),
+    );
+  }
+
   Widget _buildStageCard(ArenaStage stage) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -990,15 +1470,7 @@ class _ArenaScreenState extends State<ArenaScreen> with SingleTickerProviderStat
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
                 child: AspectRatio(
                   aspectRatio: 16 / 9,
-                  child: Image.network(
-                    stage.imageUrl,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      color: VocarioTokens.field,
-                      alignment: Alignment.center,
-                      child: const Icon(Icons.image_outlined, size: 36, color: VocarioTokens.muted),
-                    ),
-                  ),
+                  child: _buildStagePhoto(stage.imageUrl, fit: BoxFit.cover),
                 ),
               ),
               Positioned(
@@ -1061,33 +1533,37 @@ class _ArenaScreenState extends State<ArenaScreen> with SingleTickerProviderStat
                 ),
                 const SizedBox(height: 8),
 
-                // Record Row
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: VocarioTokens.field,
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: VocarioTokens.border),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.emoji_events_outlined, size: 13, color: VocarioTokens.amber),
-                          const SizedBox(width: 5),
-                          const Text(
-                            'Kỷ lục: ',
-                            style: TextStyle(fontSize: 9.5, color: VocarioTokens.brand, fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            '${stage.bestRecordStr} (${stage.bestRecordHolder})',
-                            style: const TextStyle(fontSize: 9.5, color: VocarioTokens.muted),
-                          ),
-                        ],
-                      ),
-                      const Icon(Icons.chevron_right_rounded, size: 14, color: VocarioTokens.muted),
-                    ],
+                // Record Row (Tappable to view stage leaderboard)
+                InkWell(
+                  onTap: () => _showStageLeaderboardModal(stage),
+                  borderRadius: BorderRadius.circular(6),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: VocarioTokens.field,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: VocarioTokens.border),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.emoji_events_outlined, size: 13, color: VocarioTokens.amber),
+                            const SizedBox(width: 5),
+                            const Text(
+                              'Kỷ lục: ',
+                              style: TextStyle(fontSize: 9.5, color: VocarioTokens.brand, fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              '${stage.bestRecordStr} (${stage.bestRecordHolder})',
+                              style: const TextStyle(fontSize: 9.5, color: VocarioTokens.muted),
+                            ),
+                          ],
+                        ),
+                        const Icon(Icons.chevron_right_rounded, size: 14, color: VocarioTokens.muted),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -1122,6 +1598,33 @@ class _ArenaScreenState extends State<ArenaScreen> with SingleTickerProviderStat
     );
   }
 
+  Widget _buildEmptyOfficialStages() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+      decoration: BoxDecoration(
+        color: VocarioTokens.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: VocarioTokens.border),
+      ),
+      child: Column(
+        children: [
+          const Icon(Icons.emoji_events_outlined, size: 36, color: VocarioTokens.muted),
+          const SizedBox(height: 10),
+          Text(
+            'Chưa có bối cảnh hệ thống trong CSDL',
+            style: VocarioTokens.serifHeadline.copyWith(fontSize: 14, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'Các sàn đấu chính thức sẽ được ban quản trị phát hành từ CSDL. Bạn có thể thi đấu trên các bối cảnh đời thực của mình tại tab "Ảnh của bạn".',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 10.5, color: VocarioTokens.muted, height: 1.4),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildEmptyUserStages() {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
@@ -1143,6 +1646,21 @@ class _ArenaScreenState extends State<ArenaScreen> with SingleTickerProviderStat
             'Chụp hoặc tải ảnh đồ vật trong phòng để AI tự động tạo sàn đấu phản xạ riêng cho bạn!',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 10.5, color: VocarioTokens.muted, height: 1.4),
+          ),
+          const SizedBox(height: 14),
+          ElevatedButton.icon(
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ScannerScreen()),
+            ).then((_) => _loadUserStagesFromBackend()),
+            icon: const Icon(Icons.camera_enhance_rounded, size: 14),
+            label: const Text('Chụp ảnh bối cảnh ngay', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: VocarioTokens.brand,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
           ),
         ],
       ),
@@ -1476,12 +1994,12 @@ class _ArenaScreenState extends State<ArenaScreen> with SingleTickerProviderStat
                       child: AnimatedScale(
                         scale: _isZoomed ? 1.4 : 1.0,
                         duration: const Duration(milliseconds: 250),
-                        child: Image.network(
-                          _currentStage?.imageUrl ?? '',
+                        child: _buildStagePhoto(
+                          _currentStage?.imageUrl,
                           fit: BoxFit.contain,
                           width: constraints.maxWidth,
                           height: constraints.maxHeight,
-                          errorBuilder: (context, error, stackTrace) => const Center(
+                          errorWidget: const Center(
                             child: Icon(Icons.image_not_supported_outlined, size: 48, color: Colors.white54),
                           ),
                         ),

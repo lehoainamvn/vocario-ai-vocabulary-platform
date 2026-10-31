@@ -1,9 +1,15 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../core/constants/tokens.dart';
 import '../../core/services/api_service.dart';
+import '../../core/utils/image_picker_helper.dart';
+import '../../widgets/speech_scorer_modal.dart';
 import '../arena/arena_screen.dart';
 import '../wordbook/wordbook_screen.dart';
+import '../home/home_screen.dart';
+import '../scanner/scanner_screen.dart';
+import '../profile/profile_screen.dart';
 
 class CollectionScreen extends StatefulWidget {
   final String? initialSceneId;
@@ -27,15 +33,23 @@ class _CollectionScreenState extends State<CollectionScreen> {
   String _searchQuery = '';
   String _activeFilter = 'Tất cả'; // 'Tất cả' | 'Gần đây' | 'Chưa thành thạo'
 
-  // Trạng thái lưu & xóa
+  // Trạng thái lưu & xóa & Toast notification
   bool _isSavingAll = false;
   final Map<String, bool> _savingWords = {};
   Map<String, dynamic>? _albumToDelete;
+  String? _toastMessage;
+  Timer? _toastTimer;
 
   @override
   void initState() {
     super.initState();
     _fetchCaptures();
+  }
+
+  @override
+  void dispose() {
+    _toastTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _fetchCaptures() async {
@@ -95,11 +109,12 @@ class _CollectionScreenState extends State<CollectionScreen> {
         return {
           'id': captureMap['id']?.toString() ?? UniqueKey().toString(),
           'title': captureMap['sceneTheme'] ?? captureMap['title'] ?? 'Bối cảnh đời thực',
-          'category': captureMap['category'] ?? 'Đời Sống Thực Tế',
+          'category': captureMap['category'] ?? 'Ảnh Chụp Của Bạn',
           'imageUrl': captureMap['imageUrl'] ?? '',
           'date': captureMap['createdAt'] != null
               ? captureMap['createdAt'].toString().substring(0, 10)
               : 'Gần đây',
+          'isPreset': false,
           'words': words,
         };
       }).toList();
@@ -121,7 +136,11 @@ class _CollectionScreenState extends State<CollectionScreen> {
         _isLoading = false;
       });
     } catch (_) {
-      setState(() => _isLoading = false);
+      setState(() {
+        _allAlbums = [];
+        _selectedAlbum = null;
+        _isLoading = false;
+      });
     }
   }
 
@@ -206,6 +225,23 @@ class _CollectionScreenState extends State<CollectionScreen> {
 
     setState(() => _isSavingAll = true);
 
+    final sceneId = _selectedAlbum!['id']?.toString();
+    // 1. Thử gọi API lưu hàng loạt của Spring Boot
+    if (sceneId != null && !sceneId.startsWith('w-')) {
+      try {
+        final batchRes = await _apiService.learnAllWordsFromCapture(captureId: sceneId);
+        if (batchRes.isNotEmpty) {
+          for (var w in words) {
+            w['isSaved'] = true;
+          }
+          if (mounted) setState(() => _isSavingAll = false);
+          _showToast('Đã lưu thành công ${batchRes.length} từ vào Sổ từ vựng SM-2!');
+          return;
+        }
+      } catch (_) {}
+    }
+
+    // 2. Fallback lưu từng từ
     int savedCount = 0;
     for (var w in unsavedWords) {
       final result = await _apiService.learnWordFromVision(
@@ -220,8 +256,387 @@ class _CollectionScreenState extends State<CollectionScreen> {
       }
     }
 
-    setState(() => _isSavingAll = false);
+    if (mounted) setState(() => _isSavingAll = false);
     _showToast('Đã lưu thành công $savedCount từ vào Sổ từ vựng SM-2!');
+  }
+
+  /// Mở Modal Hội Thoại Ngữ Cảnh AI thích ứng theo các vật thể trong ảnh
+  Future<void> _openAiDialogueModal() async {
+    if (_selectedAlbum == null) return;
+    final words = _selectedAlbum!['words'] as List<Map<String, dynamic>>;
+    if (words.isEmpty) {
+      _showToast('Không có từ vựng nào trong bối cảnh này để sinh hội thoại.');
+      return;
+    }
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return FutureBuilder<Map<String, dynamic>>(
+          future: _apiService.regenerateDialogue(
+            words: words.map((w) => {
+              'word': w['word'],
+              'name': w['word'],
+              'vietnamese': w['vietnamese'] ?? '',
+              'level': w['level'] ?? 'A2',
+            }).toList(),
+            theme: _selectedAlbum!['title'] ?? 'Đời sống thực tế',
+            targetLevel: 'A2',
+          ),
+          builder: (context, snapshot) {
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.75,
+              decoration: const BoxDecoration(
+                color: VocarioTokens.surface,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    decoration: const BoxDecoration(
+                      border: Border(bottom: BorderSide(color: VocarioTokens.border)),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.forum_outlined, size: 20, color: VocarioTokens.brand),
+                            const SizedBox(width: 8),
+                            Text(
+                              'HỘI THOẠI NGỮ CẢNH AI',
+                              style: VocarioTokens.monoSmall.copyWith(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: VocarioTokens.brand,
+                              ),
+                            ),
+                          ],
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close_rounded, size: 20),
+                          onPressed: () => Navigator.pop(ctx),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: snapshot.connectionState == ConnectionState.waiting
+                        ? Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const CircularProgressIndicator(color: VocarioTokens.brand, strokeWidth: 2),
+                                const SizedBox(height: 14),
+                                Text(
+                                  'Groq LLM đang sáng tác cuộc đối thoại từ các đồ vật...',
+                                  style: TextStyle(fontSize: 12, color: VocarioTokens.muted),
+                                ),
+                              ],
+                            ),
+                          )
+                        : Builder(
+                            builder: (_) {
+                              final data = snapshot.data;
+                              final dialogue = data?['dialogue'] as List<dynamic>? ?? [];
+                              if (dialogue.isEmpty) {
+                                return Center(
+                                  child: Text(
+                                    'Không thể sinh hội thoại lúc này. Hãy thử lại!',
+                                    style: TextStyle(fontSize: 12, color: VocarioTokens.muted),
+                                  ),
+                                );
+                              }
+
+                              return ListView.separated(
+                                padding: const EdgeInsets.all(16),
+                                itemCount: dialogue.length,
+                                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                                itemBuilder: (context, idx) {
+                                  final line = dialogue[idx] as Map<String, dynamic>;
+                                  final speaker = line['speaker']?.toString() ?? 'A';
+                                  final isA = speaker == 'A';
+                                  final textEn = line['en']?.toString() ?? '';
+                                  final textVi = line['vi']?.toString() ?? '';
+
+                                  return Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 14,
+                                        backgroundColor: isA ? VocarioTokens.brand : VocarioTokens.goldAccent,
+                                        child: Text(
+                                          speaker,
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                            color: isA ? Colors.white : VocarioTokens.ink,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: Container(
+                                          padding: const EdgeInsets.all(12),
+                                          decoration: BoxDecoration(
+                                            color: isA ? VocarioTokens.field : const Color(0xFFFEF3C7).withValues(alpha: 0.4),
+                                            borderRadius: BorderRadius.circular(10),
+                                            border: Border.all(
+                                              color: isA ? VocarioTokens.border : const Color(0xFFFDE68A),
+                                            ),
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      textEn,
+                                                      style: const TextStyle(
+                                                        fontSize: 13,
+                                                        fontWeight: FontWeight.w600,
+                                                        color: VocarioTokens.ink,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  InkWell(
+                                                    onTap: () => speakTextBrowser(textEn),
+                                                    child: const Icon(Icons.volume_up_rounded, size: 16, color: VocarioTokens.brand),
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                textVi,
+                                                style: TextStyle(fontSize: 11, color: VocarioTokens.muted),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  /// Mở Modal Đố Vui Trắc Nghiệm AI sinh tự động từ các từ vựng trong ảnh
+  Future<void> _openAiQuizModal() async {
+    if (_selectedAlbum == null) return;
+    final words = _selectedAlbum!['words'] as List<Map<String, dynamic>>;
+    if (words.isEmpty) {
+      _showToast('Không có từ vựng nào để tạo đề thi trắc nghiệm.');
+      return;
+    }
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setQuizState) {
+            return FutureBuilder<Map<String, dynamic>>(
+              future: _apiService.generateAiQuiz(
+                words: words.map((w) => {
+                  'word': w['word'],
+                  'name': w['word'],
+                  'vietnamese': w['vietnamese'] ?? '',
+                  'level': w['level'] ?? 'A2',
+                }).toList(),
+                theme: _selectedAlbum!['title'] ?? 'Bối cảnh đời thực',
+                targetLevel: 'A2',
+                numQuestions: 5,
+              ),
+              builder: (context, snapshot) {
+                return Container(
+                  height: MediaQuery.of(context).size.height * 0.8,
+                  decoration: const BoxDecoration(
+                    color: VocarioTokens.surface,
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                        decoration: const BoxDecoration(
+                          border: Border(bottom: BorderSide(color: VocarioTokens.border)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.quiz_outlined, size: 20, color: VocarioTokens.brand),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'TRẮC NGHIỆM TƯƠNG TÁC AI',
+                                  style: VocarioTokens.monoSmall.copyWith(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: VocarioTokens.brand,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.close_rounded, size: 20),
+                              onPressed: () => Navigator.pop(ctx),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: snapshot.connectionState == ConnectionState.waiting
+                            ? Center(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const CircularProgressIndicator(color: VocarioTokens.brand, strokeWidth: 2),
+                                    const SizedBox(height: 14),
+                                    Text(
+                                      'Groq LLM đang sinh đề thi 4 lựa chọn chuẩn CEFR...',
+                                      style: TextStyle(fontSize: 12, color: VocarioTokens.muted),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : Builder(
+                                builder: (_) {
+                                  final data = snapshot.data;
+                                  final questions = data?['questions'] as List<dynamic>? ?? [];
+                                  if (questions.isEmpty) {
+                                    return Center(
+                                      child: Text(
+                                        'Không thể tạo đề trắc nghiệm lúc này. Hãy thử lại!',
+                                        style: TextStyle(fontSize: 12, color: VocarioTokens.muted),
+                                      ),
+                                    );
+                                  }
+
+                                  return ListView.separated(
+                                    padding: const EdgeInsets.all(16),
+                                    itemCount: questions.length,
+                                    separatorBuilder: (_, __) => const SizedBox(height: 18),
+                                    itemBuilder: (context, qIdx) {
+                                      final q = questions[qIdx] as Map<String, dynamic>;
+                                      final questionText = q['question'] ?? q['prompt'] ?? 'Câu hỏi ${qIdx + 1}';
+                                      final options = (q['options'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [];
+                                      final correctIdx = (q['correctIndex'] as num?)?.toInt() ?? 0;
+                                      final explanation = q['explanation']?.toString() ?? '';
+
+                                      return Container(
+                                        padding: const EdgeInsets.all(14),
+                                        decoration: BoxDecoration(
+                                          color: VocarioTokens.field,
+                                          borderRadius: BorderRadius.circular(12),
+                                          border: Border.all(color: VocarioTokens.border),
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                  decoration: BoxDecoration(
+                                                    color: VocarioTokens.brand,
+                                                    borderRadius: BorderRadius.circular(4),
+                                                  ),
+                                                  child: Text(
+                                                    'Câu ${qIdx + 1}',
+                                                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Expanded(
+                                                  child: Text(
+                                                    questionText,
+                                                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: VocarioTokens.ink),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 10),
+                                            ...List.generate(options.length, (optIdx) {
+                                              final isCorrect = optIdx == correctIdx;
+                                              return Container(
+                                                margin: const EdgeInsets.only(bottom: 6),
+                                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                                decoration: BoxDecoration(
+                                                  color: isCorrect ? const Color(0xFFF0FDF4) : Colors.white,
+                                                  borderRadius: BorderRadius.circular(6),
+                                                  border: Border.all(
+                                                    color: isCorrect ? const Color(0xFF86EFAC) : VocarioTokens.border,
+                                                  ),
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    Text(
+                                                      '${String.fromCharCode(65 + optIdx)}.',
+                                                      style: TextStyle(
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 11,
+                                                        color: isCorrect ? const Color(0xFF15803D) : VocarioTokens.ink,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                    Expanded(
+                                                      child: Text(
+                                                        options[optIdx],
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                          color: isCorrect ? const Color(0xFF15803D) : VocarioTokens.ink,
+                                                          fontWeight: isCorrect ? FontWeight.bold : FontWeight.normal,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    if (isCorrect)
+                                                      const Icon(Icons.check_circle_rounded, size: 16, color: Color(0xFF16A34A)),
+                                                  ],
+                                                ),
+                                              );
+                                            }),
+                                            if (explanation.isNotEmpty) ...[
+                                              const SizedBox(height: 6),
+                                              Text(
+                                                '💡 Giải thích: $explanation',
+                                                style: const TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: Color(0xFFB45309)),
+                                              ),
+                                            ],
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
+    );
   }
 
   Future<void> _executeDeleteAlbum() async {
@@ -251,19 +666,11 @@ class _CollectionScreenState extends State<CollectionScreen> {
   }
 
   void _showToast(String message) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          message,
-          style: VocarioTokens.sansBody.copyWith(fontSize: 12, color: Colors.white),
-        ),
-        backgroundColor: VocarioTokens.ink,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        duration: const Duration(seconds: 3),
-      ),
-    );
+    _toastTimer?.cancel();
+    if (mounted) setState(() => _toastMessage = message);
+    _toastTimer = Timer(const Duration(milliseconds: 3200), () {
+      if (mounted) setState(() => _toastMessage = null);
+    });
   }
 
   @override
@@ -274,74 +681,386 @@ class _CollectionScreenState extends State<CollectionScreen> {
 
     return Scaffold(
       backgroundColor: VocarioTokens.canvas,
-      appBar: AppBar(
-        backgroundColor: VocarioTokens.surface,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        title: Text(
-          'Bộ Sưu Tập Bối Cảnh',
-          style: VocarioTokens.serifHeadline.copyWith(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: [
-          IconButton(
-            tooltip: 'Luyện tập Quiz nhanh',
-            icon: const Icon(Icons.sports_kabaddi_outlined, color: VocarioTokens.brand),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const ArenaScreen()),
+      body: SafeArea(
+        bottom: false,
+        child: Stack(
+          children: [
+            Column(
+              children: [
+                _buildTopAppBar(),
+                Expanded(
+                  child: _isLoading
+                      ? const Center(
+                          child: CircularProgressIndicator(color: VocarioTokens.brand),
+                        )
+                      : _allAlbums.isEmpty
+                          ? _buildEmptyState()
+                          : RefreshIndicator(
+                              color: VocarioTokens.brand,
+                              onRefresh: _fetchCaptures,
+                              child: SingleChildScrollView(
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // 1. ARCHIVE STATS HEADER
+                                    _buildArchiveHeader(),
+                                    const SizedBox(height: 16),
+
+                                    // 2. SEARCH & FILTER CHIPS
+                                    _buildSearchAndFilters(),
+                                    const SizedBox(height: 16),
+
+                                    // 3. MASTER SHELF (HORIZONTAL ALBUM STRIP)
+                                    _buildMasterShelf(),
+                                    const SizedBox(height: 20),
+
+                                    // 4. SELECTED SCENE DETAIL PANE
+                                    if (_selectedAlbum != null) ...[
+                                      _buildSelectedSceneHeader(),
+                                      const SizedBox(height: 12),
+                                      _buildVisualViewportWithBoxes(),
+                                      const SizedBox(height: 16),
+                                      _buildVocabularySection(),
+                                      const SizedBox(height: 20),
+                                      _buildActionBottomBar(allWordsSaved),
+                                      const SizedBox(height: 28),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                            ),
+                ),
+                _buildDockedBottomNav(),
+              ],
             ),
-          ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(color: VocarioTokens.border, height: 1),
+            // Floating Toast Notification chuẩn Scandinavian Editorial
+            if (_toastMessage != null) _buildFloatingToast(),
+          ],
         ),
       ),
-      body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: VocarioTokens.brand),
-            )
-          : _allAlbums.isEmpty
-              ? _buildEmptyState()
-              : RefreshIndicator(
-                  color: VocarioTokens.brand,
-                  onRefresh: _fetchCaptures,
-                  child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // 1. ARCHIVE STATS HEADER
-                        _buildArchiveHeader(),
-                        const SizedBox(height: 16),
+    );
+  }
 
-                        // 2. SEARCH & FILTER CHIPS
-                        _buildSearchAndFilters(),
-                        const SizedBox(height: 16),
-
-                        // 3. MASTER SHELF (HORIZONTAL ALBUM STRIP)
-                        _buildMasterShelf(),
-                        const SizedBox(height: 20),
-
-                        // 4. SELECTED SCENE DETAIL PANE
-                        if (_selectedAlbum != null) ...[
-                          _buildSelectedSceneHeader(),
-                          const SizedBox(height: 12),
-                          _buildVisualViewportWithBoxes(),
-                          const SizedBox(height: 16),
-                          _buildVocabularySection(),
-                          const SizedBox(height: 20),
-                          _buildActionBottomBar(allWordsSaved),
-                          const SizedBox(height: 36),
+  // ==========================================================================
+  // TOP APP BAR & EDITORIAL SEGMENTED SWITCHER (Khớp 100% Sổ từ vựng & Trang chủ)
+  // ==========================================================================
+  Widget _buildTopAppBar() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  InkWell(
+                    onTap: () => Navigator.maybePop(context),
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      width: 34,
+                      height: 34,
+                      decoration: BoxDecoration(
+                        color: VocarioTokens.surface,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: VocarioTokens.border),
+                      ),
+                      child: const Icon(Icons.arrow_back_ios_new_rounded, size: 13, color: VocarioTokens.ink),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    'Bộ sưu tập bối cảnh',
+                    style: VocarioTokens.serifHeadline.copyWith(fontSize: 19),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  InkWell(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const ArenaScreen()),
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: VocarioTokens.surface,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: VocarioTokens.border),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.emoji_events_outlined, size: 13, color: VocarioTokens.amber),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Đấu trường',
+                            style: VocarioTokens.sansLabel.copyWith(
+                              fontSize: 10,
+                              color: VocarioTokens.brand,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: VocarioTokens.field,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: VocarioTokens.border),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.auto_awesome, size: 13, color: VocarioTokens.brand),
+                        const SizedBox(width: 4),
+                        Text(
+                          'YOLO-World v2',
+                          style: VocarioTokens.monoSmall.copyWith(fontSize: 9, color: VocarioTokens.brand),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Editorial Segmented Switcher đồng bộ 3 tab Sổ từ - Flashcard - Bộ sưu tập
+          Container(
+            height: 40,
+            padding: const EdgeInsets.all(2.5),
+            decoration: BoxDecoration(
+              color: VocarioTokens.field,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: VocarioTokens.border),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: InkWell(
+                    onTap: () => Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => const WordbookScreen(initialTabIndex: 0)),
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Sổ từ vựng',
+                        style: VocarioTokens.sansLabel.copyWith(
+                          fontSize: 11,
+                          color: VocarioTokens.muted,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: InkWell(
+                    onTap: () => Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => const WordbookScreen(initialTabIndex: 1)),
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Luyện Flashcard',
+                        style: VocarioTokens.sansLabel.copyWith(
+                          fontSize: 11,
+                          color: VocarioTokens.muted,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    height: 35,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: VocarioTokens.surface,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 4,
+                          offset: const Offset(0, 1.5),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.photo_library_outlined, size: 12, color: VocarioTokens.brand),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Bộ sưu tập (${_allAlbums.length})',
+                          style: VocarioTokens.sansLabel.copyWith(
+                            fontSize: 11,
+                            color: VocarioTokens.brand,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ],
                     ),
                   ),
                 ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ==========================================================================
+  // DOCKED BOTTOM NAVIGATION BAR (Khớp 100% Trang chủ, Sổ từ & Hồ sơ)
+  // ==========================================================================
+  Widget _buildDockedBottomNav() {
+    final navItems = [
+      {'label': 'Trang chủ', 'icon': Icons.home_rounded},
+      {'label': 'Thu nạp AI', 'icon': Icons.camera_alt_outlined},
+      {'label': 'Sổ từ vựng', 'icon': Icons.book_rounded},
+      {'label': 'Đấu trường', 'icon': Icons.emoji_events_outlined},
+      {'label': 'Hồ sơ', 'icon': Icons.person_outline_rounded},
+    ];
+
+    return Container(
+      height: 72,
+      decoration: BoxDecoration(
+        color: VocarioTokens.surface.withValues(alpha: 0.98),
+        border: const Border(top: BorderSide(color: VocarioTokens.border, width: 1)),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: navItems.map((item) {
+              final label = item['label'] as String;
+              final icon = item['icon'] as IconData;
+              final isActive = label == 'Sổ từ vựng';
+
+              return Expanded(
+                child: InkWell(
+                  onTap: () {
+                    if (label == 'Trang chủ') {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (_) => const HomeScreen()),
+                        (route) => false,
+                      );
+                    } else if (label == 'Thu nạp AI') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const ScannerScreen()),
+                      );
+                    } else if (label == 'Sổ từ vựng') {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (_) => const WordbookScreen(initialTabIndex: 0)),
+                      );
+                    } else if (label == 'Đấu trường') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const ArenaScreen()),
+                      );
+                    } else if (label == 'Hồ sơ') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                      );
+                    }
+                  },
+                  child: SizedBox(
+                    height: 58,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          icon,
+                          size: 20,
+                          color: isActive ? VocarioTokens.brand : VocarioTokens.muted,
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          label,
+                          style: TextStyle(
+                            fontSize: 8,
+                            fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+                            color: isActive ? VocarioTokens.brand : VocarioTokens.muted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+          Container(
+            width: 120,
+            height: 3,
+            decoration: BoxDecoration(
+              color: VocarioTokens.ink.withValues(alpha: 0.75),
+              borderRadius: BorderRadius.circular(999),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ==========================================================================
+  // FLOATING TOAST NOTIFICATION
+  // ==========================================================================
+  Widget _buildFloatingToast() {
+    return Positioned(
+      top: 12,
+      left: 18,
+      right: 18,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: VocarioTokens.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: VocarioTokens.border),
+          boxShadow: VocarioTokens.toastShadow,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                color: VocarioTokens.brand.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.check, size: 13, color: VocarioTokens.brand),
+            ),
+            const SizedBox(width: 9),
+            Expanded(
+              child: Text(
+                _toastMessage!,
+                style: const TextStyle(fontSize: 10.5, color: VocarioTokens.ink, height: 1.4),
+              ),
+            ),
+            GestureDetector(
+              onTap: () => setState(() => _toastMessage = null),
+              child: const Icon(Icons.close, size: 15, color: VocarioTokens.muted),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -579,27 +1298,51 @@ class _CollectionScreenState extends State<CollectionScreen> {
                             fit: StackFit.expand,
                             children: [
                               _buildThumbnailImage(album['imageUrl']),
-                              // Nút xóa bối cảnh góc trên phải
+                              // Badge phân biệt bối cảnh mẫu vs ảnh thật người dùng
                               Positioned(
                                 top: 4,
-                                right: 4,
-                                child: InkWell(
-                                  onTap: () => _confirmDeleteAlbum(album),
-                                  borderRadius: BorderRadius.circular(4),
-                                  child: Container(
-                                    padding: const EdgeInsets.all(4),
-                                    decoration: BoxDecoration(
-                                      color: Colors.black.withValues(alpha: 0.55),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: const Icon(
-                                      Icons.delete_outline,
-                                      size: 13,
-                                      color: Colors.white,
+                                left: 4,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: (album['isPreset'] == true)
+                                        ? Colors.black.withValues(alpha: 0.6)
+                                        : VocarioTokens.goldAccent,
+                                    borderRadius: BorderRadius.circular(3),
+                                  ),
+                                  child: Text(
+                                    (album['isPreset'] == true) ? 'BỐI CẢNH MẪU' : 'ẢNH CỦA BẠN',
+                                    style: TextStyle(
+                                      fontSize: 7.5,
+                                      fontWeight: FontWeight.bold,
+                                      color: (album['isPreset'] == true) ? Colors.white : VocarioTokens.ink,
+                                      letterSpacing: 0.4,
                                     ),
                                   ),
                                 ),
                               ),
+                              // Nút xóa bối cảnh góc trên phải (chỉ cho ảnh người dùng)
+                              if (album['isPreset'] != true)
+                                Positioned(
+                                  top: 4,
+                                  right: 4,
+                                  child: InkWell(
+                                    onTap: () => _confirmDeleteAlbum(album),
+                                    borderRadius: BorderRadius.circular(4),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(4),
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withValues(alpha: 0.55),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: const Icon(
+                                        Icons.delete_outline,
+                                        size: 13,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                             ],
                           ),
                         ),
@@ -715,101 +1458,108 @@ class _CollectionScreenState extends State<CollectionScreen> {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            _buildThumbnailImage(imageUrl),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final viewportW = constraints.maxWidth;
+            final viewportH = constraints.maxHeight;
 
-            // L-Brackets 4 góc quang học Leica
-            Positioned(
-              top: 10,
-              left: 10,
-              child: Container(
-                width: 14,
-                height: 14,
-                decoration: const BoxDecoration(
-                  border: Border(
-                    top: BorderSide(color: Colors.white70, width: 2),
-                    left: BorderSide(color: Colors.white70, width: 2),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 10,
-              right: 10,
-              child: Container(
-                width: 14,
-                height: 14,
-                decoration: const BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: Colors.white70, width: 2),
-                    right: BorderSide(color: Colors.white70, width: 2),
-                  ),
-                ),
-              ),
-            ),
+            return Stack(
+              fit: StackFit.expand,
+              children: [
+                _buildThumbnailImage(imageUrl),
 
-            // Các Bounding Box tương tác
-            ...words.map((w) {
-              final word = w['word'] as String;
-              final isHighlighted = _highlightedWord == word;
-              final top = (w['topPercent'] as num).toDouble();
-              final left = (w['leftPercent'] as num).toDouble();
-              final width = (w['widthPercent'] as num).toDouble();
-              final height = (w['heightPercent'] as num).toDouble();
-
-              return Positioned(
-                top: (top / 100) * 230,
-                left: (left / 100) * 360,
-                width: (width / 100) * 360,
-                height: (height / 100) * 230,
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _highlightedWord = isHighlighted ? null : word;
-                      if (!isHighlighted) {
-                        _expandedWords.add(word);
-                      }
-                    });
-                  },
+                // L-Brackets 4 góc quang học Leica
+                Positioned(
+                  top: 10,
+                  left: 10,
                   child: Container(
-                    decoration: BoxDecoration(
-                      color: isHighlighted
-                          ? VocarioTokens.goldAccent.withValues(alpha: 0.25)
-                          : Colors.black.withValues(alpha: 0.1),
-                      border: Border.all(
-                        color: isHighlighted ? VocarioTokens.goldAccent : Colors.white70,
-                        width: isHighlighted ? 2.0 : 1.2,
-                      ),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Align(
-                      alignment: Alignment.topLeft,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: isHighlighted ? VocarioTokens.goldAccent : Colors.black87,
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(3),
-                            bottomRight: Radius.circular(4),
-                          ),
-                        ),
-                        child: Text(
-                          word,
-                          style: VocarioTokens.sansLabel.copyWith(
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.bold,
-                            color: isHighlighted ? VocarioTokens.ink : Colors.white,
-                          ),
-                        ),
+                    width: 14,
+                    height: 14,
+                    decoration: const BoxDecoration(
+                      border: Border(
+                        top: BorderSide(color: Colors.white70, width: 2),
+                        left: BorderSide(color: Colors.white70, width: 2),
                       ),
                     ),
                   ),
                 ),
-              );
-            }),
-          ],
+                Positioned(
+                  bottom: 10,
+                  right: 10,
+                  child: Container(
+                    width: 14,
+                    height: 14,
+                    decoration: const BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(color: Colors.white70, width: 2),
+                        right: BorderSide(color: Colors.white70, width: 2),
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Các Bounding Box tương tác
+                ...words.map((w) {
+                  final word = w['word'] as String;
+                  final isHighlighted = _highlightedWord == word;
+                  final top = (w['topPercent'] as num).toDouble();
+                  final left = (w['leftPercent'] as num).toDouble();
+                  final width = (w['widthPercent'] as num).toDouble();
+                  final height = (w['heightPercent'] as num).toDouble();
+
+                  return Positioned(
+                    top: (top / 100.0) * viewportH,
+                    left: (left / 100.0) * viewportW,
+                    width: (width / 100.0) * viewportW,
+                    height: (height / 100.0) * viewportH,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _highlightedWord = isHighlighted ? null : word;
+                          if (!isHighlighted) {
+                            _expandedWords.add(word);
+                          }
+                        });
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: isHighlighted
+                              ? VocarioTokens.goldAccent.withValues(alpha: 0.25)
+                              : Colors.black.withValues(alpha: 0.1),
+                          border: Border.all(
+                            color: isHighlighted ? VocarioTokens.goldAccent : Colors.white70,
+                            width: isHighlighted ? 2.0 : 1.2,
+                          ),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: isHighlighted ? VocarioTokens.goldAccent : Colors.black87,
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(3),
+                                bottomRight: Radius.circular(4),
+                              ),
+                            ),
+                            child: Text(
+                              word,
+                              style: VocarioTokens.sansLabel.copyWith(
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.bold,
+                                color: isHighlighted ? VocarioTokens.ink : Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -1006,7 +1756,38 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                     color: VocarioTokens.brand,
                                   ),
                                 ),
-                                onPressed: () => _showToast('Đang phát âm "$word"...'),
+                                onPressed: () {
+                                  speakTextBrowser(word);
+                                  _showToast('Đang phát âm: $word');
+                                },
+                              ),
+                              const SizedBox(width: 6),
+                              OutlinedButton.icon(
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  side: const BorderSide(color: Color(0xFFC7D2FE)),
+                                  backgroundColor: const Color(0xFFEEF2FF),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                ),
+                                icon: const Icon(Icons.mic_outlined, size: 13, color: Color(0xFF4338CA)),
+                                label: Text(
+                                  'Luyện nói AI',
+                                  style: VocarioTokens.sansLabel.copyWith(
+                                    fontSize: 10,
+                                    color: const Color(0xFF4338CA),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                onPressed: () {
+                                  SpeechScorerModal.show(
+                                    context,
+                                    word: word,
+                                    ipa: w['ipa'] ?? '',
+                                    vietnamese: w['vietnamese'] ?? '',
+                                    progressId: w['progressId']?.toString(),
+                                    contextTitle: _selectedAlbum?['sceneTheme'] ?? _selectedAlbum?['title'],
+                                  );
+                                },
                               ),
                               const Spacer(),
                               if (!isSaved)
@@ -1147,12 +1928,48 @@ class _CollectionScreenState extends State<CollectionScreen> {
             ),
           ),
         ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: VocarioTokens.brand,
+                  side: const BorderSide(color: VocarioTokens.brand),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                ),
+                icon: const Icon(Icons.forum_outlined, size: 16),
+                label: const Text('Hội thoại AI', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                onPressed: _openAiDialogueModal,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFFB45309),
+                  side: const BorderSide(color: Color(0xFFD97706)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                ),
+                icon: const Icon(Icons.quiz_outlined, size: 16),
+                label: const Text('Đố vui AI', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                onPressed: _openAiQuizModal,
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }
 
   // 8. Hộp thoại xác nhận xóa bối cảnh (Modal)
   void _confirmDeleteAlbum(Map<String, dynamic> album) {
+    if (album['isPreset'] == true) {
+      _showToast('Đây là bối cảnh mẫu đời thực của Vocario, không thể xóa.');
+      return;
+    }
     setState(() => _albumToDelete = album);
 
     showDialog(
@@ -1273,11 +2090,19 @@ class _CollectionScreenState extends State<CollectionScreen> {
 
   // Helper hiển thị ảnh an toàn (Base64 data url hoặc network hoặc placeholder)
   Widget _buildThumbnailImage(String? url) {
-    if (url != null && url.startsWith('data:image')) {
+    if (url == null || url.trim().isEmpty) {
+      return _buildPlaceholderImage();
+    }
+    String processedUrl = url.trim();
+    if (processedUrl.startsWith('/')) {
+      processedUrl = '${ApiService.defaultBaseUrl}$processedUrl';
+    }
+
+    if (processedUrl.startsWith('data:image')) {
       try {
-        final commaIdx = url.indexOf(',');
+        final commaIdx = processedUrl.indexOf(',');
         if (commaIdx != -1) {
-          final b64 = url.substring(commaIdx + 1);
+          final b64 = processedUrl.substring(commaIdx + 1);
           final bytes = base64Decode(b64);
           return Image.memory(
             bytes,
@@ -1286,9 +2111,9 @@ class _CollectionScreenState extends State<CollectionScreen> {
           );
         }
       } catch (_) {}
-    } else if (url != null && url.startsWith('http')) {
+    } else if (processedUrl.startsWith('http')) {
       return Image.network(
-        url,
+        processedUrl,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) => _buildPlaceholderImage(),
       );

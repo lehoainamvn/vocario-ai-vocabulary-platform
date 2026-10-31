@@ -125,20 +125,9 @@ interface ClickFeedback {
               </a>
             </div>
 
-            <!-- Filter tabs & Action -->
+            <!-- Filter tabs & Action (Chỉ giữ 2 mục: Đấu trường hệ thống và Ảnh của bạn) -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1 border-b border-[#E5DED3]">
               <div class="flex items-center gap-5">
-                <button 
-                  type="button"
-                  (click)="stageFilter.set('ALL'); currentStagePage.set(1)"
-                  [class.text-[#29251F]]="stageFilter() === 'ALL'"
-                  [class.font-semibold]="stageFilter() === 'ALL'"
-                  [class.border-[#7D6853]]="stageFilter() === 'ALL'"
-                  [class.text-[#746B60]]="stageFilter() !== 'ALL'"
-                  class="pb-2.5 text-xs border-b-2 border-transparent transition-all cursor-pointer hover:text-[#29251F] bg-transparent border-0"
-                >
-                  Tất cả {{ allStages().length }}
-                </button>
                 <button 
                   type="button"
                   (click)="stageFilter.set('ADMIN'); currentStagePage.set(1)"
@@ -224,16 +213,6 @@ interface ClickFeedback {
                     CHÍNH THỨC
                   </span>
 
-                  <!-- Floating Leaderboard Badge on Image (Bottom-Right) -->
-                  <button 
-                    type="button"
-                    (click)="openStageLeaderboard(stage, $event)"
-                    class="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-[3px] bg-stone-900/85 hover:bg-[#7D6853] text-white font-mono text-[10px] font-semibold flex items-center gap-1.5 shadow-md transition-all cursor-pointer backdrop-blur-xs border border-white/20 z-10 hover:scale-105 active:scale-95"
-                    title="Xem Bảng Xếp Hạng riêng của đấu trường này"
-                  >
-                    <app-icon name="crown" [size]="11" svgClass="text-amber-400"></app-icon>
-                    <span>BXH Phòng</span>
-                  </button>
                 </div>
 
                 <!-- Content below -->
@@ -248,8 +227,9 @@ interface ClickFeedback {
                     {{ getWordsList(stage) }}
                   </p>
 
-                  <!-- Mini Speedrun Leaderboard Snapshot on Card -->
-                  <div class="flex items-center justify-between bg-[#FAF8F5] border border-[#E5DED3] rounded px-3 py-1.5 text-[11px] mt-2 shadow-2xs">
+                  <!-- DUY NHẤT 1 CHỖ HIỂN THỊ KỶ LỤC / NÚT BXH TRÊN THẺ -->
+                  <!-- A. Với Đấu trường hệ thống: Hiển thị kỷ lục phòng + Nút Xem BXH -->
+                  <div *ngIf="stage.isOfficial" class="flex items-center justify-between bg-[#FAF8F5] border border-[#E5DED3] rounded px-3 py-1.5 text-[11px] mt-2 shadow-2xs">
                     <div class="flex items-center gap-1.5 truncate">
                       <app-icon name="crown" [size]="12" svgClass="text-amber-600 shrink-0"></app-icon>
                       <span class="text-[#7D6853] font-semibold shrink-0">Kỷ lục:</span>
@@ -268,16 +248,23 @@ interface ClickFeedback {
                     </button>
                   </div>
 
+                  <!-- B. Với Ảnh cá nhân: Chỉ ghi nhận thời gian cá nhân (không có xếp hạng đua top) -->
+                  <div *ngIf="!stage.isOfficial" class="flex items-center justify-between bg-[#FAF8F5] border border-[#E5DED3] rounded px-3 py-1.5 text-[11px] mt-2 shadow-2xs">
+                    <div class="flex items-center gap-1.5 truncate">
+                      <app-icon name="clock" [size]="12" svgClass="text-[#7D6853] shrink-0"></app-icon>
+                      <span class="text-[#7D6853] font-semibold shrink-0">Kỷ lục của bạn:</span>
+                      <span class="text-[#746B60] truncate font-medium">
+                        {{ arenaLeaderboard.getStageSummary(stage.id).userBestTimeMs ? arenaLeaderboard.formatTime(arenaLeaderboard.getStageSummary(stage.id).userBestTimeMs) : 'Chưa có thành tích' }}
+                      </span>
+                    </div>
+                    <span class="text-[10px] text-[#A89E91] font-mono shrink-0">Cá nhân</span>
+                  </div>
+
+                  <!-- Footer Thẻ: Chỉ hiển thị nhãn trạng thái và nút Vào thi đấu -->
                   <div class="flex items-center justify-between text-xs pt-3 mt-1 border-t border-[#E5DED3]">
-                    <button 
-                      type="button"
-                      (click)="openStageLeaderboard(stage, $event)"
-                      class="text-[11px] font-bold text-[#7D6853] hover:text-[#29251F] flex items-center gap-1.5 cursor-pointer transition-colors hover:underline p-0 bg-transparent border-0"
-                      title="Mở Bảng Xếp Hạng Speedrun của đấu trường này"
-                    >
-                      <app-icon name="crown" [size]="11" svgClass="text-amber-600"></app-icon>
-                      <span>Top 10 phản xạ</span>
-                    </button>
+                    <span class="text-[11px] text-[#746B60] font-mono truncate">
+                      {{ stage.id === activeAdminStage().id ? 'Đấu trường tiêu điểm tuần' : (stage.isOfficial ? 'Đấu trường chuẩn hóa' : 'Luyện phản xạ ảnh cá nhân') }}
+                    </span>
                     <div class="flex items-center gap-1 font-semibold text-[#29251F] group-hover:text-[#7D6853] transition-colors">
                       <span>Vào thi đấu</span>
                       <app-icon name="arrow-right" [size]="12" svgClass="group-hover:translate-x-1 transition-transform"></app-icon>
@@ -757,14 +744,19 @@ interface ClickFeedback {
                   <strong class="font-serif text-lg text-[#29251F]">
                     {{ lastRunResult()?.isNewPB ? 'Kỷ Lục Cá Nhân Mới (PB)!' : 'Đã Ghi Nhận Thành Tích Phản Xạ!' }}
                   </strong>
-                  <span class="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                  <!-- Chỉ hiển thị thứ hạng phòng khi là Đấu trường hệ thống -->
+                  <span *ngIf="currentStage()?.isOfficial" class="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-amber-100 text-amber-900 border border-amber-300">
                     Hạng #{{ lastRunResult()?.rank }} trong phòng
+                  </span>
+                  <span *ngIf="!currentStage()?.isOfficial" class="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-[#EAE5DC] text-[#5A5046] border border-[#E5DED3]">
+                    Bối cảnh cá nhân
                   </span>
                 </div>
                 <p class="text-xs text-[#746B60] m-0 mt-1">
                   Thời gian: <strong class="text-[#29251F] font-mono text-sm">{{ arenaLeaderboard.formatTime(lastRunResult()?.record?.completionTimeMs) }}</strong>
                   <span class="text-[11px] text-[#A89E91] ml-1">(Thuần túy {{ arenaLeaderboard.formatTime(lastRunResult()?.record?.pureTimeMs) }}<span *ngIf="(lastRunResult()?.record?.penaltyMs || 0) > 0" class="text-rose-600 font-semibold"> + phạt {{ (lastRunResult()?.record?.penaltyMs || 0) / 1000 }}s do {{ lastRunResult()?.record?.mistakeCount }} lỗi</span>)</span>
-                  · Nhanh hơn <strong>{{ lastRunResult()?.betterThanPercent }}%</strong> bạn học khác!
+                  <span *ngIf="currentStage()?.isOfficial"> · Nhanh hơn <strong>{{ lastRunResult()?.betterThanPercent }}%</strong> bạn học khác!</span>
+                  <span *ngIf="!currentStage()?.isOfficial"> · Đã ghi nhận kỷ lục vào hồ sơ học tập cá nhân!</span>
                 </p>
               </div>
             </div>
@@ -824,8 +816,9 @@ interface ClickFeedback {
               <span>Chơi lại bối cảnh này</span>
             </button>
 
-            <!-- DUY NHẤT 1 NÚT BXH ĐẤU TRƯỜNG PHÒNG -->
+            <!-- DUY NHẤT 1 NÚT BXH ĐẤU TRƯỜNG PHÒNG (Chỉ hiển thị khi là Đấu trường hệ thống) -->
             <button 
+              *ngIf="currentStage()?.isOfficial"
               type="button"
               (click)="openCurrentStageLeaderboard()"
               class="h-[43px] px-5 rounded-[10px] bg-amber-50 border border-amber-300 hover:bg-amber-100 text-amber-900 font-semibold text-xs flex items-center gap-2 cursor-pointer transition-colors shadow-2xs"
@@ -1181,18 +1174,15 @@ export class UserQuizComponent implements OnInit, OnDestroy {
   userStages = this.quizStageService.userStages;
   allStages = this.quizStageService.allPlayableStages;
 
-  // Bộ lọc: 'ALL' | 'ADMIN' | 'USER'
-  stageFilter = signal<'ALL' | 'ADMIN' | 'USER'>('ALL');
+  // Bộ lọc: 'ADMIN' | 'USER' (Mặc định: 'ADMIN' - Đấu trường hệ thống)
+  stageFilter = signal<'ADMIN' | 'USER'>('ADMIN');
 
   filteredStages = computed<QuizStage[]>(() => {
     const filter = this.stageFilter();
-    if (filter === 'ADMIN') {
-      return this.publishedAdminStages();
-    }
     if (filter === 'USER') {
       return this.userStages();
     }
-    return this.allStages();
+    return this.publishedAdminStages();
   });
 
   getWordsList(stage: QuizStage): string {

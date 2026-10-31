@@ -164,6 +164,7 @@ class _ClassroomScreenState extends State<ClassroomScreen> {
     final created = await _apiService.createClassroom(
       name: name,
       description: _createDescController.text.trim(),
+      level: _createTargetLevel,
       targetLevel: _createTargetLevel,
       words: sampleWords,
     );

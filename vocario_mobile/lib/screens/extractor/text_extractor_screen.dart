@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/tokens.dart';
 import '../../core/services/api_service.dart';
+import '../../core/utils/image_picker_helper.dart';
 import '../classroom/classroom_screen.dart';
+import '../scanner/scanner_screen.dart';
 
 class TextExtractorScreen extends StatefulWidget {
   const TextExtractorScreen({super.key});
@@ -18,6 +20,7 @@ class _TextExtractorScreenState extends State<TextExtractorScreen> {
   int _targetCount = 8;
   String _targetLevel = 'B2';
   bool _isExtracting = false;
+  bool _isUploadingFile = false;
   String _loadingStep = '';
 
   // Danh sách từ vựng trích xuất
@@ -39,7 +42,6 @@ class _TextExtractorScreenState extends State<TextExtractorScreen> {
   @override
   void initState() {
     super.initState();
-    _loadPreset('turtle');
   }
 
   @override
@@ -70,6 +72,34 @@ class _TextExtractorScreenState extends State<TextExtractorScreen> {
     });
   }
 
+  Future<void> _pickAndParseDocument() async {
+    setState(() => _isUploadingFile = true);
+    try {
+      final doc = await pickDocumentFromDevice();
+      if (doc != null) {
+        _showToast('Đang đọc nội dung tệp "${doc.name}"...');
+        final res = await _apiService.parseDocumentFile(
+          fileBytes: doc.bytes,
+          filename: doc.name,
+        );
+
+        if (res['success'] == true && res['text'] != null && (res['text'] as String).trim().isNotEmpty) {
+          setState(() {
+            _textController.text = res['text'] as String;
+          });
+          _showToast('Đã nạp văn bản từ "${doc.name}" (${res['wordCount']} từ). Bắt đầu phân tích AI...');
+          await _extractVocabulary();
+        } else {
+          _showToast('Không thể đọc văn bản: ${res['error'] ?? "Tệp không chứa văn bản"}');
+        }
+      }
+    } catch (e) {
+      _showToast('Lỗi tải tệp: $e');
+    } finally {
+      if (mounted) setState(() => _isUploadingFile = false);
+    }
+  }
+
   Future<void> _extractVocabulary() async {
     final text = _textController.text.trim();
     if (text.length < 15) {
@@ -95,197 +125,45 @@ class _TextExtractorScreenState extends State<TextExtractorScreen> {
     await Future.delayed(const Duration(milliseconds: 600));
     if (!mounted) return;
 
-    // Sinh danh sách từ vựng thông minh chuẩn xác theo chủ đề
+    // 1. Gọi trực tiếp mô hình AI Groq LLM qua FastAPI Port 8001
     List<Map<String, dynamic>> results = [];
-    if (text.toLowerCase().contains('turtle') || text.toLowerCase().contains('marine')) {
-      results = [
-        {
-          'word': 'carapace',
-          'ipa': '/ˈkær.ə.peɪs/',
-          'vietnamese': 'mai rùa, lớp vỏ cứng bảo vệ',
-          'level': 'C1',
-          'partOfSpeech': 'noun',
-          'exampleEn': 'They possess a streamlined carapace that facilitates rapid swimming.',
-          'selected': true,
-          'saved': false,
-        },
-        {
-          'word': 'streamlined',
-          'ipa': '/ˈstriːm.laɪnd/',
-          'vietnamese': 'có dáng thuôn mượt, giảm sức cản nước',
-          'level': 'B2',
-          'partOfSpeech': 'adjective',
-          'exampleEn': 'They possess a streamlined carapace that facilitates rapid swimming.',
-          'selected': true,
-          'saved': false,
-        },
-        {
-          'word': 'anthropogenic',
-          'ipa': '/ˌæn.θrə.pəˈdʒen.ɪk/',
-          'vietnamese': 'do con người gây ra, nguồn gốc từ nhân sinh',
-          'level': 'C1',
-          'partOfSpeech': 'adjective',
-          'exampleEn': 'Anthropogenic pressures such as coastal development severely threaten their survival.',
-          'selected': true,
-          'saved': false,
-        },
-        {
-          'word': 'geomagnetic',
-          'ipa': '/ˌdʒiː.əʊ.mæɡˈnet.ɪk/',
-          'vietnamese': 'thuộc về địa từ trường Trái Đất',
-          'level': 'C1',
-          'partOfSpeech': 'adjective',
-          'exampleEn': 'Navigate across vast oceanic distances using geomagnetic orientation.',
-          'selected': true,
-          'saved': false,
-        },
-        {
-          'word': 'bycatch',
-          'ipa': '/ˈbaɪ.kætʃ/',
-          'vietnamese': 'sản phẩm đánh bắt phụ, vô tình vướng lưới',
-          'level': 'B2',
-          'partOfSpeech': 'noun',
-          'exampleEn': 'Accidental fisheries bycatch severely threatens their survival.',
-          'selected': true,
-          'saved': false,
-        },
-        {
-          'word': 'mitigate',
-          'ipa': '/ˈmɪt.ɪ.ɡeɪt/',
-          'vietnamese': 'giảm thiểu, làm dịu bớt thiệt hại',
-          'level': 'B2',
-          'partOfSpeech': 'verb',
-          'exampleEn': 'Mandate the implementation of devices to mitigate mortality rates.',
-          'selected': true,
-          'saved': false,
-        },
-        {
-          'word': 'biodiversity',
-          'ipa': '/ˌbaɪ.əʊ.daɪˈvɜː.sə.ti/',
-          'vietnamese': 'đa dạng sinh học tự nhiên',
-          'level': 'B1',
-          'partOfSpeech': 'noun',
-          'exampleEn': 'Preserve marine biodiversity for future generations.',
-          'selected': true,
-          'saved': false,
-        },
-        {
-          'word': 'facilitate',
-          'ipa': '/fəˈsɪl.ɪ.teɪt/',
-          'vietnamese': 'tạo điều kiện thuận lợi, hỗ trợ',
-          'level': 'B2',
-          'partOfSpeech': 'verb',
-          'exampleEn': 'They possess a streamlined carapace that facilitates rapid swimming.',
-          'selected': true,
-          'saved': false,
-        },
-      ];
-    } else if (text.toLowerCase().contains('artificial intelligence') || text.toLowerCase().contains('algorithm')) {
-      results = [
-        {
-          'word': 'autonomous',
-          'ipa': '/ɔːˈtɒn.ə.məs/',
-          'vietnamese': 'tự chủ, hoạt động độc lập không cần người',
-          'level': 'B2',
-          'partOfSpeech': 'adjective',
-          'exampleEn': 'Algorithms are capable of autonomous decision making.',
-          'selected': true,
-          'saved': false,
-        },
-        {
-          'word': 'dilemma',
-          'ipa': '/dɪˈlem.ə/',
-          'vietnamese': 'thế tiến thoái lưỡng nan, nan đề đạo đức',
-          'level': 'B2',
-          'partOfSpeech': 'noun',
-          'exampleEn': 'Ethical dilemmas regarding algorithmic bias require regulatory frameworks.',
-          'selected': true,
-          'saved': false,
-        },
-        {
-          'word': 'regulatory',
-          'ipa': '/ˈreɡ.jə.lə.tər.i/',
-          'vietnamese': 'thuộc về quy chế, mang tính quản chế',
-          'level': 'C1',
-          'partOfSpeech': 'adjective',
-          'exampleEn': 'Require comprehensive regulatory frameworks and transparent oversight.',
-          'selected': true,
-          'saved': false,
-        },
-        {
-          'word': 'oversight',
-          'ipa': '/ˈəʊ.və.saɪt/',
-          'vietnamese': 'sự giám sát, thẩm quyền thanh tra',
-          'level': 'C1',
-          'partOfSpeech': 'noun',
-          'exampleEn': 'Transparent oversight is crucial for AI deployment.',
-          'selected': true,
-          'saved': false,
-        },
-        {
-          'word': 'contemporary',
-          'ipa': '/kənˈtem.pər.ər.i/',
-          'vietnamese': 'đương đại, hiện thời',
-          'level': 'B2',
-          'partOfSpeech': 'adjective',
-          'exampleEn': 'Transforming contemporary society through deep learning architectures.',
-          'selected': true,
-          'saved': false,
-        },
-        {
-          'word': 'optimize',
-          'ipa': '/ˈɒp.tɪ.maɪz/',
-          'vietnamese': 'tối ưu hóa hiệu suất',
-          'level': 'B2',
-          'partOfSpeech': 'verb',
-          'exampleEn': 'Technological efficiency optimizes economic productivity.',
-          'selected': true,
-          'saved': false,
-        },
-      ];
-    } else {
-      results = [
-        {
-          'word': 'cultivation',
-          'ipa': '/ˌkʌl.tɪˈveɪ.ʃən/',
-          'vietnamese': 'sự gieo trồng, canh tác nông nghiệp',
-          'level': 'B2',
-          'partOfSpeech': 'noun',
-          'exampleEn': 'Coffee cultivation originated in ancient Ethiopian plateaus.',
-          'selected': true,
-          'saved': false,
-        },
-        {
-          'word': 'volatile',
-          'ipa': '/ˈvɒl.ə.taɪl/',
-          'vietnamese': 'dễ bay hơi, phát tán hương thơm',
-          'level': 'C1',
-          'partOfSpeech': 'adjective',
-          'exampleEn': 'Release volatile aromatic compounds during the roasting process.',
-          'selected': true,
-          'saved': false,
-        },
-        {
-          'word': 'agroforestry',
-          'ipa': '/ˌæɡ.rəʊˈfɒr.ɪ.stri/',
-          'vietnamese': 'nông lâm kết hợp bền vững',
-          'level': 'B2',
-          'partOfSpeech': 'noun',
-          'exampleEn': 'Sustainable agriculture initiatives encourage agroforestry systems.',
-          'selected': true,
-          'saved': false,
-        },
-        {
-          'word': 'equatorial',
-          'ipa': '/ˌek.wəˈtɔː.ri.əl/',
-          'vietnamese': 'thuộc vùng xích đạo nhiệt đới',
-          'level': 'B2',
-          'partOfSpeech': 'adjective',
-          'exampleEn': 'Protect equatorial rainforest ecosystems for smallholder farmers.',
-          'selected': true,
-          'saved': false,
-        },
-      ];
+    try {
+      final aiRes = await _apiService.extractVocabFromText(
+        text: text,
+        targetCount: _targetCount,
+        targetLevel: _targetLevel,
+      );
+
+      if (aiRes['success'] == true && aiRes['words'] is List && (aiRes['words'] as List).isNotEmpty) {
+        final list = aiRes['words'] as List;
+        results = list.map<Map<String, dynamic>>((w) {
+          return {
+            'word': w['word']?.toString() ?? '',
+            'ipa': w['ipa']?.toString() ?? '/.../',
+            'vietnamese': w['vietnamese']?.toString() ?? '',
+            'level': (w['level']?.toString() ?? _targetLevel).toUpperCase(),
+            'partOfSpeech': w['partOfSpeech']?.toString() ?? 'noun',
+            'exampleEn': w['exampleEn']?.toString() ?? '',
+            'exampleVi': w['exampleVi']?.toString() ?? w['vietnamese']?.toString() ?? '',
+            'selected': true,
+            'saved': false,
+          };
+        }).toList();
+        _showToast('AI Groq đã bóc tách ${results.length} mục từ chuẩn xác từ văn bản!');
+      }
+    } catch (_) {
+      // Tiếp tục xuống fallback nếu FastAPI offline
+    }
+
+    if (results.isEmpty) {
+      if (!mounted) return;
+      setState(() {
+        _isExtracting = false;
+        _loadingStep = '';
+        _extractedWords = [];
+      });
+      _showToast('Không thể bóc tách từ vựng từ văn bản này. Vui lòng kiểm tra lại văn bản hoặc kết nối máy chủ AI.');
+      return;
     }
 
     setState(() {
@@ -390,6 +268,72 @@ class _TextExtractorScreenState extends State<TextExtractorScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Segmented Switcher giữa Quét Camera và Trích Xuất Văn Bản
+            Container(
+              height: 34,
+              margin: const EdgeInsets.only(bottom: 14),
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                color: VocarioTokens.field,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: VocarioTokens.border),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      onTap: () => Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (_) => const ScannerScreen()),
+                      ),
+                      borderRadius: BorderRadius.circular(6),
+                      child: Container(
+                        alignment: Alignment.center,
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.camera_alt_outlined, size: 13, color: VocarioTokens.muted),
+                            SizedBox(width: 5),
+                            Text(
+                              'Quét Camera AI',
+                              style: TextStyle(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w500,
+                                color: VocarioTokens.muted,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: VocarioTokens.brand,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.description_outlined, size: 13, color: Colors.white),
+                          SizedBox(width: 5),
+                          Text(
+                            'Trích Xuất Văn Bản AI',
+                            style: TextStyle(
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             // 1. EDITORIAL HEADER BANNER
             _buildHeaderBanner(),
             const SizedBox(height: 16),
@@ -479,6 +423,30 @@ class _TextExtractorScreenState extends State<TextExtractorScreen> {
                 ),
               ),
               const Spacer(),
+              InkWell(
+                onTap: _isUploadingFile ? null : _pickAndParseDocument,
+                borderRadius: BorderRadius.circular(4),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: VocarioTokens.border),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.upload_file_rounded, size: 13, color: VocarioTokens.brand),
+                      const SizedBox(width: 4),
+                      Text(
+                        _isUploadingFile ? 'Đang đọc...' : 'Tải tệp PDF/Word/Text',
+                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: VocarioTokens.brand),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
               if (_textController.text.isNotEmpty)
                 InkWell(
                   onTap: () => setState(() => _textController.clear()),
@@ -820,17 +788,23 @@ class _TextExtractorScreenState extends State<TextExtractorScreen> {
                     ],
                   ),
                 ),
-                if (isSaved)
-                  const Padding(
-                    padding: EdgeInsets.only(top: 8),
-                    child: Icon(Icons.check_circle, size: 16, color: Color(0xFF15803D)),
-                  )
-                else
-                  IconButton(
-                    tooltip: 'Nghe phát âm',
-                    icon: const Icon(Icons.volume_up_outlined, size: 18, color: VocarioTokens.brand),
-                    onPressed: () => _showToast('Đang phát âm "$word"...'),
-                  ),
+                Row(
+                  children: [
+                    if (isSaved)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 8, right: 6),
+                        child: Icon(Icons.check_circle, size: 16, color: Color(0xFF15803D)),
+                      ),
+                    IconButton(
+                      tooltip: 'Nghe phát âm',
+                      icon: const Icon(Icons.volume_up_outlined, size: 18, color: VocarioTokens.brand),
+                      onPressed: () {
+                        speakTextBrowser(word);
+                        _showToast('Đang phát âm "$word"...');
+                      },
+                    ),
+                  ],
+                ),
               ],
             ),
           );
@@ -1105,7 +1079,10 @@ class _TextExtractorScreenState extends State<TextExtractorScreen> {
             ),
             IconButton(
               icon: const Icon(Icons.volume_up, size: 16, color: VocarioTokens.brand),
-              onPressed: () => _showToast('Nghe từ: $word'),
+              onPressed: () {
+                speakTextBrowser(word);
+                _showToast('Đang phát âm: $word');
+              },
             ),
           ],
         ),

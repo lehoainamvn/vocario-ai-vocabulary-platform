@@ -14,17 +14,19 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   bool _isLoading = true;
   bool _isSaving = false;
+  bool _isClaimingCert = false;
+  bool _isLevelingUp = false;
   String? _toastMessage;
   Timer? _toastTimer;
 
   // Account Fields
   final TextEditingController _fullNameController = TextEditingController();
-  String _username = 'nam23';
-  String _email = 'nam23@gmail.com';
-  int _streakCount = 7;
+  String _username = '';
+  String _email = '';
+  int _streakCount = 0;
 
   // Learning Goals
-  String _targetLevel = 'B1';
+  String _targetLevel = 'A2';
   int _dailyGoal = 10;
 
   // Certificates list
@@ -66,14 +68,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       setState(() {
         if (user != null) {
-          _fullNameController.text = user['fullName'] ?? user['username'] ?? 'Lê Hoài Nam';
-          _username = user['username'] ?? 'nam23';
-          _email = user['email'] ?? 'nam23@gmail.com';
-          _streakCount = (user['streakCount'] as num?)?.toInt() ?? 7;
-          _targetLevel = user['targetLevel'] ?? 'B1';
+          _fullNameController.text = user['fullName'] ?? user['username'] ?? '';
+          _username = user['username'] ?? '';
+          _email = user['email'] ?? '';
+          _streakCount = (user['streakCount'] as num?)?.toInt() ?? 0;
+          _targetLevel = user['targetLevel'] ?? 'A2';
           _dailyGoal = (user['dailyGoal'] as num?)?.toInt() ?? 10;
-        } else {
-          _fullNameController.text = 'Lê Hoài Nam';
         }
 
         _certificates = certs;
@@ -82,7 +82,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } catch (_) {
       if (mounted) {
         setState(() {
-          _fullNameController.text = 'Lê Hoài Nam';
           _isLoading = false;
         });
       }
@@ -119,6 +118,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
         setState(() => _isSaving = false);
         _showToast('Đã cập nhật mục tiêu học tập!');
       }
+    }
+  }
+
+  /// Yêu cầu cấp Chứng chỉ CEFR chính thức qua `POST /api/certificates/claim`
+  Future<void> _claimCertificate() async {
+    setState(() => _isClaimingCert = true);
+    try {
+      final res = await ApiService().claimCertificate(level: _targetLevel);
+      if (res != null) {
+        _showToast('Đã nhận thành công Chứng chỉ CEFR $_targetLevel chính thức!');
+        await _loadProfileData();
+      } else {
+        _showToast('Chưa đủ 100% điều kiện nhận chứng chỉ hoặc đã nhận trước đó.');
+      }
+    } catch (e) {
+      _showToast('Lỗi nhận chứng chỉ: $e');
+    } finally {
+      if (mounted) setState(() => _isClaimingCert = false);
+    }
+  }
+
+  /// Thăng cấp trình độ học viên qua `POST /api/auth/level-up`
+  Future<void> _levelUpUser() async {
+    setState(() => _isLevelingUp = true);
+    try {
+      final res = await ApiService().levelUpUser();
+      if (res != null) {
+        final newLvl = res['targetLevel']?.toString() ?? _targetLevel;
+        setState(() => _targetLevel = newLvl);
+        _showToast('Chúc mừng! Bạn đã thăng cấp thành công lên trình độ $newLvl!');
+        await _loadProfileData();
+      } else {
+        _showToast('Chưa đạt đủ chỉ tiêu số từ để thăng cấp.');
+      }
+    } catch (e) {
+      _showToast('Lỗi thăng cấp: $e');
+    } finally {
+      if (mounted) setState(() => _isLevelingUp = false);
     }
   }
 
@@ -594,6 +631,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
               }).toList(),
             ),
           ),
+          const SizedBox(height: 14),
+          SizedBox(
+            width: double.infinity,
+            height: 38,
+            child: OutlinedButton.icon(
+              onPressed: _isLevelingUp ? null : _levelUpUser,
+              icon: _isLevelingUp
+                  ? const SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: VocarioTokens.brand),
+                    )
+                  : const Icon(Icons.trending_up_rounded, size: 16, color: VocarioTokens.brand),
+              label: Text(
+                _isLevelingUp ? 'Đang kiểm tra chỉ tiêu...' : 'Thăng cấp trình độ tiếp theo (Level Up)',
+                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: VocarioTokens.brand),
+              ),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: VocarioTokens.brand),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -652,6 +712,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 10, color: VocarioTokens.muted, height: 1.35),
                   ),
+                  const SizedBox(height: 10),
+                  TextButton.icon(
+                    onPressed: () => _showCertificateModal({
+                      'cefrLevel': _targetLevel,
+                      'id': 'preview-demo',
+                      'title': 'Chứng chỉ Năng lực Tiếng Anh $_targetLevel',
+                    }),
+                    icon: const Icon(Icons.visibility_outlined, size: 14, color: VocarioTokens.brand),
+                    label: Text(
+                      'Xem bản mẫu chứng chỉ CEFR $_targetLevel',
+                      style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: VocarioTokens.brand),
+                    ),
+                  ),
                 ],
               ),
             )
@@ -660,40 +733,267 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: _certificates.map((cert) {
                 final lvl = cert['cefrLevel'] ?? 'A2';
                 final title = cert['title'] ?? 'Chứng chỉ Năng lực Tiếng Anh $lvl';
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF0FDF4),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFF86EFAC)),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.verified_rounded, size: 20, color: Color(0xFF16A34A)),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              title,
-                              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF14532D)),
-                            ),
-                            Text(
-                              'Đã cấp duyệt · Cấp độ chuẩn $lvl',
-                              style: TextStyle(fontSize: 9.5, color: const Color(0xFF166534)),
-                            ),
-                          ],
+                return InkWell(
+                  onTap: () => _showCertificateModal(cert as Map<String, dynamic>),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF0FDF4),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0xFF86EFAC)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.verified_rounded, size: 20, color: Color(0xFF16A34A)),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                title,
+                                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF14532D)),
+                              ),
+                              Text(
+                                'Đã cấp duyệt · Cấp độ chuẩn $lvl · Bấm để xem chi tiết',
+                                style: TextStyle(fontSize: 9.5, color: const Color(0xFF166534)),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                        const Icon(Icons.chevron_right_rounded, size: 16, color: Color(0xFF16A34A)),
+                      ],
+                    ),
                   ),
                 );
               }).toList(),
             ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            height: 40,
+            child: ElevatedButton.icon(
+              onPressed: _isClaimingCert ? null : _claimCertificate,
+              icon: _isClaimingCert
+                  ? const SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    )
+                  : const Icon(Icons.military_tech_rounded, size: 17),
+              label: Text(
+                _isClaimingCert ? 'Đang gửi yêu cầu cấp chứng chỉ...' : 'Nhận chứng chỉ CEFR $_targetLevel chính thức',
+                style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFB45309),
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+            ),
+          ),
         ],
       ),
+    );
+  }
+
+  // ==========================================================================
+  // CERTIFICATE FULL DETAILS MODAL
+  // ==========================================================================
+  void _showCertificateModal(Map<String, dynamic> cert) {
+    final lvl = cert['cefrLevel'] ?? _targetLevel;
+    final name = _fullNameController.text.isNotEmpty ? _fullNameController.text : _username;
+    final idStr = (cert['id'] ?? '8892').toString().replaceAll('-', '');
+    final code = 'VOC-2026-${idStr.length >= 8 ? idStr.substring(0, 8).toUpperCase() : idStr.toUpperCase()}';
+    final issueDate = cert['issuedAt'] != null
+        ? cert['issuedAt'].toString().split('T').first
+        : '28/10/2026';
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 420),
+            padding: const EdgeInsets.all(22),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFBF9F5),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFD4AF37), width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.25),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Top status ribbon
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFEF3C7),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: const Color(0xFFD97706)),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.verified_rounded, size: 14, color: Color(0xFFD97706)),
+                            const SizedBox(width: 4),
+                            Text(
+                              'CHỨNG CHỈ CEFR CHÍNH THỨC',
+                              style: VocarioTokens.monoSmall.copyWith(
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xFF92400E),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close_rounded, size: 18),
+                        onPressed: () => Navigator.pop(ctx),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Gold seal emblem
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFAF5EB),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: const Color(0xFFD4AF37), width: 2),
+                    ),
+                    child: const Icon(Icons.military_tech_rounded, size: 32, color: Color(0xFFB45309)),
+                  ),
+                  const SizedBox(height: 12),
+
+                  Text(
+                    'HỘI ĐỒNG HỌC THUẬT VOCARIO',
+                    style: VocarioTokens.monoSmall.copyWith(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                      color: const Color(0xFF78350F),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'CHỨNG NHẬN NĂNG LỰC TỪ VỰNG',
+                    style: TextStyle(
+                      fontFamily: 'Playfair Display',
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2D2823),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+
+                  Text(
+                    'Chứng nhận trao cho học viên:',
+                    style: TextStyle(fontSize: 11, color: VocarioTokens.muted, fontStyle: FontStyle.italic),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    name,
+                    style: VocarioTokens.serifHeadline.copyWith(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF1E1B18),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Level Badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: VocarioTokens.brand,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      'TRÌNH ĐỘ CEFR $lvl',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Text(
+                      'Đã hoàn thành toàn diện lộ trình bóc tách từ vựng qua AI Vision và ghi nhớ dài hạn qua thuật toán lặp lại ngắt quãng SM-2.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 10.5, color: VocarioTokens.ink, height: 1.45),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Divider(color: Color(0xFFE5DED3)),
+                  const SizedBox(height: 10),
+
+                  // Metadata Row
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('MÃ TRA CỨU:', style: VocarioTokens.monoSmall.copyWith(fontSize: 8, color: VocarioTokens.muted)),
+                          Text(code, style: VocarioTokens.monoSmall.copyWith(fontSize: 9, fontWeight: FontWeight.bold, color: VocarioTokens.brand)),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text('NGÀY CẤP:', style: VocarioTokens.monoSmall.copyWith(fontSize: 8, color: VocarioTokens.muted)),
+                          Text(issueDate, style: VocarioTokens.monoSmall.copyWith(fontSize: 9, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+
+                  SizedBox(
+                    width: double.infinity,
+                    height: 38,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: VocarioTokens.brand,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: const Text('Đóng cửa sổ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 

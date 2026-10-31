@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../core/constants/tokens.dart';
 import '../../core/services/api_service.dart';
@@ -10,6 +13,7 @@ import '../profile/profile_screen.dart';
 import '../collection/collection_screen.dart';
 import '../extractor/text_extractor_screen.dart';
 import '../classroom/classroom_screen.dart';
+import '../../core/utils/image_picker_helper.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,30 +30,35 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isSpeaking = false;
   bool _isLoading = true;
 
-  // Synced Database State (Fallbacks are set to authentic demo data)
-  String _userFullName = 'Lê Hoài Nam';
-  String _targetLevel = 'B1';
-  int _streakCount = 7;
-  int _dueWordsCount = 12;
+  // Synced Database State (Dữ liệu thật từ CSDL PostgreSQL)
+  String _userFullName = '';
+  String _targetLevel = 'A2';
+  int _streakCount = 0;
+  int _dueWordsCount = 0;
 
   // Word Preview (Syncs from first due card in CSDL)
-  String _previewWord = 'refrigerator';
-  String _previewIpa = '/rɪˈfrɪdʒəreɪtər/';
-  String _previewMeaning = 'tủ lạnh';
-  String _previewLevel = 'B1';
+  String _previewWord = '';
+  String _previewIpa = '';
+  String _previewMeaning = '';
+  String _previewLevel = 'A2';
 
   // Mastery Progress (Syncs from CSDL target-progress)
-  int _masteredWords = 86;
-  int _totalTargetWords = 120;
-  int _completionPercentage = 72;
+  int _masteredWords = 0;
+  int _totalTargetWords = 0;
+  int _completionPercentage = 0;
 
   List<Map<String, dynamic>> _tiers = [
-    {'code': 'A1', 'progress': '100%', 'status': 'complete'},
-    {'code': 'A2', 'progress': '100%', 'status': 'complete'},
-    {'code': 'B1', 'progress': '72%', 'status': 'active'},
-    {'code': 'B2', 'progress': '15%', 'status': 'future'},
+    {'code': 'A1', 'progress': '0%', 'status': 'future'},
+    {'code': 'A2', 'progress': '0%', 'status': 'active'},
+    {'code': 'B1', 'progress': '0%', 'status': 'future'},
+    {'code': 'B2', 'progress': '0%', 'status': 'future'},
     {'code': 'C1', 'progress': '0%', 'status': 'future'},
   ];
+
+  List<Map<String, dynamic>> _weeklyTopThree = [];
+
+  // Featured Real-World Arena Challenge (Dữ liệu thật từ CSDL PostgreSQL)
+  Map<String, dynamic>? _featuredHeroStage;
 
   @override
   void initState() {
@@ -66,40 +75,52 @@ class _HomeScreenState extends State<HomeScreen> {
   /// Đồng bộ dữ liệu trực tiếp với Backend Spring Boot & CSDL PostgreSQL
   Future<void> _fetchDatabaseData() async {
     try {
-      final bundle = await ApiService().getDashboardData();
+      final results = await Future.wait([
+        ApiService().getDashboardData(),
+        ApiService().getLeaderboard(period: 'weekly', size: 3),
+        ApiService().getUserCaptures(),
+      ]);
+
+      final bundle = results[0] as Map<String, dynamic>;
+      final lbRes = results[1] as Map<String, dynamic>?;
+      final rawCaptures = results[2] as List<dynamic>? ?? [];
 
       final user = bundle['user'] as Map<String, dynamic>?;
-      final dueCards = bundle['dueCards'] as List<dynamic>;
+      final dueCards = bundle['dueCards'] as List<dynamic>? ?? [];
       final targetProgress = bundle['targetProgress'] as Map<String, dynamic>?;
 
       if (!mounted) return;
 
       setState(() {
-        // 1. Đồng bộ thông tin người dùng
+        // 1. Đồng bộ thông tin người dùng thực tế
         if (user != null) {
-          _userFullName = user['fullName'] ?? user['username'] ?? 'Lê Hoài Nam';
-          _targetLevel = user['targetLevel'] ?? 'B1';
-          _streakCount = user['streakCount'] ?? 7;
+          _userFullName = user['fullName'] ?? user['username'] ?? 'Học viên Vocario';
+          _targetLevel = user['targetLevel'] ?? 'A2';
+          _streakCount = (user['streakCount'] as num?)?.toInt() ?? 0;
         }
 
-        // 2. Đồng bộ hàng đợi ôn tập SM-2
+        // 2. Đồng bộ hàng đợi ôn tập SM-2 thực tế
+        _dueWordsCount = dueCards.length;
         if (dueCards.isNotEmpty) {
-          _dueWordsCount = dueCards.length;
           final firstCard = dueCards.first;
           final wordObj = firstCard['word'] as Map<String, dynamic>?;
           if (wordObj != null) {
-            _previewWord = wordObj['word'] ?? 'refrigerator';
-            _previewIpa = wordObj['phoneticIpa'] ?? '/rɪˈfrɪdʒəreɪtər/';
-            _previewMeaning = wordObj['vietnameseMeaning'] ?? 'tủ lạnh';
+            _previewWord = wordObj['word'] ?? '';
+            _previewIpa = wordObj['phoneticIpa'] ?? '';
+            _previewMeaning = wordObj['vietnameseMeaning'] ?? '';
             _previewLevel = wordObj['cefrLevel'] ?? _targetLevel;
           }
+        } else {
+          _previewWord = '';
+          _previewIpa = '';
+          _previewMeaning = '';
         }
 
-        // 3. Đồng bộ tiến độ chuẩn hóa CEFR
+        // 3. Đồng bộ tiến độ chuẩn hóa CEFR thực tế
         if (targetProgress != null) {
-          _masteredWords = (targetProgress['masteredWordsAtLevel'] as num?)?.toInt() ?? 86;
-          _totalTargetWords = (targetProgress['totalWordsAtLevel'] as num?)?.toInt() ?? 120;
-          _completionPercentage = (targetProgress['completionPercentage'] as num?)?.toInt() ?? 72;
+          _masteredWords = (targetProgress['masteredWordsAtLevel'] as num?)?.toInt() ?? 0;
+          _totalTargetWords = (targetProgress['totalWordsAtLevel'] as num?)?.toInt() ?? 0;
+          _completionPercentage = (targetProgress['completionPercentage'] as num?)?.toInt() ?? 0;
 
           final breakdowns = targetProgress['levelBreakdowns'] as List<dynamic>?;
           if (breakdowns != null && breakdowns.isNotEmpty) {
@@ -117,6 +138,79 @@ class _HomeScreenState extends State<HomeScreen> {
             }).toList();
           }
         }
+
+        // 4. Đồng bộ Top 3 bảng xếp hạng tuần thực tế từ CSDL
+        if (lbRes != null) {
+          final top = lbRes['topUsers'] as List<dynamic>? ?? [];
+          final podium = lbRes['podium'] as List<dynamic>? ?? [];
+          final all = <Map<String, dynamic>>[];
+          for (var p in podium) {
+            if (p is Map<String, dynamic>) all.add(p);
+          }
+          for (var u in top) {
+            if (u is Map<String, dynamic> && !all.any((x) => x['userId'] == u['userId'])) {
+              all.add(u);
+            }
+          }
+          all.sort((a, b) => ((a['rank'] as num?)?.toInt() ?? 99).compareTo((b['rank'] as num?)?.toInt() ?? 99));
+
+          _weeklyTopThree = all.take(3).map((item) {
+            final isMe = item['isCurrentUser'] == true;
+            final rank = (item['rank'] as num?)?.toInt() ?? 1;
+            return {
+              'rank': rank,
+              'name': isMe ? '${item['fullName'] ?? item['username']} (Bạn)' : (item['fullName'] ?? item['username'] ?? 'Học viên'),
+              'level': item['targetLevel'] ?? 'A2',
+              'streak': (item['streakCount'] as num?)?.toInt() ?? 0,
+              'xp': (item['xp'] as num?)?.toInt() ?? 0,
+              'isMe': isMe,
+            };
+          }).toList();
+        }
+
+        // 5. Đồng bộ Bối cảnh Đấu trường Thật từ CSDL (Ưu tiên ảnh chụp thực tế của học viên)
+        Map<String, dynamic>? heroStage;
+        for (final c in rawCaptures) {
+          if (c is! Map<String, dynamic>) continue;
+          final rawObjs = c['detectedObjects'];
+          List<dynamic> detectedList = [];
+          if (rawObjs is List) {
+            detectedList = rawObjs;
+          } else if (rawObjs is String && rawObjs.trim().isNotEmpty) {
+            try {
+              detectedList = jsonDecode(rawObjs);
+            } catch (_) {}
+          }
+          if (detectedList.isNotEmpty) {
+            final firstObj = detectedList.first;
+            final word = (firstObj is Map ? (firstObj['word'] ?? firstObj['name'] ?? '') : '').toString();
+            if (word.isNotEmpty && word != 'object') {
+              final conf = firstObj is Map && firstObj['confidence'] != null
+                  ? '${((firstObj['confidence'] as num) * 100).toInt()}%'
+                  : '96%';
+              heroStage = {
+                'id': c['id']?.toString() ?? '',
+                'title': c['sceneTheme']?.toString() ?? 'Bối cảnh đời thực của bạn',
+                'imageUrl': c['imageUrl']?.toString() ?? '',
+                'badge': 'ẢNH CỦA BẠN',
+                'firstWord': word,
+                'confidence': conf,
+                'isUserCapture': true,
+              };
+              break;
+            }
+          }
+        }
+
+        _featuredHeroStage = heroStage ?? {
+          'id': 'stage-admin-kitchen',
+          'title': 'Gian Bếp Đời Thực',
+          'imageUrl': '/kitchen_refrigerator.png',
+          'badge': 'ĐẤU TRƯỜNG THỊ GIÁC TUẦN',
+          'firstWord': 'refrigerator',
+          'confidence': '96%',
+          'isUserCapture': false,
+        };
 
         _isLoading = false;
       });
@@ -139,6 +233,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _playWordAudio() {
     setState(() => _isSpeaking = true);
+    if (_previewWord.isNotEmpty) {
+      speakTextBrowser(_previewWord);
+    }
     _showToast('Đang phát âm chuẩn bản ngữ: $_previewWord');
     Timer(const Duration(milliseconds: 900), () {
       if (mounted) {
@@ -434,7 +531,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Khoảng cách ngắt quãng đã đến hạn. Dành 5 phút để ghi nhớ vĩnh viễn.',
+                  _dueWordsCount > 0
+                      ? 'Khoảng cách ngắt quãng đã đến hạn. Dành 5 phút để ghi nhớ vĩnh viễn.'
+                      : 'Hôm nay bạn không có thẻ nào tồn đọng. Hãy tiếp tục duy trì chuỗi học tập!',
                   style: TextStyle(
                     fontSize: 11,
                     color: Colors.white.withValues(alpha: 0.8),
@@ -442,8 +541,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                // Word Preview Floating White Card
-                _buildWordPreviewCard(),
+                // Word Preview Floating White Card (hoặc thông báo hoàn thành)
+                _dueWordsCount > 0 ? _buildWordPreviewCard() : _buildEmptyDueCard(),
                 const SizedBox(height: 12),
                 // Primary Action Button
                 SizedBox(
@@ -453,7 +552,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     onPressed: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const WordbookScreen(initialTabIndex: 1),
+                        builder: (_) => _dueWordsCount > 0
+                            ? const WordbookScreen(initialTabIndex: 1)
+                            : const ScannerScreen(),
                       ),
                     ).then((_) => _fetchDatabaseData()),
                     style: ElevatedButton.styleFrom(
@@ -466,16 +567,61 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
+                      children: [
                         Text(
-                          'Bắt đầu ôn tập',
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                          _dueWordsCount > 0 ? 'Bắt đầu ôn tập ($_dueWordsCount từ)' : 'Khám phá & Quét từ mới',
+                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
                         ),
-                        SizedBox(width: 6),
-                        Icon(Icons.arrow_forward_rounded, size: 16),
+                        const SizedBox(width: 6),
+                        const Icon(Icons.arrow_forward_rounded, size: 16),
                       ],
                     ),
                   ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyDueCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: VocarioTokens.surface,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: VocarioTokens.border),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: const Color(0xFF10B981).withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(Icons.check_circle_outline_rounded, color: Color(0xFF059669), size: 18),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Tuyệt vời! Không còn thẻ đến hạn',
+                  style: VocarioTokens.serifHeadline.copyWith(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                const Text(
+                  'Đã ôn tập xong thẻ SM-2 hôm nay. Hãy quét thêm ảnh đời thực để nạp từ mới.',
+                  style: TextStyle(fontSize: 10, color: VocarioTokens.muted),
                 ),
               ],
             ),
@@ -679,8 +825,9 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
               child: _buildQuickActionCard(
                 icon: Icons.description_outlined,
-                title: 'Tài Liệu OCR',
-                subtitle: 'Trích xuất văn bản AI',
+                title: 'Trích Xuất Văn Bản',
+                subtitle: 'Bóc tách từ vựng tài liệu AI',
+                tag: 'AI',
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const TextExtractorScreen()),
@@ -981,6 +1128,102 @@ class _HomeScreenState extends State<HomeScreen> {
   // 5. VISUAL ARENA CHALLENGE POD
   // ==========================================================================
   Widget _buildVisualArenaSection() {
+    if (_featuredHeroStage == null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'THỬ THÁCH MỖI NGÀY',
+                    style: VocarioTokens.monoSmall.copyWith(
+                      fontSize: 8,
+                      color: VocarioTokens.brand,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Khám phá bối cảnh đời thật',
+                    style: VocarioTokens.serifHeadline.copyWith(fontSize: 16),
+                  ),
+                ],
+              ),
+              Text(
+                '60 GIÂY',
+                style: VocarioTokens.monoSmall.copyWith(
+                  fontSize: 9,
+                  color: VocarioTokens.muted,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            decoration: BoxDecoration(
+              color: VocarioTokens.surface,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: VocarioTokens.border),
+            ),
+            child: Column(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: VocarioTokens.field,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: VocarioTokens.border),
+                  ),
+                  child: const Icon(Icons.camera_alt_outlined, size: 24, color: VocarioTokens.brand),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Chưa có bối cảnh thực tế trong CSDL',
+                  style: VocarioTokens.serifHeadline.copyWith(fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  'Chụp hoặc tải ảnh không gian sống (bàn học, phòng khách, góc bếp...) để AI nhận diện đồ vật và tạo sàn đấu phản xạ thị giác độc quyền của bạn.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 11, color: VocarioTokens.muted, height: 1.4),
+                ),
+                const SizedBox(height: 14),
+                ElevatedButton.icon(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ScannerScreen()),
+                  ).then((_) => _fetchDatabaseData()),
+                  icon: const Icon(Icons.camera_enhance_rounded, size: 14),
+                  label: const Text('Chụp ảnh bối cảnh ngay', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: VocarioTokens.ink,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+
+    final hero = _featuredHeroStage!;
+    final title = hero['title'] as String;
+    final badge = hero['badge'] as String;
+    final firstWord = hero['firstWord'] as String;
+    final confidence = hero['confidence'] as String;
+    final stageId = hero['id'] as String;
+    final imageUrl = hero['imageUrl'] as String;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1025,20 +1268,10 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           child: Stack(
             children: [
-              // Desk Image
+              // Real Scene Image from PostgreSQL / Supabase
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
-                child: Image.network(
-                  'https://images.unsplash.com/photo-1747336754882-dfa5c49f15da?auto=format&fit=crop&w=900&q=82',
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: double.infinity,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    color: const Color(0xFFD8D0C3),
-                    alignment: Alignment.center,
-                    child: const Icon(Icons.image_outlined, size: 36, color: VocarioTokens.muted),
-                  ),
-                ),
+                child: _buildHeroStagePhoto(imageUrl),
               ),
               // Dark gradient overlay
               Container(
@@ -1065,8 +1298,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 top: 20,
                 right: 32,
                 child: Container(
-                  width: 76,
-                  height: 60,
+                  height: 52,
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.white.withValues(alpha: 0.88)),
                   ),
@@ -1074,31 +1307,33 @@ class _HomeScreenState extends State<HomeScreen> {
                     clipBehavior: Clip.none,
                     children: [
                       Positioned(
-                        top: -9,
+                        top: -19,
                         left: -1,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                           color: Colors.white.withValues(alpha: 0.9),
                           child: Text(
-                            'study lamp',
+                            firstWord,
                             style: VocarioTokens.monoSmall.copyWith(
-                              fontSize: 7,
+                              fontSize: 8,
                               color: VocarioTokens.ink,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
                       ),
                       Positioned(
-                        top: -9,
+                        top: -19,
                         right: -1,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                           color: VocarioTokens.goldAccent,
                           child: Text(
-                            '95%',
+                            confidence,
                             style: VocarioTokens.monoSmall.copyWith(
-                              fontSize: 6.5,
+                              fontSize: 7.5,
                               color: VocarioTokens.ink,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
@@ -1116,33 +1351,39 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'ĐẤU TRƯỜNG THỊ GIÁC TUẦN',
-                          style: VocarioTokens.monoSmall.copyWith(
-                            fontSize: 7,
-                            color: Colors.white.withValues(alpha: 0.75),
-                            letterSpacing: 0.8,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            badge,
+                            style: VocarioTokens.monoSmall.copyWith(
+                              fontSize: 7,
+                              color: Colors.white.withValues(alpha: 0.85),
+                              letterSpacing: 0.8,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 3),
-                        Text(
-                          'Góc học tập & bàn làm việc',
-                          style: VocarioTokens.serifHeadline.copyWith(
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                          const SizedBox(height: 3),
+                          Text(
+                            title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: VocarioTokens.serifHeadline.copyWith(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 8),
                     ElevatedButton(
                       onPressed: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const ArenaScreen(initialStageId: 'stage-admin-desk'),
+                          builder: (_) => ArenaScreen(initialStageId: stageId),
                         ),
                       ).then((_) => _fetchDatabaseData()),
                       style: ElevatedButton.styleFrom(
@@ -1156,6 +1397,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       child: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: const [
                           Text('Vào thi', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold)),
                           SizedBox(width: 4),
@@ -1170,6 +1412,54 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildHeroStagePhoto(String? url) {
+    if (url == null || url.trim().isEmpty) {
+      return Container(
+        color: const Color(0xFFD8D0C3),
+        alignment: Alignment.center,
+        child: const Icon(Icons.image_outlined, size: 36, color: VocarioTokens.muted),
+      );
+    }
+    final trimmed = url.trim();
+    if (trimmed.startsWith('data:image')) {
+      try {
+        final commaIdx = trimmed.indexOf(',');
+        final b64 = commaIdx != -1 ? trimmed.substring(commaIdx + 1) : trimmed;
+        final bytes = base64Decode(b64);
+        return Image.memory(
+          bytes,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+          errorBuilder: (_, __, ___) => Container(
+            color: const Color(0xFFD8D0C3),
+            alignment: Alignment.center,
+            child: const Icon(Icons.broken_image_outlined, size: 36, color: VocarioTokens.muted),
+          ),
+        );
+      } catch (_) {}
+    }
+    String fullUrl = trimmed;
+    if (fullUrl.startsWith('/')) {
+      if (kIsWeb) {
+        fullUrl = trimmed;
+      } else {
+        fullUrl = '${ApiService.defaultBaseUrl}$trimmed';
+      }
+    }
+    return Image.network(
+      fullUrl,
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: double.infinity,
+      errorBuilder: (_, __, ___) => Container(
+        color: const Color(0xFFD8D0C3),
+        alignment: Alignment.center,
+        child: const Icon(Icons.broken_image_outlined, size: 36, color: VocarioTokens.muted),
+      ),
     );
   }
 
@@ -1205,32 +1495,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // 5. WEEKLY LEADERBOARD SECTION (KHỚP 100% WEB USERHOMECOMPONENT)
   // ==========================================================================
   Widget _buildWeeklyLeaderboardSection() {
-    final topThree = [
-      {
-        'rank': 1,
-        'name': 'Minh Hoàng',
-        'level': 'B2',
-        'streak': 7,
-        'xp': 1420,
-        'isMe': false,
-      },
-      {
-        'rank': 2,
-        'name': 'Phương Thảo',
-        'level': 'A2',
-        'streak': 5,
-        'xp': 1280,
-        'isMe': false,
-      },
-      {
-        'rank': 3,
-        'name': '$_userFullName (Bạn)',
-        'level': _targetLevel,
-        'streak': _streakCount,
-        'xp': 960,
-        'isMe': true,
-      },
-    ];
+    final topThree = _weeklyTopThree;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1273,15 +1538,41 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         const SizedBox(height: 10),
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: VocarioTokens.surface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: VocarioTokens.border),
-          ),
-          child: Column(
-            children: topThree.map((user) {
+        topThree.isEmpty
+            ? Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                decoration: BoxDecoration(
+                  color: VocarioTokens.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: VocarioTokens.border),
+                ),
+                child: Column(
+                  children: [
+                    const Icon(Icons.emoji_events_outlined, size: 28, color: VocarioTokens.muted),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Chưa có dữ liệu xếp hạng tuần này',
+                      style: VocarioTokens.serifHeadline.copyWith(fontSize: 13, fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 3),
+                    const Text(
+                      'Hãy tham gia Đấu trường Speedrun để ghi điểm và vươn lên Top 1!',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 10.5, color: VocarioTokens.muted),
+                    ),
+                  ],
+                ),
+              )
+            : Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: VocarioTokens.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: VocarioTokens.border),
+                ),
+                child: Column(
+                  children: topThree.map((user) {
               final rank = user['rank'] as int;
               final isMe = user['isMe'] as bool;
 

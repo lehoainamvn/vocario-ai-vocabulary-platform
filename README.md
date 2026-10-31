@@ -136,6 +136,13 @@ DoAnTotNghiep/
 │   ├── nginx.conf            # Nginx reverse proxy & HTML5 SPA rewrite rules
 │   └── package.json
 │
+├── vocario_mobile/           # Mobile Application (Flutter Cross-Platform)
+│   ├── lib/                  # Mã nguồn Dart (Clean Architecture, Tokens, Screens)
+│   │   ├── core/             # Constants (Tokens), Services (ApiService), Utils (Image/Speech)
+│   │   ├── screens/          # Scanner, Wordbook (SM-2), Arena, Extractor, Profile, Home
+│   │   └── widgets/          # SpeechScorerModal, Custom UI Components
+│   └── pubspec.yaml          # Cấu hình dependencies Flutter (Dio, Google Fonts, SharedPrefs)
+│
 ├── docs/                     # Tài liệu kiến trúc & Thiết kế giao diện
 │   ├── figures/              # Biểu đồ đánh giá độ chính xác mAP, Loss, Confusion Matrix
 │   └── UI_DESIGN_SYSTEM_GUIDELINES.md
@@ -184,6 +191,7 @@ docker compose down
 | **Node.js & npm** | Node.js v18+ hoặc v20+ LTS | `node -v` && `npm -v` |
 | **PostgreSQL** | PostgreSQL 15, 16 hoặc 17 | `psql -V` |
 | **Python** | Python 3.10+ (64-bit) | `py --version` |
+| **Flutter SDK** | Flutter 3.29+ / Dart 3.7+ | `flutter --version` |
 
 ---
 
@@ -233,6 +241,35 @@ npm start
 ```
 * **Ứng dụng Web:** `http://localhost:4200`
 * **Cổng Quản Trị Admin:** `http://localhost:4200/admin`
+
+---
+
+### Bước 5: Khởi Chạy Mobile App Flutter (`vocario_mobile`)
+
+Ứng dụng di động Vocario hỗ trợ đa nền tảng (**Flutter Web**, **Android Emulator**, **Thiết bị thật**):
+
+```powershell
+cd d:\GitHub\DoAnTotNghiep\vocario_mobile
+
+# 1. Tải và đồng bộ các gói phụ thuộc (chỉ cần chạy lần đầu)
+flutter pub get
+
+# 2. Khởi chạy trên trình duyệt Google Chrome (chế độ kiểm thử nhanh)
+flutter run -d chrome
+
+# Hoặc khởi chạy trên Máy ảo Android (yêu cầu Android Studio / AVD đang mở):
+flutter run -d android
+```
+
+> **📌 Cơ chế tự động điều phối kết nối mạng (`ApiService`):**
+> * **Khi chạy trên Google Chrome (Web):** App tự động nhận diện `kIsWeb` và kết nối Spring Boot tại `http://127.0.0.1:8088`, FastAPI AI Vision tại `http://127.0.0.1:8001`.
+> * **Khi chạy trên Android Emulator:** `ApiService` tự động nhận diện môi trường Android và chuyển kết nối sang `http://10.0.2.2:8088` và `http://10.0.2.2:8001` (địa chỉ loopback chuẩn của Android SDK để gọi về localhost máy chủ).
+> * **Khi kết nối điện thoại vật lý qua mạng LAN / Wi-Fi:** Mở file `vocario_mobile/lib/core/services/api_service.dart`, đổi địa chỉ `defaultBaseUrl` sang IPv4 mạng LAN của máy tính (ví dụ `http://192.168.1.xxx:8088`).
+
+> **⚡ Phím tắt điều khiển tiện ích khi Flutter đang chạy trong Terminal:**
+> * Bấm phím `r`: **Hot Reload** — cập nhật thay đổi mã nguồn Dart tức thì trong ~1 giây mà không mất trạng thái hiện tại.
+> * Bấm phím `R`: **Hot Restart** — tải lại toàn bộ trạng thái ứng dụng.
+> * Bấm phím `q`: Thoát và dừng tiến trình app.
 
 ---
 
