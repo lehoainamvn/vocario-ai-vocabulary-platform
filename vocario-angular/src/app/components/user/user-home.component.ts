@@ -5,7 +5,7 @@ import { ApiService } from '../../services/api.service';
 import { ToastService } from '../../services/toast.service';
 import { UserStudyService, SrsDueCard } from '../../services/user-study.service';
 import { LeaderboardEntry } from '../../models/leaderboard.model';
-import { Certificate } from '../../models/certificate.model';
+import { Certificate, CertificateType } from '../../models/certificate.model';
 import { IconComponent } from '../common/icon.component';
 import { CertificateModalComponent } from './certificate-modal.component';
 
@@ -225,7 +225,7 @@ import { CertificateModalComponent } from './certificate-modal.component';
                   </div>
 
                   <div class="flex items-center justify-between text-[10px] text-[#746B60]">
-                    <span>{{ getTierMastered(tier.level) }} từ</span>
+                    <span>{{ getTierMastered(tier.level) }}/{{ getTierThreshold(tier.level) }} từ</span>
                     <span class="font-mono font-medium">{{ getTierPercentage(tier.level) }}%</span>
                   </div>
 
@@ -535,6 +535,7 @@ export class UserHomeComponent implements OnInit {
   // Trạng thái Quản lý Chứng Chỉ & Bản Xem Trước
   activeCertificate = signal<Certificate | null>(null);
   myCertificates = signal<Certificate[]>([]);
+  certificateTypes = signal<CertificateType[]>([]);
   isCertPreview = signal<boolean>(false);
   certPreviewProgress = signal<number>(0);
   isCertCelebration = signal<boolean>(false);
@@ -553,6 +554,18 @@ export class UserHomeComponent implements OnInit {
     this.studyService.refreshDueCards();
     this.loadLeaderboardPreview();
     this.loadCertificates();
+    this.loadCertificateTypes();
+  }
+
+  loadCertificateTypes() {
+    this.api.getCertificateTypes().subscribe({
+      next: (types) => {
+        if (types && types.length > 0) {
+          this.certificateTypes.set(types);
+        }
+      },
+      error: () => {}
+    });
   }
 
   loadCertificates() {
@@ -619,11 +632,23 @@ export class UserHomeComponent implements OnInit {
     return b ? b.masteredCount : 0;
   }
 
+  getTierThreshold(level: string): number {
+    const found = this.certificateTypes().find(t => 
+      t.cefrLevel?.toUpperCase() === level.toUpperCase() || 
+      t.typeCode?.toUpperCase() === level.toUpperCase()
+    );
+    if (found && found.requiredWords && found.requiredWords > 0) {
+      return found.requiredWords;
+    }
+    const tier = this.cefrTiers.find(t => t.level.toUpperCase() === level.toUpperCase());
+    return tier ? tier.threshold : 500;
+  }
+
   getTierPercentage(level: string): number {
     const mastered = this.getTierMastered(level);
-    if (mastered === 0) return 0;
-    // Chế độ thử nghiệm mốc 10 từ/level để phục vụ demo trực quan đồ án tốt nghiệp
-    return Math.min(100, Math.round((mastered / 10) * 100));
+    if (mastered <= 0) return 0;
+    const threshold = this.getTierThreshold(level);
+    return Math.min(100, Math.round((mastered / threshold) * 100));
   }
 
   /**

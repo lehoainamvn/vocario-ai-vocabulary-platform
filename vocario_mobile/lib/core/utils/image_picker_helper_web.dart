@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:html' as html;
+import 'dart:js' as js;
+import 'dart:js_util' as js_util;
 import 'dart:typed_data';
 
 class PickedImageData {
@@ -84,7 +86,7 @@ void speakTextBrowser(String text) {
 typedef SpeechResultCallback = void Function(String transcript, bool isFinal);
 typedef SpeechErrorCallback = void Function(String error);
 
-html.SpeechRecognition? _activeRecognition;
+dynamic _activeRecognition;
 
 void startSpeechRecognition({
   required SpeechResultCallback onResult,
@@ -92,45 +94,93 @@ void startSpeechRecognition({
   void Function()? onEnd,
 }) {
   try {
-    if (!html.SpeechRecognition.supported) {
-      onError('Trình duyệt chưa hỗ trợ Web Speech Recognition.');
+    final hasStandard = js_util.hasProperty(html.window, 'SpeechRecognition');
+    final hasWebkit = js_util.hasProperty(html.window, 'webkitSpeechRecognition');
+
+    if (!hasStandard && !hasWebkit) {
+      onError('Trình duyệt chưa hỗ trợ Web Speech API. Bạn nên dùng Google Chrome hoặc Microsoft Edge.');
       return;
     }
 
-    _activeRecognition?.abort();
-    final recognition = html.SpeechRecognition();
+    // Hủy phiên nhận diện trước đó nếu có
+    if (_activeRecognition != null) {
+      try {
+        js_util.callMethod(_activeRecognition, 'abort', []);
+      } catch (_) {}
+      _activeRecognition = null;
+    }
+
+    final speechConstructor = hasStandard
+        ? js_util.getProperty(html.window, 'SpeechRecognition')
+        : js_util.getProperty(html.window, 'webkitSpeechRecognition');
+
+    final recognition = js_util.callConstructor(speechConstructor, []);
     _activeRecognition = recognition;
-    recognition.continuous = false;
-    recognition.lang = 'en-US';
-    recognition.interimResults = true;
 
-    recognition.onResult.listen((event) {
-      final results = event.results;
-      if (results != null && results.isNotEmpty) {
-        final lastResult = results[results.length - 1];
-        final transcript = lastResult.item(0)?.transcript ?? '';
-        final isFinal = lastResult.isFinal ?? false;
-        onResult(transcript, isFinal);
+    js_util.setProperty(recognition, 'continuous', false);
+    js_util.setProperty(recognition, 'lang', 'en-US');
+    js_util.setProperty(recognition, 'interimResults', true);
+    js_util.setProperty(recognition, 'maxAlternatives', 3);
+
+    js_util.setProperty(recognition, 'onresult', js.allowInterop((event) {
+      try {
+        final results = js_util.getProperty(event, 'results');
+        if (results == null) return;
+        final int length = js_util.getProperty(results, 'length') ?? 0;
+        String finalTranscript = '';
+        String interimTranscript = '';
+
+        for (int i = 0; i < length; i++) {
+          final resItem = js_util.callMethod(results, 'item', [i]) ?? js_util.getProperty(results, i);
+          if (resItem == null) continue;
+          final bool isFinal = js_util.getProperty(resItem, 'isFinal') == true;
+          final alt0 = js_util.callMethod(resItem, 'item', [0]) ?? js_util.getProperty(resItem, 0);
+          if (alt0 == null) continue;
+          final transcript = js_util.getProperty(alt0, 'transcript')?.toString() ?? '';
+          if (isFinal) {
+            finalTranscript += transcript;
+          } else {
+            interimTranscript += transcript;
+          }
+        }
+
+        final combined = finalTranscript.isNotEmpty ? finalTranscript : interimTranscript;
+        if (combined.trim().isNotEmpty) {
+          onResult(combined.trim(), finalTranscript.isNotEmpty);
+        }
+      } catch (err) {
+        // Safe capture
       }
-    });
+    }));
 
-    recognition.onError.listen((event) {
-      onError('Không thể thu âm: ${event.error ?? ""}');
-    });
+    js_util.setProperty(recognition, 'onerror', js.allowInterop((event) {
+      final err = js_util.getProperty(event, 'error')?.toString() ?? '';
+      if (err == 'not-allowed') {
+        onError('Trình duyệt bị từ chối quyền Micro. Vui lòng bấm vào icon ổ khóa trên thanh địa chỉ và chọn "Cho phép" (Allow) microphone.');
+      } else if (err == 'no-speech') {
+        onError('Chưa nhận diện được giọng nói. Bạn hãy bấm nói lại to và rõ ràng hơn nhé.');
+      } else if (err == 'audio-capture') {
+        onError('Không phát hiện micro trên thiết bị.');
+      } else {
+        onError('Lỗi thu âm: $err');
+      }
+    }));
 
-    recognition.onEnd.listen((_) {
+    js_util.setProperty(recognition, 'onend', js.allowInterop((_) {
       onEnd?.call();
-    });
+    }));
 
-    recognition.start();
+    js_util.callMethod(recognition, 'start', []);
   } catch (e) {
-    onError('Lỗi khởi động micro: $e');
+    onError('Không thể khởi động micro: $e');
   }
 }
 
 void stopSpeechRecognition() {
   try {
-    _activeRecognition?.stop();
-    _activeRecognition = null;
+    if (_activeRecognition != null) {
+      js_util.callMethod(_activeRecognition, 'stop', []);
+      _activeRecognition = null;
+    }
   } catch (_) {}
 }

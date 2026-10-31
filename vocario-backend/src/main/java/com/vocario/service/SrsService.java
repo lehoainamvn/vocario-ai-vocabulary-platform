@@ -415,13 +415,17 @@ public class SrsService {
             wordsByLevel.computeIfAbsent(lvl, k -> new ArrayList<>()).add(p);
         }
 
-        // Tạo bảng phân bổ theo từng level chuẩn (A1 -> C1)
+        // Tạo bảng phân bổ theo từng level chuẩn (A1 -> C1) kết hợp ngưỡng động từ bảng certificate_types
         List<TargetProgressDto.LevelBreakdown> breakdowns = new ArrayList<>();
         for (String lvl : List.of("A1", "A2", "B1", "B2", "C1")) {
             List<UserWordProgress> list = wordsByLevel.getOrDefault(lvl, Collections.emptyList());
             long total = list.size();
             long mastered = list.stream().filter(w -> "MASTERED".equalsIgnoreCase(w.getStatus())).count();
-            breakdowns.add(new TargetProgressDto.LevelBreakdown(lvl, total, mastered));
+            int req = certificateTypeRepository.findByCefrLevel(lvl)
+                    .map(t -> t.getRequiredWords() != null && t.getRequiredWords() > 0 ? t.getRequiredWords() : cefrThresholds.getOrDefault(lvl, 1000))
+                    .orElseGet(() -> cefrThresholds.getOrDefault(lvl, 1000));
+            int pct = (req > 0 && mastered > 0) ? (int) Math.min(100, Math.round(((double) mastered / req) * 100)) : 0;
+            breakdowns.add(new TargetProgressDto.LevelBreakdown(lvl, total, mastered, req, pct));
         }
 
         List<UserWordProgress> currentLevelWords = wordsByLevel.getOrDefault(currentLevel, Collections.emptyList());

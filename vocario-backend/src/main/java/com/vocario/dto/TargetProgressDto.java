@@ -66,6 +66,8 @@ public class TargetProgressDto {
         public String level;
         public long totalCount;
         public long masteredCount;
+        public int requiredWords;
+        public int completionPercentage;
 
         public LevelBreakdown() {}
 
@@ -73,6 +75,16 @@ public class TargetProgressDto {
             this.level = level;
             this.totalCount = totalCount;
             this.masteredCount = masteredCount;
+            this.requiredWords = 10;
+            this.completionPercentage = totalCount > 0 ? (int) Math.min(100, Math.round(((double) masteredCount / 10) * 100)) : 0;
+        }
+
+        public LevelBreakdown(String level, long totalCount, long masteredCount, int requiredWords, int completionPercentage) {
+            this.level = level;
+            this.totalCount = totalCount;
+            this.masteredCount = masteredCount;
+            this.requiredWords = requiredWords;
+            this.completionPercentage = completionPercentage;
         }
     }
 }

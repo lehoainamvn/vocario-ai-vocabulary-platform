@@ -5603,5 +5603,25 @@
     "vietnamese": "điện thoại",
     "ipa": "/ˈtɛləˌfoʊn/",
     "level": "A1"
+  },
+  "paper tray": {
+    "vietnamese": "khay giấy",
+    "ipa": "/ˈpeɪpər treɪ/",
+    "level": "B2"
+  },
+  "patient monitor": {
+    "vietnamese": "máy theo dõi bệnh nhân",
+    "ipa": "/ˈpeɪʃənt ˈmɑnətər/",
+    "level": "B1"
+  },
+  "x-ray viewer": {
+    "vietnamese": "máy soi phim",
+    "ipa": "/ˈɛksˌreɪ vjuər/",
+    "level": "B2"
+  },
+  "lab coat": {
+    "vietnamese": "áo blouse",
+    "ipa": "/læb koʊt/",
+    "level": "A1"
   }
 }
