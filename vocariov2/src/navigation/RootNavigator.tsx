@@ -1,6 +1,6 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { HomeScreen } from '../screens/HomeScreen';
 import { ScannerScreen } from '../screens/ScannerScreen';
 import { WordbookScreen } from '../screens/WordbookScreen';
@@ -37,7 +37,7 @@ export const RootNavigator: React.FC = () => {
         component={HomeScreen}
         options={{
           tabBarLabel: 'Trang chủ',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 18, color }}>🏠</Text>,
+          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'home' : 'home-outline'} size={22} color={color} />,
         }}
       />
       <Tab.Screen
@@ -45,7 +45,7 @@ export const RootNavigator: React.FC = () => {
         component={ScannerScreen}
         options={{
           tabBarLabel: 'Thu nạp AI',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 18, color }}>📷</Text>,
+          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'camera' : 'camera-outline'} size={22} color={color} />,
         }}
       />
       <Tab.Screen
@@ -53,7 +53,7 @@ export const RootNavigator: React.FC = () => {
         component={WordbookScreen}
         options={{
           tabBarLabel: 'Sổ từ vựng',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 18, color }}>📖</Text>,
+          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'book' : 'book-outline'} size={22} color={color} />,
         }}
       />
       <Tab.Screen
@@ -61,7 +61,7 @@ export const RootNavigator: React.FC = () => {
         component={ArenaScreen}
         options={{
           tabBarLabel: 'Đấu trường',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 18, color }}>⚡</Text>,
+          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'flash' : 'flash-outline'} size={22} color={color} />,
         }}
       />
       <Tab.Screen
@@ -69,7 +69,7 @@ export const RootNavigator: React.FC = () => {
         component={LeaderboardScreen}
         options={{
           tabBarLabel: 'Bảng vàng',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 18, color }}>🏆</Text>,
+          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'trophy' : 'trophy-outline'} size={22} color={color} />,
         }}
       />
       <Tab.Screen
@@ -77,7 +77,7 @@ export const RootNavigator: React.FC = () => {
         component={ProfileScreen}
         options={{
           tabBarLabel: 'Hồ sơ',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 18, color }}>👤</Text>,
+          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'person' : 'person-outline'} size={22} color={color} />,
         }}
       />
     </Tab.Navigator>
