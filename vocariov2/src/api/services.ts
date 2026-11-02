@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { apiClient, AI_VISION_URL } from './client';
+import { apiClient, AI_VISION_URL, removeStoredToken } from './client';
 import { TargetProgress, WordItem, LeaderboardEntry, CertificateItem, DetectedBox } from '../types';
 
 // Helper chuyển đổi DTO UserWordProgress từ backend Spring Boot sang giao diện WordItem
@@ -46,6 +46,23 @@ export const authService = {
       params: userId ? { userId } : {},
     });
     return res.data;
+  },
+
+  async updateProfile(data: { fullName?: string; targetLevel?: string; dailyGoal?: number }) {
+    const res = await apiClient.put('/api/auth/profile', data);
+    return res.data;
+  },
+
+  async levelUp() {
+    const res = await apiClient.post('/api/auth/level-up');
+    return res.data;
+  },
+
+  async logout() {
+    try {
+      await apiClient.post('/api/auth/logout');
+    } catch (_) {}
+    await removeStoredToken();
   },
 };
 

@@ -19,6 +19,9 @@ export const API_BASE_URL = USE_PRODUCTION
       default: 'http://localhost:8088',
     });
 
+// Alias for image URL construction
+export const BASE_URL = API_BASE_URL;
+
 export const AI_VISION_URL = USE_PRODUCTION
   ? PRODUCTION_AI_URL
   : Platform.select({
