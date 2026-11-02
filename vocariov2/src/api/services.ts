@@ -143,6 +143,81 @@ export const visionService = {
       return fallbackRes.data;
     }
   },
+
+  async detectObjectsWithYolo(formData: FormData, params?: Record<string, any>) {
+    try {
+      const res = await axios.post(`${AI_VISION_URL}/detect`, formData, {
+        params: {
+          conf: params?.confidenceThreshold || 0.15,
+          theme: params?.sceneTheme || 'auto',
+          target_level: params?.targetLevel || 'A2',
+          skip_dialogue: params?.skipDialogue ?? true,
+        },
+        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 30000,
+      });
+      return res.data;
+    } catch (_) {
+      // Fallback qua Spring Boot
+      try {
+        const res = await apiClient.post('/api/vision/detect', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        return res.data;
+      } catch (err: any) {
+        return { success: false, error: err.message || 'Không thể kết nối máy chủ AI Vision' };
+      }
+    }
+  },
+
+  async saveRealCapture(data: {
+    sceneTheme: string;
+    detectedObjects: any[];
+    base64DataUrl?: string;
+    imageUri?: string;
+  }) {
+    try {
+      const formData = new FormData();
+      formData.append('sceneTheme', data.sceneTheme);
+      formData.append('detectedObjectsJson', JSON.stringify(data.detectedObjects));
+      if (data.imageUri) {
+        formData.append('image', {
+          uri: data.imageUri,
+          name: 'capture.jpg',
+          type: 'image/jpeg',
+        } as any);
+      }
+      const res = await apiClient.post('/api/vision/save-capture', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      return res.data;
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  },
+
+  async learnWordFromVision(params: {
+    englishWord: string;
+    vietnameseMeaning: string;
+    phoneticIpa: string;
+    cefrLevel: string;
+    captureId?: string;
+  }) {
+    const res = await apiClient.post('/api/vision/learn-word', null, { params });
+    return res.data;
+  },
+
+  async learnAllWords(captureId: string) {
+    const res = await apiClient.post('/api/vision/learn-all-words', null, {
+      params: { captureId },
+    });
+    return res.data;
+  },
+
+  async getUserCaptures() {
+    const res = await apiClient.get('/api/vision/captures');
+    return res.data || [];
+  },
 };
 
 export const arenaService = {
