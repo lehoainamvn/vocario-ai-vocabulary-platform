@@ -16,8 +16,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { apiClient } from '../api/client';
-import { BASE_URL } from '../api/client';
+import { apiClient, BASE_URL } from '../api/client';
+import { authService, visionService } from '../api/services';
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const T = {
@@ -89,14 +89,14 @@ export const HomeScreen: React.FC = () => {
   const fetchDatabaseData = useCallback(async () => {
     try {
       const [dashRes, lbRes, capturesRes] = await Promise.allSettled([
-        apiClient.get('/api/srs/dashboard'),
+        authService.getDashboardData(),
         apiClient.get('/api/leaderboard', { params: { period: 'weekly', size: 3 } }),
-        apiClient.get('/api/vision/captures'),
+        visionService.getUserCaptures(),
       ]);
 
-      // --- Dashboard bundle ---
+      // --- Dashboard bundle (Real user, real due cards, real targetProgress) ---
       if (dashRes.status === 'fulfilled') {
-        const bundle = dashRes.value.data || {};
+        const bundle: any = dashRes.value || {};
         const user = bundle.user || {};
         const dueCards: any[] = bundle.dueCards || [];
         const targetProgress = bundle.targetProgress || {};
@@ -160,7 +160,7 @@ export const HomeScreen: React.FC = () => {
 
       // --- Arena hero stage from captures ---
       if (capturesRes.status === 'fulfilled') {
-        const rawCaptures: any[] = capturesRes.value.data || [];
+        const rawCaptures: any[] = Array.isArray(capturesRes.value) ? capturesRes.value : (capturesRes.value as any)?.data || [];
         let heroStage: HeroStage | null = null;
         for (const c of rawCaptures) {
           let detected: any[] = [];
@@ -176,7 +176,7 @@ export const HomeScreen: React.FC = () => {
               heroStage = {
                 id: c.id?.toString() ?? '',
                 title: c.sceneTheme?.toString() ?? 'Bối cảnh đời thực của bạn',
-                imageUrl: c.imageUrl?.toString() ?? '',
+                imageUrl: c.base64DataUrl || c.imageUrl?.toString() || '',
                 badge: 'ẢNH CỦA BẠN',
                 firstWord: word,
                 confidence: conf,

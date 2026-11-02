@@ -37,8 +37,8 @@ const MainTabNavigator: React.FC = () => {
           borderTopColor: T.border,
           borderTopWidth: 1,
           height: Platform.OS === 'ios' ? 84 : 64,
-          paddingBottom: Platform.OS === 'ios' ? 24 : 8,
-          paddingTop: 8,
+          paddingBottom: Platform.OS === 'ios' ? 24 : 6,
+          paddingTop: 6,
           elevation: 8,
           shadowColor: '#000',
           shadowOffset: { width: 0, height: -2 },
@@ -50,6 +50,8 @@ const MainTabNavigator: React.FC = () => {
         tabBarLabelStyle: {
           fontSize: 10,
           fontWeight: '600',
+          marginTop: -2,
+          paddingBottom: 2,
         },
       }}
     >

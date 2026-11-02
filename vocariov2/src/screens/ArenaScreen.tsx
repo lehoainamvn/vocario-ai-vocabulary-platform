@@ -167,6 +167,51 @@ export const ArenaScreen: React.FC = () => {
     toastTimer.current = setTimeout(() => setToastMessage(null), 3000);
   };
 
+  // ── Sync Stage Leaderboards from PostgreSQL ─────────────────────────────────
+  const syncStageLeaderboards = useCallback(async (currentOfficials: ArenaStage[], currentUsers: ArenaStage[]) => {
+    // 1. Cập nhật kỷ lục thật cho Official Stages từ CSDL (bảng arena_stage_records)
+    const updatedOfficials = [...currentOfficials];
+    for (let i = 0; i < updatedOfficials.length; i++) {
+      const st = updatedOfficials[i];
+      try {
+        const records = await leaderboardService.getStageLeaderboard(st.id);
+        if (Array.isArray(records) && records.length > 0) {
+          const top = records[0];
+          const ms = Number(top.completionTimeMs) || 0;
+          const holder = top.userName || top.username || 'Học viên';
+          updatedOfficials[i] = {
+            ...st,
+            bestRecordStr: formatTime(ms),
+            bestRecordHolder: holder,
+          };
+        }
+      } catch (_) {}
+    }
+    setOfficialStages(updatedOfficials);
+
+    // 2. Cập nhật kỷ lục thật cho User Stages từ CSDL
+    if (currentUsers.length > 0) {
+      const updatedUsers = [...currentUsers];
+      for (let i = 0; i < updatedUsers.length; i++) {
+        const st = updatedUsers[i];
+        try {
+          const records = await leaderboardService.getStageLeaderboard(st.id);
+          if (Array.isArray(records) && records.length > 0) {
+            const top = records[0];
+            const ms = Number(top.completionTimeMs) || 0;
+            const holder = top.userName || top.username || 'Bạn';
+            updatedUsers[i] = {
+              ...st,
+              bestRecordStr: formatTime(ms),
+              bestRecordHolder: holder,
+            };
+          }
+        } catch (_) {}
+      }
+      setUserStages(updatedUsers);
+    }
+  }, []);
+
   // ── Load User Captures as Stages ────────────────────────────────────────────
   const loadUserStages = useCallback(async () => {
     setIsLoadingUserStages(true);
@@ -195,7 +240,7 @@ export const ArenaScreen: React.FC = () => {
           })).filter((w) => w.word !== 'object');
 
           if (words.length > 0) {
-            let imgUrl = c.imageUrl || '';
+            let imgUrl = c.base64DataUrl || c.imageUrl || '';
             if (imgUrl.startsWith('/') && !imgUrl.startsWith('http')) {
               imgUrl = `${BASE_URL}${imgUrl}`;
             }
@@ -215,12 +260,15 @@ export const ArenaScreen: React.FC = () => {
           }
         });
         setUserStages(loaded);
+        syncStageLeaderboards(officialStages, loaded);
+      } else {
+        syncStageLeaderboards(officialStages, []);
       }
     } catch (_) {}
     finally {
       setIsLoadingUserStages(false);
     }
-  }, []);
+  }, [officialStages, syncStageLeaderboards]);
 
   useEffect(() => {
     loadUserStages();

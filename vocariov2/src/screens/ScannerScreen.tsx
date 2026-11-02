@@ -206,68 +206,82 @@ export const ScannerScreen: React.FC = () => {
 
     try {
       let base64Data = customImageDataUrl;
+      let localUri = customImageUri || imageSrc;
 
-      // Nếu dùng ảnh URL preset, chuẩn bị data URL hoặc gửi thẳng
-      if (!base64Data) {
-        // Nén ảnh sang base64
-        const manip = await ImageManipulator.manipulateAsync(
-          imageSrc,
-          [{ resize: { width: 900 } }],
-          { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG, base64: true }
-        );
+      // Nén ảnh sang JPEG và base64
+      const manip = await ImageManipulator.manipulateAsync(
+        imageSrc,
+        [{ resize: { width: 900 } }],
+        { compress: 0.82, format: ImageManipulator.SaveFormat.JPEG, base64: true }
+      );
+
+      if (manip.base64) {
         base64Data = `data:image/jpeg;base64,${manip.base64}`;
         setCustomImageDataUrl(base64Data);
       }
+      localUri = manip.uri;
 
       const theme = customImageUri ? 'auto' : PRESET_SCENES[activePresetIndex].theme;
-      const res = await visionService.detectObjectsFromBase64(base64Data, theme);
+      const res = await visionService.detectObjectsFromImage({
+        imageUri: localUri,
+        base64DataUrl: base64Data || undefined,
+        sceneTheme: theme,
+        targetLevel: 'A2',
+        confidenceThreshold: 0.12,
+        skipDialogue: false,
+      });
 
-      const detectedRaw = res?.detected_objects || [];
-      if (detectedRaw.length > 0) {
+      const detectedRaw = res?.detectedObjects || res?.detected_objects || [];
+      if (Array.isArray(detectedRaw) && detectedRaw.length > 0) {
         const mapped: DetectedItem[] = detectedRaw.map((raw: any) => ({
-          word: raw.object_name || raw.word || 'object',
+          word: raw.word || raw.object_name || 'object',
           ipa: raw.ipa || '',
-          level: raw.cefr_level || raw.level || 'A2',
-          partOfSpeech: raw.part_of_speech || raw.partOfSpeech || 'noun',
-          vietnamese: raw.vietnamese_meaning || raw.vietnamese || '',
-          exampleEn: raw.example_sentence || raw.exampleEn || '',
-          exampleVi: raw.example_translation || raw.exampleVi || '',
-          confidence: raw.confidence_score || raw.confidence || 0.95,
-          leftPercent: raw.bounding_box?.left || 15,
-          topPercent: raw.bounding_box?.top || 20,
-          widthPercent: raw.bounding_box?.width || 25,
-          heightPercent: raw.bounding_box?.height || 25,
+          level: (raw.level || raw.cefr_level || 'A2').toUpperCase(),
+          partOfSpeech: raw.partOfSpeech || raw.part_of_speech || 'noun',
+          vietnamese: raw.vietnamese || raw.vietnamese_meaning || raw.vietnameseMeaning || '',
+          exampleEn: raw.exampleEn || raw.example_sentence || raw.exampleSentenceEn || '',
+          exampleVi: raw.exampleVi || raw.example_translation || raw.exampleSentenceVi || '',
+          confidence: typeof raw.confidence === 'number' ? raw.confidence : (raw.confidence_score || 0.92),
+          leftPercent: raw.leftPercent ?? raw.bounding_box?.left ?? 15,
+          topPercent: raw.topPercent ?? raw.bounding_box?.top ?? 20,
+          widthPercent: raw.widthPercent ?? raw.bounding_box?.width ?? 25,
+          heightPercent: raw.heightPercent ?? raw.bounding_box?.height ?? 25,
         }));
+
+        // Trích xuất hội thoại AI Groq nếu có
+        const rawDialogue = res?.dialogue || [];
+        const mappedDialogue: DialogueTurn[] = Array.isArray(rawDialogue)
+          ? rawDialogue.map((d: any) => ({
+              speaker: d.speakerLabel || d.speaker || 'Speaker',
+              en: d.en || d.english || '',
+              vi: d.vi || d.vietnamese || '',
+            }))
+          : [];
 
         setDetectedItems(mapped);
         setSelectedWordIndex(0);
-        setSceneTitle(res.scene_theme || theme);
+        setSceneTitle(res.sceneTitle || res.scene_theme || theme);
+        setDialogueTurns(mappedDialogue);
         setHasScanned(true);
 
-        // Lưu capture vào Spring Boot PostgreSQL
+        // Lưu capture vào Spring Boot PostgreSQL (bảng captures)
         visionService.saveRealCapture({
-          sceneTheme: res.scene_theme || theme,
+          sceneTheme: res.sceneTitle || res.scene_theme || theme,
           detectedObjects: mapped,
-          base64DataUrl: base64Data,
-          imageUri: customImageUri || undefined,
+          base64DataUrl: base64Data || undefined,
+          imageUri: customImageUri || localUri,
         }).catch(() => {});
 
         showToast(`Two-Stage AI đã bóc tách ${mapped.length} vật thể thực tế!`);
       } else {
-        // Fallback vật thể thông minh theo theme
-        const fallbackItems: DetectedItem[] = [
-          { word: 'laptop', ipa: '/ˈlæp.tɒp/', level: 'A1', partOfSpeech: 'noun', vietnamese: 'máy tính xách tay', exampleEn: 'He works on his laptop.', exampleVi: 'Anh ấy làm việc trên máy tính xách tay.', confidence: 0.96, leftPercent: 20, topPercent: 30, widthPercent: 35, heightPercent: 28 },
-          { word: 'coffee mug', ipa: '/ˈkɒf.i mʌɡ/', level: 'A1', partOfSpeech: 'noun', vietnamese: 'cốc cà phê', exampleEn: 'A cup of hot coffee is on the desk.', exampleVi: 'Một tách cà phê nóng ở trên bàn.', confidence: 0.92, leftPercent: 60, topPercent: 40, widthPercent: 18, heightPercent: 22 },
-          { word: 'notebook', ipa: '/ˈnəʊt.bʊk/', level: 'A1', partOfSpeech: 'noun', vietnamese: 'sổ tay ghi chú', exampleEn: 'She writes notes in her notebook.', exampleVi: 'Cô ấy ghi chú vào cuốn sổ tay.', confidence: 0.89, leftPercent: 40, topPercent: 62, widthPercent: 25, heightPercent: 20 },
-        ];
-        setDetectedItems(fallbackItems);
-        setSelectedWordIndex(0);
-        setSceneTitle(theme);
-        setHasScanned(true);
-        showToast('Đã nhận diện thành công các vật thể trong bối cảnh!');
+        if (res?.error) {
+          showToast(`Máy chủ AI: ${res.error}`);
+        } else {
+          showToast('Không phát hiện vật thể rõ nét trong vùng chụp. Vui lòng thử lại với góc chụp hoặc ánh sáng khác.');
+        }
       }
-    } catch (_) {
-      showToast('Lỗi nhận diện máy chủ AI. Đang hiển thị kết quả tối ưu...');
+    } catch (err: any) {
+      showToast(`Lỗi quét AI: ${err?.message || 'Không thể kết nối máy chủ'}`);
     } finally {
       setIsScanning(false);
     }

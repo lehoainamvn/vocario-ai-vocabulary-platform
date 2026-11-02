@@ -149,29 +149,76 @@ export const srsService = {
 };
 
 export const visionService = {
-  async detectObjectsFromBase64(base64Image: string, sceneTheme: string = 'auto'): Promise<{
-    scene_theme: string;
-    detected_objects: DetectedBox[];
-  }> {
+  /**
+   * Bóc tách vật thể thực tế qua FastAPI YOLO-World v2 (Port 8001 /detect)
+   */
+  async detectObjectsFromImage(options: {
+    imageUri?: string;
+    base64DataUrl?: string;
+    sceneTheme?: string;
+    targetLevel?: string;
+    confidenceThreshold?: number;
+    skipDialogue?: boolean;
+  }) {
     try {
-      const res = await axios.post(
-        `${AI_VISION_URL}/api/vision/detect-and-lexicon`,
-        {
-          image_base64: base64Image,
-          scene_theme: sceneTheme,
-          confidence_threshold: 0.12,
+      const formData = new FormData();
+      const filename = 'capture.jpg';
+
+      if (options.base64DataUrl) {
+        if (typeof window !== 'undefined' && typeof window.fetch === 'function') {
+          const blobRes = await fetch(options.base64DataUrl);
+          const blob = await blobRes.blob();
+          formData.append('file', blob, filename);
+        } else {
+          formData.append('file', {
+            uri: options.imageUri || options.base64DataUrl,
+            name: filename,
+            type: 'image/jpeg',
+          } as any);
+        }
+      } else if (options.imageUri) {
+        if (typeof window !== 'undefined' && options.imageUri.startsWith('http')) {
+          const blobRes = await fetch(options.imageUri);
+          const blob = await blobRes.blob();
+          formData.append('file', blob, filename);
+        } else {
+          formData.append('file', {
+            uri: options.imageUri,
+            name: filename,
+            type: 'image/jpeg',
+          } as any);
+        }
+      }
+
+      const res = await axios.post(`${AI_VISION_URL}/detect`, formData, {
+        params: {
+          conf: options.confidenceThreshold ?? 0.12,
+          theme: options.sceneTheme || 'auto',
+          target_level: options.targetLevel || 'A2',
+          skip_dialogue: options.skipDialogue ?? false,
         },
-        { timeout: 30000 }
-      );
-      return res.data;
-    } catch (err) {
-      // Fallback API Spring Boot proxy nếu AI Vision server không gọi trực tiếp được
-      const fallbackRes = await apiClient.post('/api/vision/detect-and-lexicon', {
-        imageBase64: base64Image,
-        sceneTheme,
+        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 45000,
       });
-      return fallbackRes.data;
+
+      return res.data;
+    } catch (err: any) {
+      console.warn('[visionService.detectObjectsFromImage] error:', err?.message || err);
+      return {
+        success: false,
+        error: err?.response?.data?.detail || err?.message || 'Không thể kết nối máy chủ AI Vision (Port 8001)',
+        detectedObjects: [],
+        dialogue: [],
+      };
     }
+  },
+
+  async detectObjectsFromBase64(base64Image: string, sceneTheme: string = 'auto') {
+    return this.detectObjectsFromImage({
+      base64DataUrl: base64Image,
+      sceneTheme,
+      confidenceThreshold: 0.12,
+    });
   },
 
   async detectObjectsWithYolo(formData: FormData, params?: Record<string, any>) {
@@ -184,19 +231,11 @@ export const visionService = {
           skip_dialogue: params?.skipDialogue ?? true,
         },
         headers: { 'Content-Type': 'multipart/form-data' },
-        timeout: 30000,
+        timeout: 45000,
       });
       return res.data;
-    } catch (_) {
-      // Fallback qua Spring Boot
-      try {
-        const res = await apiClient.post('/api/vision/detect', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
-        return res.data;
-      } catch (err: any) {
-        return { success: false, error: err.message || 'Không thể kết nối máy chủ AI Vision' };
-      }
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Không thể kết nối máy chủ AI Vision' };
     }
   },
 
@@ -210,10 +249,15 @@ export const visionService = {
       const formData = new FormData();
       formData.append('sceneTheme', data.sceneTheme);
       formData.append('detectedObjectsJson', JSON.stringify(data.detectedObjects));
-      if (data.imageUri) {
+      const filename = 'capture.jpg';
+      if (data.base64DataUrl && typeof window !== 'undefined' && typeof window.fetch === 'function') {
+        const blobRes = await fetch(data.base64DataUrl);
+        const blob = await blobRes.blob();
+        formData.append('image', blob, filename);
+      } else if (data.imageUri) {
         formData.append('image', {
           uri: data.imageUri,
-          name: 'capture.jpg',
+          name: filename,
           type: 'image/jpeg',
         } as any);
       }
