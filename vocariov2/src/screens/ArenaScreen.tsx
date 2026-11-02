@@ -16,6 +16,7 @@ import {
   Alert,
   Modal,
   Dimensions,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Speech from 'expo-speech';
@@ -105,10 +106,10 @@ const DEFAULT_OFFICIAL_STAGES: ArenaStage[] = [
     bestRecordStr: '00:11.20',
     bestRecordHolder: 'Lê Minh Khôi',
     words: [
-      { id: 'sd-1', word: 'laptop', ipa: '/ˈlæptɒp/', vietnamese: 'máy tính xách tay', level: 'A1', partOfSpeech: 'noun', topPercent: 32, leftPercent: 34, widthPercent: 28, heightPercent: 26 },
-      { id: 'sd-2', word: 'desk lamp', ipa: '/ˈdesk læmp/', vietnamese: 'đèn học để bàn', level: 'A2', partOfSpeech: 'noun', topPercent: 12, leftPercent: 12, widthPercent: 18, heightPercent: 34 },
-      { id: 'sd-3', word: 'chair', ipa: '/tʃeər/', vietnamese: 'ghế ngồi làm việc', level: 'A1', partOfSpeech: 'noun', topPercent: 52, leftPercent: 38, widthPercent: 24, heightPercent: 44 },
-      { id: 'sd-4', word: 'notebook', ipa: '/ˈnəʊtbʊk/', vietnamese: 'sổ tay ghi chép', level: 'A1', partOfSpeech: 'noun', topPercent: 48, leftPercent: 66, widthPercent: 18, heightPercent: 20 },
+      { id: 'sd-1', word: 'laptop', ipa: '/ˈlæptɒp/', vietnamese: 'máy tính xách tay', level: 'A1', partOfSpeech: 'noun', topPercent: 14, leftPercent: 54, widthPercent: 32, heightPercent: 44 },
+      { id: 'sd-2', word: 'desk lamp', ipa: '/ˈdesk læmp/', vietnamese: 'đèn học để bàn', level: 'A2', partOfSpeech: 'noun', topPercent: 12, leftPercent: 40, widthPercent: 20, heightPercent: 36 },
+      { id: 'sd-3', word: 'chair', ipa: '/tʃeər/', vietnamese: 'ghế ngồi làm việc', level: 'A1', partOfSpeech: 'noun', topPercent: 34, leftPercent: 0, widthPercent: 42, heightPercent: 62 },
+      { id: 'sd-4', word: 'notebook', ipa: '/ˈnəʊtbʊk/', vietnamese: 'sổ tay ghi chép', level: 'A1', partOfSpeech: 'noun', topPercent: 34, leftPercent: 24, widthPercent: 22, heightPercent: 18 },
     ],
   },
 ];
@@ -152,6 +153,7 @@ export const ArenaScreen: React.FC = () => {
   const [isShowingSuccess, setIsShowingSuccess] = useState(false);
   const [isHintActive, setIsHintActive] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [canvasLayout, setCanvasLayout] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -390,13 +392,46 @@ export const ArenaScreen: React.FC = () => {
 
   const currentTarget = activeQueue[currentIndex] || null;
 
-  // ── Hitbox Touch Detection ──────────────────────────────────────────────────
-  const onPhotoTapped = (event: any, containerWidth: number, containerHeight: number) => {
+  // ── Direct Word Hitbox Handler ──────────────────────────────────────────────
+  const handleDirectWordHit = (hitWord: ArenaWord) => {
+    if (isShowingSuccess || !currentTarget) return;
+    setTotalClicks((prev) => prev + 1);
+
+    if (
+      hitWord.id === currentTarget.id ||
+      hitWord.word.toLowerCase() === currentTarget.word.toLowerCase()
+    ) {
+      handleCorrectHit(hitWord);
+    } else {
+      setComboMultiplier(1.0);
+      setMistakeCount((prev) => prev + 1);
+      setPenaltyTimeMs((prev) => prev + 2000);
+      showToast(
+        `Đó là "${hitWord.word}" (${hitWord.vietnamese}), hãy tìm "${currentTarget.word}"! (+2s phạt)`
+      );
+    }
+  };
+
+  // ── Hitbox Touch Detection (Fallback & Freehand Taps) ────────────────────────
+  const onPhotoTapped = (event: any) => {
     if (isShowingSuccess || !currentTarget) return;
 
-    const { locationX, locationY } = event.nativeEvent;
-    const clickX = (locationX / containerWidth) * 100;
-    const clickY = (locationY / containerHeight) * 100;
+    const nativeEvt = event.nativeEvent || {};
+    const actualWidth = canvasLayout.width > 0 ? canvasLayout.width : SCREEN_WIDTH;
+    const actualHeight =
+      canvasLayout.height > 0 ? canvasLayout.height : SCREEN_WIDTH * 0.75;
+
+    let locX = nativeEvt.locationX;
+    let locY = nativeEvt.locationY;
+    if (locX === undefined || isNaN(locX)) {
+      locX = nativeEvt.offsetX ?? 0;
+    }
+    if (locY === undefined || isNaN(locY)) {
+      locY = nativeEvt.offsetY ?? 0;
+    }
+
+    const clickX = (locX / actualWidth) * 100;
+    const clickY = (locY / actualHeight) * 100;
 
     setTotalClicks((prev) => prev + 1);
 
@@ -404,17 +439,20 @@ export const ArenaScreen: React.FC = () => {
     let hitWord: ArenaWord | null = null;
     let isTargetHit = false;
 
-    // Hitbox tolerance
+    // Hitbox tolerance (Generous 8% tolerance)
     for (const item of words) {
       if (solvedIds.has(item.id)) continue;
-      const tol = 5.0;
+      const tol = 8.0;
       const minX = item.leftPercent - tol;
       const maxX = item.leftPercent + item.widthPercent + tol;
       const minY = item.topPercent - tol;
       const maxY = item.topPercent + item.heightPercent + tol;
 
       if (clickX >= minX && clickX <= maxX && clickY >= minY && clickY <= maxY) {
-        if (item.id === currentTarget.id || item.word.toLowerCase() === currentTarget.word.toLowerCase()) {
+        if (
+          item.id === currentTarget.id ||
+          item.word.toLowerCase() === currentTarget.word.toLowerCase()
+        ) {
           isTargetHit = true;
           hitWord = item;
           break;
@@ -427,13 +465,13 @@ export const ArenaScreen: React.FC = () => {
     if (isTargetHit && hitWord) {
       handleCorrectHit(hitWord);
     } else if (hitWord) {
-      // Wrong object
       setComboMultiplier(1.0);
       setMistakeCount((prev) => prev + 1);
       setPenaltyTimeMs((prev) => prev + 2000);
-      showToast(`Đó là "${hitWord.word}" (${hitWord.vietnamese}), hãy tìm "${currentTarget.word}"! (+2s phạt)`);
+      showToast(
+        `Đó là "${hitWord.word}" (${hitWord.vietnamese}), hãy tìm "${currentTarget.word}"! (+2s phạt)`
+      );
     } else {
-      // Miss click
       setComboMultiplier(1.0);
       setMistakeCount((prev) => prev + 1);
       setPenaltyTimeMs((prev) => prev + 2000);
@@ -771,56 +809,80 @@ export const ArenaScreen: React.FC = () => {
         </View>
 
         {/* Interactive Photo Canvas */}
-        <View style={{ flex: 1, position: 'relative' }}>
+        <View
+          style={{ flex: 1, position: 'relative' }}
+          onLayout={(e) => {
+            const { width, height } = e.nativeEvent.layout;
+            if (width > 0 && height > 0) {
+              setCanvasLayout({ width, height });
+            }
+          }}
+        >
           <Image
             source={{ uri: currentStage?.imageUrl }}
             style={StyleSheet.absoluteFill}
             resizeMode="cover"
           />
 
-          {/* Touch Layer */}
+          {/* Background Touch Layer (Catches Miss-Clicks) */}
           <TouchableOpacity
             style={StyleSheet.absoluteFill}
             activeOpacity={1}
-            onPress={(e) => onPhotoTapped(e, SCREEN_WIDTH, SCREEN_WIDTH * 0.75)}
-          >
-            {/* Radar Hint Circle */}
-            {isHintActive && target && (
-              <View
+            onPress={onPhotoTapped}
+          />
+
+          {/* Interactive Word Hitbox Overlays */}
+          {currentStage?.words.map((item) => {
+            const isCurrent =
+              currentTarget?.id === item.id ||
+              currentTarget?.word.toLowerCase() === item.word.toLowerCase();
+            const isSolved = solvedIds.has(item.id);
+            if (isSolved) return null;
+
+            return (
+              <TouchableOpacity
+                key={item.id}
                 style={[
-                  styles.radarCircle,
+                  styles.hitboxOverlay,
                   {
-                    left: `${target.leftPercent}%` as any,
-                    top: `${target.topPercent}%` as any,
-                    width: `${target.widthPercent}%` as any,
-                    height: `${target.heightPercent}%` as any,
+                    left: `${item.leftPercent}%` as any,
+                    top: `${item.topPercent}%` as any,
+                    width: `${item.widthPercent}%` as any,
+                    height: `${item.heightPercent}%` as any,
+                  },
+                  isHintActive && isCurrent && styles.radarCircle,
+                ]}
+                activeOpacity={0.7}
+                onPress={(e) => {
+                  e.stopPropagation();
+                  handleDirectWordHit(item);
+                }}
+              />
+            );
+          })}
+
+          {/* Solved items checkmarks */}
+          {Array.from(solvedIds).map((id) => {
+            const word = currentStage?.words.find((w) => w.id === id);
+            if (!word) return null;
+            return (
+              <View
+                key={id}
+                pointerEvents="none"
+                style={[
+                  styles.solvedBox,
+                  {
+                    left: `${word.leftPercent}%` as any,
+                    top: `${word.topPercent}%` as any,
+                    width: `${word.widthPercent}%` as any,
+                    height: `${word.heightPercent}%` as any,
                   },
                 ]}
-              />
-            )}
-
-            {/* Solved items checkmarks */}
-            {Array.from(solvedIds).map((id) => {
-              const word = currentStage?.words.find((w) => w.id === id);
-              if (!word) return null;
-              return (
-                <View
-                  key={id}
-                  style={[
-                    styles.solvedBox,
-                    {
-                      left: `${word.leftPercent}%` as any,
-                      top: `${word.topPercent}%` as any,
-                      width: `${word.widthPercent}%` as any,
-                      height: `${word.heightPercent}%` as any,
-                    },
-                  ]}
-                >
-                  <Ionicons name="checkmark-circle" size={24} color="#10B981" />
-                </View>
-              );
-            })}
-          </TouchableOpacity>
+              >
+                <Ionicons name="checkmark-circle" size={30} color="#10B981" />
+              </View>
+            );
+          })}
         </View>
       </View>
     );
@@ -1185,17 +1247,25 @@ const styles = StyleSheet.create({
   skipBtnText: { fontSize: 9.5, color: T.muted },
 
   // ── In-game Visual Highlights ──────────────────────────────────────────────
+  hitboxOverlay: {
+    position: 'absolute',
+    zIndex: 10,
+    borderRadius: 8,
+    ...(Platform.OS === 'web' ? ({ cursor: 'pointer' } as any) : {}),
+  },
   radarCircle: {
     position: 'absolute',
-    borderWidth: 2,
-    borderColor: T.goldAccent,
-    borderRadius: 6,
+    borderWidth: 2.5,
+    borderColor: '#F7D147',
+    borderRadius: 8,
     backgroundColor: 'rgba(247,209,71,0.25)',
+    zIndex: 15,
   },
   solvedBox: {
     position: 'absolute',
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 20,
   },
 
   // ── Victory Screen ─────────────────────────────────────────────────────────
