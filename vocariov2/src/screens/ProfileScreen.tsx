@@ -17,6 +17,7 @@ import {
   Animated,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import { authService, certificateService } from '../api/services';
 import { removeStoredToken } from '../api/client';
 
@@ -74,10 +75,13 @@ interface ProfileScreenProps {
 }
 
 export const ProfileScreen: React.FC<ProfileScreenProps> = ({ onLogout }) => {
+  const navigation = useNavigation<any>();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isClaimingCert, setIsClaimingCert] = useState(false);
   const [isLevelingUp, setIsLevelingUp] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   // Account state
   const [fullName, setFullName] = useState('');
@@ -185,21 +189,27 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ onLogout }) => {
 
   // ── Logout ──────────────────────────────────────────────────────────────
   const handleLogout = () => {
-    Alert.alert(
-      'Đăng xuất tài khoản?',
-      'Bạn sẽ cần đăng nhập lại để tiếp tục đồng bộ từ vựng và chuỗi học tập.',
-      [
-        { text: 'Hủy', style: 'cancel' },
-        {
-          text: 'Đăng xuất',
-          style: 'destructive',
-          onPress: async () => {
-            await removeStoredToken();
-            onLogout?.();
-          },
-        },
-      ]
-    );
+    setShowLogoutModal(true);
+  };
+
+  const confirmLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await authService.logout();
+      setShowLogoutModal(false);
+      onLogout?.();
+
+      // Reset root navigation to Auth
+      const parentNav = navigation.getParent() || navigation;
+      parentNav.reset({
+        index: 0,
+        routes: [{ name: 'Auth' }],
+      });
+    } catch (_) {
+      setShowLogoutModal(false);
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   // ── Certificate modal ───────────────────────────────────────────────────
@@ -272,6 +282,50 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ onLogout }) => {
                 <Text style={styles.certModalCloseBtnText}>Đóng cửa sổ</Text>
               </TouchableOpacity>
             </ScrollView>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
+  const renderLogoutModal = () => {
+    if (!showLogoutModal) return null;
+    return (
+      <Modal transparent visible={showLogoutModal} animationType="fade" onRequestClose={() => setShowLogoutModal(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.logoutDialogBox}>
+            <View style={styles.logoutDialogHeader}>
+              <View style={styles.logoutDialogIconWrap}>
+                <Ionicons name="log-out-outline" size={20} color={T.rose} />
+              </View>
+              <Text style={styles.logoutDialogTitle}>Đăng xuất tài khoản?</Text>
+            </View>
+
+            <Text style={styles.logoutDialogMessage}>
+              Bạn sẽ cần đăng nhập lại để tiếp tục đồng bộ từ vựng và chuỗi học tập cá nhân.
+            </Text>
+
+            <View style={styles.logoutDialogActions}>
+              <TouchableOpacity
+                style={styles.logoutCancelBtn}
+                disabled={isLoggingOut}
+                onPress={() => setShowLogoutModal(false)}
+              >
+                <Text style={styles.logoutCancelBtnText}>Hủy</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.logoutConfirmBtn, isLoggingOut && { opacity: 0.7 }]}
+                disabled={isLoggingOut}
+                onPress={confirmLogout}
+              >
+                {isLoggingOut ? (
+                  <ActivityIndicator color="#FFFFFF" size="small" />
+                ) : (
+                  <Text style={styles.logoutConfirmBtnText}>Đăng xuất</Text>
+                )}
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>
@@ -553,6 +607,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ onLogout }) => {
 
       {/* Certificate detail modal */}
       {renderCertModal()}
+
+      {/* Logout confirmation modal */}
+      {renderLogoutModal()}
     </View>
   );
 };
@@ -1025,6 +1082,77 @@ const styles = StyleSheet.create({
   },
   certModalCloseBtnText: {
     fontSize: 12,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+
+  // ── Logout Confirmation Dialog ──────────────────────────────────────────
+  logoutDialogBox: {
+    backgroundColor: T.surface,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: T.border,
+    padding: 20,
+    width: '88%',
+    maxWidth: 340,
+    shadowColor: '#000',
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    elevation: 6,
+  },
+  logoutDialogHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  logoutDialogIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: '#FEE2E2',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  logoutDialogTitle: {
+    fontSize: 16,
+    fontFamily: 'serif',
+    fontWeight: 'bold',
+    color: T.ink,
+  },
+  logoutDialogMessage: {
+    fontSize: 12,
+    color: T.muted,
+    lineHeight: 18,
+    marginBottom: 18,
+  },
+  logoutDialogActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    gap: 8,
+  },
+  logoutCancelBtn: {
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: 8,
+  },
+  logoutCancelBtnText: {
+    fontSize: 12.5,
+    fontWeight: '600',
+    color: T.muted,
+  },
+  logoutConfirmBtn: {
+    backgroundColor: '#B91C1C',
+    paddingHorizontal: 16,
+    paddingVertical: 9,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minWidth: 90,
+  },
+  logoutConfirmBtnText: {
+    fontSize: 12.5,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
