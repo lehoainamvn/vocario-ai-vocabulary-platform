@@ -101,6 +101,21 @@ export const srsService = {
     const res = await apiClient.post('/api/srs/review', data);
     return res.data;
   },
+
+  async markWordAsMastered(progressId?: string, wordText?: string) {
+    const res = await apiClient.post('/api/srs/mark-mastered', null, {
+      params: {
+        ...(progressId ? { progressId } : {}),
+        ...(wordText ? { wordText } : {}),
+      },
+    });
+    return res.data;
+  },
+
+  async deleteWord(progressId: string) {
+    const res = await apiClient.delete(`/api/srs/word/${progressId}`);
+    return res.status === 200 || res.status === 204;
+  },
 };
 
 export const visionService = {
