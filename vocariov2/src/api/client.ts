@@ -30,38 +30,80 @@ export const AI_VISION_URL = USE_PRODUCTION
       default: 'http://localhost:8001',
     });
 
-const TOKEN_KEY = 'vocario_auth_token';
+const TOKEN_KEY = 'vocario_jwt_token';
+const USER_ID_KEY = 'vocario_user_id';
+const USERNAME_KEY = 'vocario_username';
 const USER_KEY = 'vocario_user_data';
 
 export const getStoredToken = async (): Promise<string | null> => {
   try {
     if (Platform.OS === 'web') {
-      return await AsyncStorage.getItem(TOKEN_KEY);
+      return (await AsyncStorage.getItem(TOKEN_KEY)) || (await AsyncStorage.getItem('vocario_auth_token'));
     }
-    return await SecureStore.getItemAsync(TOKEN_KEY);
+    return (await SecureStore.getItemAsync(TOKEN_KEY)) || (await SecureStore.getItemAsync('vocario_auth_token'));
   } catch (_) {
     return null;
   }
 };
 
-export const setStoredToken = async (token: string): Promise<void> => {
+export const getStoredUserId = async (): Promise<string | null> => {
+  try {
+    if (Platform.OS === 'web') {
+      return await AsyncStorage.getItem(USER_ID_KEY);
+    }
+    return await SecureStore.getItemAsync(USER_ID_KEY);
+  } catch (_) {
+    return null;
+  }
+};
+
+export const getStoredUsername = async (): Promise<string | null> => {
+  try {
+    if (Platform.OS === 'web') {
+      return await AsyncStorage.getItem(USERNAME_KEY);
+    }
+    return await SecureStore.getItemAsync(USERNAME_KEY);
+  } catch (_) {
+    return null;
+  }
+};
+
+export const setAuthData = async (token: string, userId?: string, username?: string, rawUser?: any): Promise<void> => {
   try {
     if (Platform.OS === 'web') {
       await AsyncStorage.setItem(TOKEN_KEY, token);
+      await AsyncStorage.setItem('vocario_auth_token', token);
+      if (userId) await AsyncStorage.setItem(USER_ID_KEY, String(userId));
+      if (username) await AsyncStorage.setItem(USERNAME_KEY, username);
+      if (rawUser) await AsyncStorage.setItem(USER_KEY, JSON.stringify(rawUser));
     } else {
       await SecureStore.setItemAsync(TOKEN_KEY, token);
+      await SecureStore.setItemAsync('vocario_auth_token', token);
+      if (userId) await SecureStore.setItemAsync(USER_ID_KEY, String(userId));
+      if (username) await SecureStore.setItemAsync(USERNAME_KEY, username);
+      if (rawUser) await AsyncStorage.setItem(USER_KEY, JSON.stringify(rawUser));
     }
   } catch (_) {}
+};
+
+export const setStoredToken = async (token: string): Promise<void> => {
+  await setAuthData(token);
 };
 
 export const removeStoredToken = async (): Promise<void> => {
   try {
     if (Platform.OS === 'web') {
       await AsyncStorage.removeItem(TOKEN_KEY);
+      await AsyncStorage.removeItem('vocario_auth_token');
+      await AsyncStorage.removeItem(USER_ID_KEY);
+      await AsyncStorage.removeItem(USERNAME_KEY);
       await AsyncStorage.removeItem(USER_KEY);
     } else {
       await SecureStore.deleteItemAsync(TOKEN_KEY);
-      await SecureStore.deleteItemAsync(USER_KEY);
+      await SecureStore.deleteItemAsync('vocario_auth_token');
+      await SecureStore.deleteItemAsync(USER_ID_KEY);
+      await SecureStore.deleteItemAsync(USERNAME_KEY);
+      await AsyncStorage.removeItem(USER_KEY);
     }
   } catch (_) {}
 };
@@ -78,6 +120,13 @@ apiClient.interceptors.request.use(async (config) => {
   const token = await getStoredToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+  }
+  const userId = await getStoredUserId();
+  if (userId) {
+    config.params = config.params || {};
+    if (!config.params.userId && !config.params.currentUserId) {
+      config.params.userId = userId;
+    }
   }
   return config;
 });

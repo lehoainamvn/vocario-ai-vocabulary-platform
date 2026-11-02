@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { apiClient, AI_VISION_URL, removeStoredToken } from './client';
+import { apiClient, AI_VISION_URL, removeStoredToken, setAuthData, getStoredUserId } from './client';
 import { TargetProgress, WordItem, LeaderboardEntry, CertificateItem, DetectedBox } from '../types';
 
 // Helper chuyển đổi DTO UserWordProgress từ backend Spring Boot sang giao diện WordItem
@@ -25,20 +25,37 @@ export const mapProgressToWordItem = (item: any): WordItem => {
 export const authService = {
   async login(usernameOrEmail: string, password: string) {
     const res = await apiClient.post('/api/auth/login', {
-      usernameOrEmail,
+      usernameOrEmail: usernameOrEmail.trim(),
       password,
     });
-    return res.data;
+    const data = res.data;
+    if (data?.token) {
+      await setAuthData(data.token, data.userId ? String(data.userId) : undefined, data.username, data);
+    }
+    return data;
   },
 
-  async register(username: string, email: string, password: string, fullName?: string) {
+  async register(username: string, email: string, password: string, fullName?: string, targetLevel: string = 'A2') {
     const res = await apiClient.post('/api/auth/register', {
-      username,
-      email,
+      username: username.trim(),
+      email: email.trim(),
       password,
-      fullName: fullName || username,
+      fullName: (fullName || username).trim(),
     });
-    return res.data;
+    const data = res.data;
+    if (data?.token) {
+      await setAuthData(data.token, data.userId ? String(data.userId) : undefined, data.username, data);
+      if (data.userId) {
+        try {
+          await apiClient.put('/api/auth/profile', {
+            fullName: fullName || username,
+            targetLevel,
+            dailyGoal: 10,
+          }, { params: { userId: data.userId } });
+        } catch (_) {}
+      }
+    }
+    return data;
   },
 
   async getProfile(userId?: string) {
@@ -63,6 +80,19 @@ export const authService = {
       await apiClient.post('/api/auth/logout');
     } catch (_) {}
     await removeStoredToken();
+  },
+
+  async getDashboardData() {
+    const [user, dueCards, targetProgress] = await Promise.allSettled([
+      authService.getProfile().catch(() => null),
+      srsService.getDueCards().catch(() => []),
+      srsService.getTargetProgress().catch(() => null),
+    ]);
+    return {
+      user: user.status === 'fulfilled' ? user.value : null,
+      dueCards: dueCards.status === 'fulfilled' ? dueCards.value : [],
+      targetProgress: targetProgress.status === 'fulfilled' ? targetProgress.value : null,
+    };
   },
 };
 
@@ -271,6 +301,35 @@ export const arenaService = {
 };
 
 export const leaderboardService = {
+  async getLeaderboard(params?: {
+    period?: string;
+    level?: string;
+    page?: number;
+    size?: number;
+    userId?: string;
+  }) {
+    const res = await apiClient.get('/api/leaderboard', {
+      params: {
+        period: params?.period || 'weekly',
+        level: params?.level || 'ALL',
+        page: params?.page ?? 0,
+        size: params?.size ?? 10,
+        ...(params?.userId ? { userId: params.userId } : {}),
+      },
+    });
+    return res.data;
+  },
+
+  async getMyRank(period: string = 'weekly', userId?: string) {
+    const res = await apiClient.get('/api/leaderboard/my-rank', {
+      params: {
+        period,
+        ...(userId ? { userId } : {}),
+      },
+    });
+    return res.data;
+  },
+
   async getWeeklyLeaderboard(period: string = 'weekly', level: string = 'ALL'): Promise<LeaderboardEntry[]> {
     const res = await apiClient.get('/api/leaderboard', {
       params: { period, level, page: 0, size: 20 },
@@ -291,18 +350,110 @@ export const leaderboardService = {
     return [];
   },
 
-  async getStageLeaderboard(stageId: string): Promise<LeaderboardEntry[]> {
-    const res = await apiClient.get(`/api/arena/stages/${stageId}/leaderboard`);
-    const raw = res.data || [];
-    return raw.map((r: any) => ({
-      rank: r.rank,
-      userId: String(r.userId),
-      username: r.userName || 'Học viên',
-      score: r.totalXpEarned || 0,
-      streakDays: 0,
-      accuracyRate: r.accuracyPct,
-      timeTakenSeconds: r.completionTimeMs ? r.completionTimeMs / 1000 : 0,
-    }));
+  async getStageLeaderboard(stageId: string, params?: { period?: string; currentUserId?: string }): Promise<any[]> {
+    const res = await apiClient.get(`/api/arena/stages/${stageId}/leaderboard`, {
+      params: {
+        period: params?.period || 'all',
+        ...(params?.currentUserId ? { currentUserId: params.currentUserId } : {}),
+      },
+    });
+    return res.data || [];
+  },
+};
+
+export const classroomService = {
+  async getMyClassrooms(userId?: string) {
+    const res = await apiClient.get('/api/classrooms/my-classrooms', {
+      params: userId ? { userId } : {},
+    });
+    return res.data || [];
+  },
+
+  async getClassroomByCode(code: string, userId?: string) {
+    const res = await apiClient.get(`/api/classrooms/${code.trim().toUpperCase()}`, {
+      params: userId ? { userId } : {},
+    });
+    return res.data;
+  },
+
+  async joinClassroom(code: string, userId?: string) {
+    const res = await apiClient.post(`/api/classrooms/${code.trim().toUpperCase()}/join`, {}, {
+      params: userId ? { userId } : {},
+    });
+    return res.data;
+  },
+
+  async cloneClassroomToNotebook(code: string, userId?: string) {
+    const res = await apiClient.post(`/api/classrooms/${code.trim().toUpperCase()}/clone-to-notebook`, {}, {
+      params: userId ? { userId } : {},
+    });
+    return res.data;
+  },
+
+  async createClassroom(data: {
+    name: string;
+    description: string;
+    targetLevel: string;
+    words: any[];
+    userId?: string;
+  }) {
+    const { userId, ...body } = data;
+    const res = await apiClient.post('/api/classrooms', body, {
+      params: userId ? { userId } : {},
+    });
+    return res.data;
+  },
+
+  async saveWordsToNotebook(
+    words: any[],
+    category: string = 'Trích xuất văn bản',
+    targetLevel: string = 'B1',
+    userId?: string
+  ) {
+    const res = await apiClient.post(
+      '/api/classrooms/save-words-to-notebook',
+      { category, targetLevel, words },
+      { params: userId ? { userId } : {} }
+    );
+    return res.data;
+  },
+};
+
+export const nlpService = {
+  async regenerateDialogue(words: any[], theme: string = 'general', targetLevel: string = 'A2') {
+    const res = await axios.post(`${AI_VISION_URL}/regenerate-dialogue`, {
+      words,
+      theme,
+      target_level: targetLevel,
+    });
+    return res.data;
+  },
+
+  async generateAiQuiz(words: any[], theme: string = 'Bối cảnh đời thực', targetLevel: string = 'A2', numQuestions: number = 5) {
+    const res = await axios.post(`${AI_VISION_URL}/generate-quiz`, {
+      words,
+      theme,
+      target_level: targetLevel,
+      num_questions: numQuestions,
+    });
+    return res.data;
+  },
+
+  async parseDocumentFile(fileFormData: FormData) {
+    const res = await axios.post(`${AI_VISION_URL}/parse-document`, fileFormData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return res.data;
+  },
+
+  async extractVocabFromText(text: string, targetCount: number = 8, targetLevel: string = 'B2', themeHint: string = '') {
+    const res = await axios.post(`${AI_VISION_URL}/extract-vocab`, {
+      text,
+      target_count: targetCount,
+      target_level: targetLevel,
+      theme_hint: themeHint,
+    });
+    return res.data;
   },
 };
 

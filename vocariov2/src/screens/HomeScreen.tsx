@@ -362,11 +362,11 @@ export const HomeScreen: React.FC = () => {
   const renderQuickActions = () => {
     const actions = [
       { icon: 'camera-outline', title: 'Quét Camera', subtitle: 'Nhận diện AI thế giới thực', tag: 'HOT', screen: 'Scanner' },
-      { icon: 'images-outline', title: 'Bộ Sưu Tập', subtitle: 'Kho ảnh và từ theo không gian', tag: 'MỚI', screen: 'Scanner' },
+      { icon: 'images-outline', title: 'Bộ Sưu Tập', subtitle: 'Kho ảnh và từ theo không gian', tag: 'MỚI', screen: 'Collection' },
       { icon: 'albums-outline', title: 'Sổ Từ SM-2', subtitle: 'Kho thẻ nhớ của bạn', screen: 'Wordbook' },
       { icon: 'flash-outline', title: 'Đấu Trường', subtitle: 'Phản xạ qua ảnh thật', screen: 'Arena' },
-      { icon: 'document-text-outline', title: 'Trích Xuất Văn Bản', subtitle: 'Bóc tách từ vựng tài liệu AI', tag: 'AI', screen: 'Scanner' },
-      { icon: 'people-outline', title: 'Lớp Học Ảo', subtitle: 'Mã phòng & chia sẻ bộ từ', screen: 'Leaderboard' },
+      { icon: 'document-text-outline', title: 'Trích Xuất Văn Bản', subtitle: 'Bóc tách từ vựng tài liệu AI', tag: 'AI', screen: 'TextExtractor' },
+      { icon: 'people-outline', title: 'Lớp Học Ảo', subtitle: 'Mã phòng & chia sẻ bộ từ', screen: 'Classroom' },
     ];
 
     const rows = [[actions[0], actions[1]], [actions[2], actions[3]], [actions[4], actions[5]]];

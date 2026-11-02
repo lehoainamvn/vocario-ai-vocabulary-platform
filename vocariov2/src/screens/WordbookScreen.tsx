@@ -336,7 +336,7 @@ export const WordbookScreen: React.FC = () => {
         <View style={{ flexDirection: 'row', gap: 6 }}>
           <TouchableOpacity
             style={styles.collectionPill}
-            onPress={() => navigation.navigate('Scanner')}
+            onPress={() => navigation.navigate('Collection')}
             activeOpacity={0.75}
           >
             <Ionicons name="images-outline" size={13} color={T.brand} />
@@ -385,7 +385,7 @@ export const WordbookScreen: React.FC = () => {
         {/* Tab 2: Bộ sưu tập */}
         <TouchableOpacity
           style={styles.segmentBtn}
-          onPress={() => navigation.navigate('Scanner')}
+          onPress={() => navigation.navigate('Collection')}
           activeOpacity={0.8}
         >
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>

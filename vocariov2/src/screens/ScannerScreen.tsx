@@ -365,7 +365,7 @@ export const ScannerScreen: React.FC = () => {
         {/* Link OCR */}
         <TouchableOpacity
           style={styles.ocrLink}
-          onPress={() => showToast('Tính năng OCR Văn Bản đang sẵn sàng.')}
+          onPress={() => navigation.navigate('TextExtractor')}
           activeOpacity={0.75}
         >
           <Ionicons name="document-text-outline" size={13} color={T.brand} />
