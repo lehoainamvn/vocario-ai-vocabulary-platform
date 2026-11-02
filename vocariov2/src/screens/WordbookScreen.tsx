@@ -15,6 +15,7 @@ import {
   ActivityIndicator,
   Animated,
   Alert,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Speech from 'expo-speech';
@@ -322,15 +323,9 @@ export const WordbookScreen: React.FC = () => {
   const renderTopAppBar = () => (
     <View style={styles.topAppBar}>
       <View style={styles.topRow}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="chevron-back" size={16} color={T.ink} />
-          </TouchableOpacity>
-          <Text style={styles.appBarTitle}>Sổ tay từ vựng</Text>
+        <View>
+          <Text style={styles.topMono}>SUPERMEMO SM-2 LEXICON</Text>
+          <Text style={styles.appBarTitle}>Sổ từ vựng</Text>
         </View>
 
         <View style={{ flexDirection: 'row', gap: 6 }}>
@@ -857,22 +852,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  backButton: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
-    backgroundColor: T.surface,
-    borderWidth: 1,
-    borderColor: T.border,
-    alignItems: 'center',
-    justifyContent: 'center',
+  topMono: {
+    fontSize: 7.5,
+    fontFamily: 'monospace',
+    color: T.brand,
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
   },
   appBarTitle: {
-    fontSize: 19,
+    fontSize: 18,
     fontFamily: 'serif',
     fontWeight: 'bold',
     color: T.ink,
-    marginLeft: 10,
+    marginTop: 1,
   },
   collectionPill: {
     flexDirection: 'row',
@@ -915,6 +907,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
+    ...(Platform.OS === 'web' ? ({ outlineStyle: 'none' } as any) : {}),
   },
   segmentBtnActive: {
     backgroundColor: T.surface,
