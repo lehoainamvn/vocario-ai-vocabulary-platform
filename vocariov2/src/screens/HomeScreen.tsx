@@ -13,6 +13,7 @@ import {
   RefreshControl,
   Animated,
   Image,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -523,39 +524,27 @@ export const HomeScreen: React.FC = () => {
                   <Ionicons name="image-outline" size={36} color={T.muted} />
                 </View>
               )}
-              {/* Dark gradient overlay (simulated) */}
+              {/* Dark smooth gradient overlay */}
               <View style={styles.arenaGradient} />
-
-              {/* Corner brackets */}
-              {[{ top: 12, left: 12, isTop: true, isLeft: true }, { top: 12, right: 12, isTop: true, isLeft: false },
-                { bottom: 12, left: 12, isTop: false, isLeft: true }, { bottom: 12, right: 12, isTop: false, isLeft: false }]
-                .map((b, i) => (
-                  <View key={i} style={[styles.cornerBracket, {
-                    top: b.top, bottom: b.bottom, left: b.left, right: b.right,
-                    borderTopWidth: b.isTop ? 1.5 : 0, borderBottomWidth: !b.isTop ? 1.5 : 0,
-                    borderLeftWidth: b.isLeft ? 1.5 : 0, borderRightWidth: !b.isLeft ? 1.5 : 0,
-                  }]} />
-                ))}
-
-              {/* Bounding box tag */}
-              <View style={styles.arenaBoundingBox}>
-                <View style={styles.arenaBbWordTag}>
-                  <Text style={styles.arenaBbWordText}>{hero.firstWord}</Text>
-                </View>
-                <View style={styles.arenaBbConfTag}>
-                  <Text style={styles.arenaBbConfText}>{hero.confidence}</Text>
-                </View>
-              </View>
 
               {/* Bottom info + CTA */}
               <View style={styles.arenaBottomRow}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.arenaBadgeText}>{hero.badge}</Text>
-                  <Text style={styles.arenaTitle} numberOfLines={1}>{hero.title}</Text>
+                <View style={{ flex: 1, marginRight: 10 }}>
+                  <View style={styles.arenaBadgePill}>
+                    <Ionicons name="sparkles" size={10} color={T.goldAccent} />
+                    <Text style={styles.arenaBadgeText}>{hero.badge}</Text>
+                  </View>
+                  <Text style={styles.arenaTitle} numberOfLines={1}>
+                    {hero.title}
+                  </Text>
+                  <Text style={styles.arenaSubTitle}>
+                    Thử thách phản xạ tìm đồ vật · 60s Speedrun
+                  </Text>
                 </View>
                 <TouchableOpacity
                   style={styles.arenaEnterBtn}
                   onPress={() => navigation.navigate('Arena')}
+                  activeOpacity={0.85}
                 >
                   <Text style={styles.arenaEnterBtnText}>Vào thi</Text>
                   <Ionicons name="arrow-forward" size={12} color="#fff" />
@@ -949,75 +938,65 @@ const styles = StyleSheet.create({
   },
   arenaGradient: {
     position: 'absolute',
-    left: 0, right: 0, bottom: 0,
-    height: 120,
-    backgroundColor: 'rgba(45,40,35,0.75)',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    top: 0,
+    ...(Platform.OS === 'web'
+      ? ({
+          backgroundImage:
+            'linear-gradient(to bottom, transparent 30%, rgba(20, 18, 15, 0.88) 100%)',
+        } as any)
+      : { backgroundColor: 'rgba(20, 18, 15, 0.45)' }),
   },
-  cornerBracket: {
-    position: 'absolute',
-    width: 15,
-    height: 15,
-    borderColor: 'rgba(255,255,255,0.82)',
-  },
-  arenaBoundingBox: {
-    position: 'absolute',
-    top: 20,
-    right: 32,
-    width: 92,
-    height: 52,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.88)',
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-  },
-  arenaBbWordTag: {
-    position: 'absolute',
-    top: -10,
-    left: -1,
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    paddingHorizontal: 5,
-    paddingVertical: 2,
-  },
-  arenaBbWordText: { fontSize: 8, fontFamily: 'monospace', fontWeight: 'bold', color: T.ink },
-  arenaBbConfTag: {
-    position: 'absolute',
-    top: -10,
-    right: -1,
-    backgroundColor: T.goldAccent,
-    paddingHorizontal: 4,
-    paddingVertical: 2,
-  },
-  arenaBbConfText: { fontSize: 7.5, fontFamily: 'monospace', fontWeight: 'bold', color: T.ink },
   arenaBottomRow: {
     position: 'absolute',
-    left: 15,
-    right: 15,
-    bottom: 13,
+    left: 14,
+    right: 14,
+    bottom: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
   },
+  arenaBadgePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginBottom: 2,
+  },
   arenaBadgeText: {
-    fontSize: 7,
+    fontSize: 8.5,
     fontFamily: 'monospace',
-    color: 'rgba(255,255,255,0.85)',
+    color: T.goldAccent,
     letterSpacing: 0.8,
     fontWeight: 'bold',
     textTransform: 'uppercase',
   },
-  arenaTitle: { fontSize: 13.5, fontFamily: 'serif', fontWeight: 'bold', color: '#fff', marginTop: 3 },
+  arenaTitle: {
+    fontSize: 15,
+    fontFamily: 'serif',
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginTop: 2,
+    letterSpacing: -0.3,
+  },
+  arenaSubTitle: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.78)',
+    marginTop: 2,
+  },
   arenaEnterBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: T.ink,
-    borderRadius: 9,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
     gap: 4,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
+    borderColor: 'rgba(255,255,255,0.3)',
   },
-  arenaEnterBtnText: { fontSize: 9, fontWeight: 'bold', color: '#fff' },
+  arenaEnterBtnText: { fontSize: 10.5, fontWeight: 'bold', color: '#FFFFFF' },
 
   // ── Leaderboard ───────────────────────────────────────────────────────────
   lbRow: {
