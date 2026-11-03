@@ -16,4 +16,10 @@ public interface CertificateTypeRepository extends JpaRepository<CertificateType
     boolean existsByTypeCode(String typeCode);
 
     List<CertificateType> findAllByOrderByCreatedAtAsc();
+
+    Optional<CertificateType> findFirstByCefrLevelOrderByCreatedAtDesc(String cefrLevel);
+
+    default Optional<CertificateType> findByCefrLevel(String cefrLevel) {
+        return findFirstByCefrLevelOrderByCreatedAtDesc(cefrLevel);
+    }
 }

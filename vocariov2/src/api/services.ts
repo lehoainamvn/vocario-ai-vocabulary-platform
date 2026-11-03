@@ -91,14 +91,18 @@ export const authService = {
     const storedId = await getStoredUserId();
     const profile = await authService.getProfile(storedId || undefined).catch(() => null);
     const userId = storedId || profile?.id || profile?.userId;
-    const [dueCards, targetProgress] = await Promise.allSettled([
+    const [dueCards, targetProgress, savedWords, certTypes] = await Promise.allSettled([
       srsService.getDueCards(userId).catch(() => []),
       srsService.getTargetProgress(userId).catch(() => null),
+      srsService.getSavedWords(userId).catch(() => []),
+      certificateService.getCertificateTypes().catch(() => []),
     ]);
     return {
       user: profile,
       dueCards: dueCards.status === 'fulfilled' ? dueCards.value : [],
       targetProgress: targetProgress.status === 'fulfilled' ? targetProgress.value : null,
+      savedWords: savedWords.status === 'fulfilled' ? (savedWords.value as WordItem[]) : [],
+      certTypes: certTypes.status === 'fulfilled' ? (certTypes.value as any[]) : [],
     };
   },
 };
@@ -522,6 +526,11 @@ export const nlpService = {
 };
 
 export const certificateService = {
+  async getCertificateTypes(): Promise<any[]> {
+    const res = await apiClient.get('/api/certificates/admin/types');
+    return res.data || [];
+  },
+
   async getMyCertificates(userId?: string): Promise<CertificateItem[]> {
     const res = await apiClient.get('/api/certificates/my-certificates', {
       params: userId ? { userId } : {},

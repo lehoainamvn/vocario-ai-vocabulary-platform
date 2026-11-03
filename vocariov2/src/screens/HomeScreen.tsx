@@ -38,7 +38,16 @@ const T = {
 };
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-interface TierStatus { code: string; progress: string; status: 'complete' | 'active' | 'future'; }
+interface TierStatus {
+  code: string;
+  label: string;
+  mastered: number;
+  required: number;
+  progress: string;
+  pctNumber: number;
+  color: string;
+  status: 'complete' | 'active' | 'future';
+}
 interface LeaderboardUser { rank: number; name: string; level: string; streak: number; xp: number; isMe: boolean; }
 interface HeroStage {
   id: string; title: string; imageUrl: string;
@@ -66,14 +75,16 @@ export const HomeScreen: React.FC = () => {
 
   // Mastery
   const [masteredWords, setMasteredWords] = useState(0);
-  const [totalTargetWords, setTotalTargetWords] = useState(0);
+  const [collectionWords, setCollectionWords] = useState(0);
+  const [totalTargetWords, setTotalTargetWords] = useState(1000);
+  const [remainingWordsToTarget, setRemainingWordsToTarget] = useState(1000);
   const [completionPercentage, setCompletionPercentage] = useState(0);
   const [tiers, setTiers] = useState<TierStatus[]>([
-    { code: 'A1', progress: '0%', status: 'future' },
-    { code: 'A2', progress: '0%', status: 'active' },
-    { code: 'B1', progress: '0%', status: 'future' },
-    { code: 'B2', progress: '0%', status: 'future' },
-    { code: 'C1', progress: '0%', status: 'future' },
+    { code: 'A1', label: 'Sơ cấp', mastered: 0, required: 1000, progress: '0%', pctNumber: 0, color: '#059669', status: 'future' },
+    { code: 'A2', label: 'Cơ bản', mastered: 0, required: 1000, progress: '0%', pctNumber: 0, color: '#D97706', status: 'active' },
+    { code: 'B1', label: 'Trung cấp', mastered: 0, required: 20, progress: '0%', pctNumber: 0, color: '#4F46E5', status: 'future' },
+    { code: 'B2', label: 'Nâng cao', mastered: 0, required: 30, progress: '0%', pctNumber: 0, color: '#7C3AED', status: 'future' },
+    { code: 'C1', label: 'Tinh anh', mastered: 0, required: 50, progress: '0%', pctNumber: 0, color: '#B45309', status: 'future' },
   ]);
 
   // Leaderboard
@@ -127,34 +138,67 @@ export const HomeScreen: React.FC = () => {
           setPreviewLevel(user.targetLevel || 'A2');
         }
 
-        // Cập nhật tiến độ chuẩn hóa CEFR theo đúng chuẩn Web & Spring Boot
-        const cefrThresholds: Record<string, number> = { A1: 500, A2: 1000, B1: 2000, B2: 4000, C1: 8000 };
+        // Cập nhật tiến độ chuẩn hóa CEFR đồng bộ 100% với Web & Spring Boot CSDL
+        const savedWords: any[] = bundle.savedWords || [];
+        const certTypes: any[] = bundle.certTypes || [];
+        const defaultThresholds: Record<string, number> = { A1: 1000, A2: 1000, B1: 20, B2: 30, C1: 50 };
+        const tierMeta: Record<string, { label: string; color: string }> = {
+          A1: { label: 'Sơ cấp', color: '#059669' },
+          A2: { label: 'Cơ bản', color: '#D97706' },
+          B1: { label: 'Trung cấp', color: '#4F46E5' },
+          B2: { label: 'Nâng cao', color: '#7C3AED' },
+          C1: { label: 'Tinh anh', color: '#B45309' },
+        };
+
         const userLvl = (user.targetLevel || 'A2').toUpperCase();
-        const threshold = targetProgress?.masteryThreshold || cefrThresholds[userLvl] || 1000;
-        const rawMastered = targetProgress?.masteredWordsAtLevel ?? 0;
-        const totalMasteredFromBreakdowns = targetProgress?.levelBreakdowns?.reduce((sum: number, b: any) => sum + (b.masteredCount || 0), 0) ?? 0;
-        const mastered = rawMastered > 0 ? rawMastered : totalMasteredFromBreakdowns;
-        const pct = targetProgress?.completionPercentage ?? (threshold > 0 ? Math.min(100, Math.round((mastered / threshold) * 100)) : 0);
-
-        setMasteredWords(mastered);
-        setTotalTargetWords(threshold);
-        setCompletionPercentage(pct);
-
-        const levels = ['A1', 'A2', 'B1', 'B2', 'C1'];
         const breakdowns: any[] = targetProgress?.levelBreakdowns || [];
-        setTiers(levels.map((lvl) => {
+
+        // Tính toán từ vựng cho từng level: ưu tiên breakdowns từ backend, fallback trực tiếp từ savedWords
+        const levels = ['A1', 'A2', 'B1', 'B2', 'C1'];
+        const updatedTiers: TierStatus[] = levels.map((lvl) => {
           const b = breakdowns.find((x: any) => (x.level || '').toUpperCase() === lvl);
-          const lvlMastered = b?.masteredCount ?? (lvl === userLvl ? mastered : 0);
-          const lvlReq = b?.requiredWords ?? (cefrThresholds[lvl] || 1000);
-          const lvlPct = b?.completionPercentage ?? (lvlReq > 0 ? Math.min(100, Math.round((lvlMastered / lvlReq) * 100)) : 0);
+          const ct = certTypes.find((t: any) => (t.cefrLevel || t.typeCode || '').toUpperCase() === lvl);
+
+          // Ngưỡng yêu cầu: lấy từ certTypes DB -> breakdowns -> defaultThresholds
+          const lvlReq = ct?.requiredWords && ct.requiredWords > 0
+            ? ct.requiredWords
+            : (b?.requiredWords && b.requiredWords > 0 ? b.requiredWords : (defaultThresholds[lvl] || 1000));
+
+          // Số từ thành thạo: từ breakdowns hoặc đếm trực tiếp từ savedWords (status === 'MASTERED')
+          const wordsAtLvl = savedWords.filter((w: any) => (w.cefrLevel || w.level || 'A2').toUpperCase() === lvl);
+          const masteredFromWords = wordsAtLvl.filter((w: any) => String(w.status).toUpperCase() === 'MASTERED').length;
+          const lvlMastered = b && b.masteredCount !== undefined && b.masteredCount !== null ? b.masteredCount : masteredFromWords;
+
+          const lvlPct = lvlReq > 0 ? Math.min(100, Math.round((lvlMastered / lvlReq) * 100)) : 0;
           const isComplete = lvlPct >= 100;
           const isActive = lvl === userLvl;
+
           return {
             code: lvl,
+            label: tierMeta[lvl]?.label || 'Chuẩn',
+            mastered: lvlMastered,
+            required: lvlReq,
             progress: `${lvlPct}%`,
+            pctNumber: lvlPct,
+            color: tierMeta[lvl]?.color || T.brand,
             status: isComplete ? 'complete' : isActive ? 'active' : 'future',
           };
-        }));
+        });
+
+        // Current level mastery summary
+        const currentTier = updatedTiers.find((t) => t.code === userLvl) || updatedTiers[1];
+        const mastered = currentTier.mastered;
+        const threshold = currentTier.required;
+        const totalSaved = savedWords.length > 0 ? savedWords.length : (targetProgress?.totalWordsAtLevel || 18);
+        const remaining = Math.max(0, threshold - mastered);
+        const pct = currentTier.pctNumber;
+
+        setMasteredWords(mastered);
+        setCollectionWords(totalSaved);
+        setTotalTargetWords(threshold);
+        setRemainingWordsToTarget(remaining);
+        setCompletionPercentage(pct);
+        setTiers(updatedTiers);
       }
 
       // --- Leaderboard ---
@@ -438,42 +482,56 @@ export const HomeScreen: React.FC = () => {
     );
   };
 
-  // ── Mastery Progress Card ───────────────────────────────────────────────────
+  // ── Mastery Progress Card (Đồng bộ 100% với Web & Scandinavian Editorial) ──
   const renderMasteryProgressCard = () => (
     <View style={styles.card}>
+      {/* Header Row */}
       <View style={styles.sectionHeaderRow}>
         <View>
-          <Text style={styles.sectionMono}>KHUNG NĂNG LỰC CHUẨN</Text>
-          <Text style={styles.sectionTitle}>Tiến độ chuẩn hóa {targetLevel}</Text>
+          <Text style={styles.sectionMono}>MỤC TIÊU CỦA BẠN</Text>
+          <Text style={styles.sectionTitle}>Tiến bộ từ vựng {targetLevel}</Text>
         </View>
-        <TouchableOpacity
-          style={{ flexDirection: 'row', alignItems: 'center' }}
-          onPress={() => showToast('Chi tiết khung CEFR đang đồng bộ CSDL.')}
-        >
-          <Text style={styles.sectionLink}>Chi tiết</Text>
-          <Ionicons name="arrow-forward" size={12} color={T.brand} />
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+          <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#10B981' }} />
+          <Text style={{ fontSize: 10, color: '#10B981', fontWeight: '600' }}>Thời gian thực</Text>
+        </View>
       </View>
 
-      {/* Count row */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 12 }}>
-        <View>
-          <Text style={styles.masteryCount}>
-            <Text style={styles.masteryBig}>{masteredWords}</Text>
-            <Text style={styles.masteryTotal}> / {totalTargetWords} từ</Text>
-          </Text>
-          <Text style={styles.masterySub}>đã thuộc vĩnh viễn</Text>
+      {/* Main Stats Row: Mastered vs In Collection */}
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 14 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
+          <Text style={styles.masteryBig}>{masteredWords}</Text>
+          <Text style={styles.masteryLabel}> từ đã thành thạo</Text>
         </View>
-        <Text style={styles.masteryPct}>{completionPercentage}% HOÀN THÀNH</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
+          <Text style={[styles.masteryBig, { fontSize: 18, color: T.ink }]}>{collectionWords}</Text>
+          <Text style={styles.masteryLabel}> từ trong bộ sưu tập</Text>
+        </View>
       </View>
 
-      {/* Progress bar */}
-      <View style={styles.progressTrack}>
+      {/* Main Progress Bar */}
+      <View style={[styles.progressTrack, { marginTop: 10, height: 6 }]}>
         <View style={[styles.progressFill, { width: `${Math.min(completionPercentage, 100)}%` as any }]} />
       </View>
 
-      {/* 5-tier grid */}
-      <View style={{ flexDirection: 'row', marginTop: 12 }}>
+      {/* Sub-info under progress bar */}
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6, paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: T.border }}>
+        <Text style={{ fontSize: 10.5, color: T.muted }}>Đã thành thạo ({completionPercentage}%)</Text>
+        <Text style={{ fontSize: 10.5, color: T.muted }}>Tiếp tục học thêm {remainingWordsToTarget} từ để đạt chuẩn</Text>
+      </View>
+
+      {/* CEFR Tiers Section Title */}
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, marginBottom: 8 }}>
+        <Text style={styles.sectionMono}>TIẾN ĐỘ TỪNG DẢI NĂNG LỰC & CHỨNG CHỈ CEFR</Text>
+        <Text style={{ fontSize: 9, color: T.muted }}>Tự động ghi nhận</Text>
+      </View>
+
+      {/* 5-Tier Horizontal Cards Carousel */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ gap: 8, paddingVertical: 2 }}
+      >
         {tiers.map((tier) => {
           const isComplete = tier.status === 'complete';
           const isActive = tier.status === 'active';
@@ -481,25 +539,61 @@ export const HomeScreen: React.FC = () => {
             <View
               key={tier.code}
               style={[
-                styles.tierCell,
-                isComplete && styles.tierCellComplete,
-                isActive && styles.tierCellActive,
+                styles.tierCardBox,
+                isActive && styles.tierCardBoxActive,
+                isComplete && styles.tierCardBoxComplete,
               ]}
             >
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                {isComplete && <Ionicons name="checkmark" size={9} color="#5F765E" style={{ marginRight: 1 }} />}
-                <Text style={[
-                  styles.tierCode,
-                  isComplete && { color: '#5F765E' },
-                  isActive && { color: T.brand },
-                  !isComplete && !isActive && { color: T.muted },
-                ]}>{tier.code}</Text>
+              {/* Tier Header: Code + Label */}
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Text style={[styles.tierCodeText, isActive && { color: T.brand }]}>{tier.code}</Text>
+                <Text style={styles.tierLabelText}>{tier.label}</Text>
               </View>
-              <Text style={[styles.tierPct, isComplete && { color: '#5F765E' }]}>{tier.progress}</Text>
+
+              {/* Mini Progress Bar */}
+              <View style={styles.miniProgressTrack}>
+                <View
+                  style={[
+                    styles.miniProgressFill,
+                    { backgroundColor: tier.color, width: `${Math.min(tier.pctNumber, 100)}%` as any },
+                  ]}
+                />
+              </View>
+
+              {/* Progress Count & Percent */}
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Text style={styles.tierCountText}>{tier.mastered}/{tier.required} từ</Text>
+                <Text style={styles.tierPctText}>{tier.progress}</Text>
+              </View>
+
+              {/* Action Button: Preview Draft / Claim Certificate */}
+              <TouchableOpacity
+                style={[
+                  styles.tierBtn,
+                  isComplete ? styles.tierBtnClaim : styles.tierBtnPreview,
+                ]}
+                activeOpacity={0.7}
+                onPress={() => {
+                  if (isComplete) {
+                    navigation.navigate('Profile');
+                  } else {
+                    showToast(`Bản nháp chứng chỉ CEFR ${tier.code}: Đã thành thạo ${tier.mastered}/${tier.required} từ.`);
+                  }
+                }}
+              >
+                <Ionicons
+                  name={isComplete ? 'ribbon-outline' : 'eye-outline'}
+                  size={10}
+                  color={isComplete ? '#065F46' : T.muted}
+                />
+                <Text style={[styles.tierBtnText, isComplete && { color: '#065F46', fontWeight: 'bold' }]}>
+                  {isComplete ? 'Chứng chỉ' : 'Xem trước'}
+                </Text>
+              </TouchableOpacity>
             </View>
           );
         })}
-      </View>
+      </ScrollView>
     </View>
   );
 
@@ -909,7 +1003,8 @@ const styles = StyleSheet.create({
 
   // ── Mastery progress ──────────────────────────────────────────────────────
   masteryCount: { flexDirection: 'row' },
-  masteryBig: { fontSize: 21, fontFamily: 'serif', fontWeight: 'bold', color: T.ink },
+  masteryBig: { fontSize: 24, fontFamily: 'serif', fontWeight: 'bold', color: T.ink },
+  masteryLabel: { fontSize: 11.5, color: T.muted },
   masteryTotal: { fontSize: 13, color: T.muted },
   masterySub: { fontSize: 9, color: T.muted, marginTop: 2 },
   masteryPct: { fontSize: 8.5, fontFamily: 'monospace', color: T.brand, fontWeight: 'bold' },
@@ -925,21 +1020,78 @@ const styles = StyleSheet.create({
     backgroundColor: T.brand,
     borderRadius: 999,
   },
-  tierCell: {
-    flex: 1,
-    height: 43,
-    marginHorizontal: 2.5,
-    borderRadius: 8,
+  tierCardBox: {
+    width: 112,
+    padding: 8,
+    borderRadius: 6,
     borderWidth: 1,
     borderColor: T.border,
-    backgroundColor: T.field,
+    backgroundColor: '#FFFFFF',
+    gap: 6,
+  },
+  tierCardBoxActive: {
+    borderColor: T.brand,
+    borderWidth: 1.5,
+    backgroundColor: '#FAF8F5',
+  },
+  tierCardBoxComplete: {
+    borderColor: 'rgba(16, 185, 129, 0.4)',
+    backgroundColor: '#F0FDF4',
+  },
+  tierCodeText: {
+    fontSize: 12,
+    fontFamily: 'monospace',
+    fontWeight: 'bold',
+    color: T.ink,
+  },
+  tierLabelText: {
+    fontSize: 9.5,
+    color: T.muted,
+  },
+  miniProgressTrack: {
+    width: '100%',
+    height: 4,
+    backgroundColor: '#E5DFD4',
+    borderRadius: 2,
+    overflow: 'hidden',
+  },
+  miniProgressFill: {
+    height: '100%',
+    borderRadius: 2,
+  },
+  tierCountText: {
+    fontSize: 9,
+    color: T.muted,
+  },
+  tierPctText: {
+    fontSize: 9.5,
+    fontFamily: 'monospace',
+    fontWeight: '600',
+    color: T.ink,
+  },
+  tierBtn: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingVertical: 3.5,
+    borderRadius: 3,
+    gap: 3,
   },
-  tierCellComplete: { backgroundColor: 'rgba(95,118,94,0.12)', borderColor: 'rgba(95,118,94,0.35)' },
-  tierCellActive: { backgroundColor: T.surface, borderColor: T.brand, borderWidth: 1.5 },
-  tierCode: { fontSize: 9, fontFamily: 'monospace', fontWeight: 'bold' },
-  tierPct: { fontSize: 7, fontFamily: 'monospace', color: T.muted, marginTop: 2 },
+  tierBtnPreview: {
+    backgroundColor: '#FAF8F5',
+    borderWidth: 1,
+    borderColor: T.border,
+  },
+  tierBtnClaim: {
+    backgroundColor: '#D1FAE5',
+    borderWidth: 1,
+    borderColor: '#A7F3D0',
+  },
+  tierBtnText: {
+    fontSize: 9,
+    color: T.ink,
+    fontWeight: '500',
+  },
 
   // ── Arena hero ────────────────────────────────────────────────────────────
   arenaEmptyIcon: {

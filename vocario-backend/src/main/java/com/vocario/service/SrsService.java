@@ -415,6 +415,15 @@ public class SrsService {
             wordsByLevel.computeIfAbsent(lvl, k -> new ArrayList<>()).add(p);
         }
 
+        // Ngưỡng vốn từ vựng chuẩn lấy động từ cấu hình Admin (bảng certificate_types) hoặc fallback theo EVP
+        Map<String, Integer> cefrThresholds = Map.of(
+                "A1", 500,
+                "A2", 1000,
+                "B1", 2000,
+                "B2", 4000,
+                "C1", 8000
+        );
+
         // Tạo bảng phân bổ theo từng level chuẩn (A1 -> C1) kết hợp ngưỡng động từ bảng certificate_types
         List<TargetProgressDto.LevelBreakdown> breakdowns = new ArrayList<>();
         for (String lvl : List.of("A1", "A2", "B1", "B2", "C1")) {
@@ -433,14 +442,6 @@ public class SrsService {
         long masteredWordsAtLevel = currentLevelWords.stream().filter(w -> "MASTERED".equalsIgnoreCase(w.getStatus())).count();
         long learningWordsAtLevel = totalWordsAtLevel - masteredWordsAtLevel;
 
-        // Ngưỡng vốn từ vựng chuẩn lấy động từ cấu hình Admin (bảng certificate_types) hoặc fallback theo EVP
-        Map<String, Integer> cefrThresholds = Map.of(
-                "A1", 500,
-                "A2", 1000,
-                "B1", 2000,
-                "B2", 4000,
-                "C1", 8000
-        );
         int masteryThreshold = certificateTypeRepository.findByCefrLevel(currentLevel)
                 .map(t -> t.getRequiredWords() != null && t.getRequiredWords() > 0 ? t.getRequiredWords() : cefrThresholds.getOrDefault(currentLevel, 1000))
                 .orElseGet(() -> cefrThresholds.getOrDefault(currentLevel, 1000));
