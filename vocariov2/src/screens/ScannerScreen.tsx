@@ -93,8 +93,8 @@ interface DialogueTurn {
 export const ScannerScreen: React.FC = () => {
   const navigation = useNavigation<any>();
 
-  // Studio Mode: 'camera' | 'upload'
-  const [activeStudioTab, setActiveStudioTab] = useState<'camera' | 'upload'>('camera');
+  // Studio Mode: 'camera' | 'upload' | 'preset'
+  const [activeStudioTab, setActiveStudioTab] = useState<'camera' | 'upload' | 'preset'>('camera');
   const [isGridActive, setIsGridActive] = useState(true);
   const [isScanning, setIsScanning] = useState(false);
   const [hasScanned, setHasScanned] = useState(false);
@@ -150,13 +150,61 @@ export const ScannerScreen: React.FC = () => {
   };
 
   // ── Mode Switcher ──────────────────────────────────────────────────────────
-  const switchStudioTab = (tab: 'camera' | 'upload') => {
+  const switchStudioTab = (tab: 'camera' | 'upload' | 'preset') => {
     if (activeStudioTab === tab) return;
     setActiveStudioTab(tab);
     setHasScanned(false);
     setDetectedItems([]);
-    setCustomImageUri(null);
-    setCustomImageDataUrl(null);
+    if (tab === 'camera' || tab === 'upload') {
+      setCustomImageUri(null);
+      setCustomImageDataUrl(null);
+    }
+  };
+
+  // ── Real Phone Camera ───────────────────────────────────────────────────────
+  const openDeviceCamera = async () => {
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert(
+          'Quyền Camera',
+          'Vui lòng cấp quyền truy cập Camera để Vocario chụp ảnh và quét nhận diện đồ vật thực tế xung quanh bạn.',
+          [{ text: 'Đã hiểu' }]
+        );
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: false,
+        quality: 0.85,
+      });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const asset = result.assets[0];
+        setCustomImageUri(asset.uri);
+        setHasScanned(false);
+        setDetectedItems([]);
+
+        // Nén ảnh sang JPEG và base64
+        const manip = await ImageManipulator.manipulateAsync(
+          asset.uri,
+          [{ resize: { width: 900 } }],
+          { compress: 0.82, format: ImageManipulator.SaveFormat.JPEG, base64: true }
+        );
+
+        let b64: string | undefined;
+        if (manip.base64) {
+          b64 = `data:image/jpeg;base64,${manip.base64}`;
+          setCustomImageDataUrl(b64);
+        }
+
+        showToast('Đang quét từ vựng ảnh vừa chụp...');
+        await executeAiScan(manip.uri, b64);
+      }
+    } catch (e: any) {
+      showToast(`Không thể mở Camera: ${e.message}`);
+    }
   };
 
   // ── Image Picker (Upload) ──────────────────────────────────────────────────
@@ -180,10 +228,13 @@ export const ScannerScreen: React.FC = () => {
           [{ resize: { width: 900 } }],
           { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG, base64: true }
         );
+        let b64: string | undefined;
         if (manipulated.base64) {
-          setCustomImageDataUrl(`data:image/jpeg;base64,${manipulated.base64}`);
+          b64 = `data:image/jpeg;base64,${manipulated.base64}`;
+          setCustomImageDataUrl(b64);
         }
         showToast('Đã nạp ảnh thành công!');
+        await executeAiScan(manipulated.uri, b64);
       }
     } catch (e: any) {
       showToast(`Lỗi chọn ảnh: ${e.message}`);
@@ -195,33 +246,48 @@ export const ScannerScreen: React.FC = () => {
     setIsFlashing(true);
     setTimeout(() => setIsFlashing(false), 120);
 
-    const currentImg = customImageUri || PRESET_SCENES[activePresetIndex].url;
-    await executeAiScan(currentImg);
+    if (activeStudioTab === 'camera') {
+      if (!customImageUri) {
+        await openDeviceCamera();
+        return;
+      }
+      await executeAiScan(customImageUri, customImageDataUrl || undefined);
+    } else if (activeStudioTab === 'upload') {
+      if (!customImageUri) {
+        await pickImageFromDevice();
+        return;
+      }
+      await executeAiScan(customImageUri, customImageDataUrl || undefined);
+    } else {
+      const currentImg = PRESET_SCENES[activePresetIndex].url;
+      await executeAiScan(currentImg);
+    }
   };
 
   // ── Execute Two-Stage AI Scan ──────────────────────────────────────────────
-  const executeAiScan = async (imageSrc: string) => {
+  const executeAiScan = async (imageSrc: string, directBase64?: string) => {
     setIsScanning(true);
     setHasScanned(false);
 
     try {
-      let base64Data = customImageDataUrl;
+      let base64Data = directBase64 || customImageDataUrl;
       let localUri = customImageUri || imageSrc;
 
-      // Nén ảnh sang JPEG và base64
-      const manip = await ImageManipulator.manipulateAsync(
-        imageSrc,
-        [{ resize: { width: 900 } }],
-        { compress: 0.82, format: ImageManipulator.SaveFormat.JPEG, base64: true }
-      );
+      if (!base64Data) {
+        const manip = await ImageManipulator.manipulateAsync(
+          imageSrc,
+          [{ resize: { width: 900 } }],
+          { compress: 0.82, format: ImageManipulator.SaveFormat.JPEG, base64: true }
+        );
 
-      if (manip.base64) {
-        base64Data = `data:image/jpeg;base64,${manip.base64}`;
-        setCustomImageDataUrl(base64Data);
+        if (manip.base64) {
+          base64Data = `data:image/jpeg;base64,${manip.base64}`;
+          setCustomImageDataUrl(base64Data);
+        }
+        localUri = manip.uri;
       }
-      localUri = manip.uri;
 
-      const theme = customImageUri ? 'auto' : PRESET_SCENES[activePresetIndex].theme;
+      const theme = customImageUri ? 'auto' : (activeStudioTab === 'preset' ? PRESET_SCENES[activePresetIndex].theme : 'auto');
       const res = await visionService.detectObjectsFromImage({
         imageUri: localUri,
         base64DataUrl: base64Data || undefined,
@@ -423,6 +489,21 @@ export const ScannerScreen: React.FC = () => {
             Tải ảnh lên
           </Text>
         </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.tabBtn, activeStudioTab === 'preset' && styles.tabBtnActive]}
+          onPress={() => switchStudioTab('preset')}
+          activeOpacity={0.8}
+        >
+          <Ionicons
+            name="sparkles-outline"
+            size={14}
+            color={activeStudioTab === 'preset' ? T.brand : T.muted}
+          />
+          <Text style={[styles.tabText, activeStudioTab === 'preset' && styles.tabTextActive]}>
+            Ảnh mẫu AI
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -431,7 +512,7 @@ export const ScannerScreen: React.FC = () => {
   // 2. DARK CINEMATIC VIEWPORT
   // ──────────────────────────────────────────────────────────────────────────
   const renderCinematicViewport = () => {
-    const currentImg = customImageUri || PRESET_SCENES[activePresetIndex].url;
+    const currentImg = customImageUri || (activeStudioTab === 'preset' ? PRESET_SCENES[activePresetIndex].url : null);
 
     // Laser translate Y
     const laserTop = laserAnim.interpolate({
@@ -443,11 +524,17 @@ export const ScannerScreen: React.FC = () => {
       <View style={styles.viewport}>
         {/* Floating Top Badge */}
         <View style={styles.floatingTopBadge}>
-          <Text style={styles.floatingTopText}>Hướng camera về vật thể bạn muốn học</Text>
+          <Text style={styles.floatingTopText}>
+            {activeStudioTab === 'camera'
+              ? 'Hướng camera về vật thể bạn muốn học'
+              : activeStudioTab === 'upload'
+              ? 'Chọn ảnh chụp từ thiết bị'
+              : 'Chọn ảnh bối cảnh mẫu có sẵn'}
+          </Text>
         </View>
 
-        {/* Preset Scenes Horizontal Carousel (when camera tab) */}
-        {activeStudioTab === 'camera' && !customImageUri && !hasScanned && (
+        {/* Preset Scenes Horizontal Carousel (when in preset tab) */}
+        {activeStudioTab === 'preset' && !customImageUri && !hasScanned && (
           <View style={styles.presetCarouselContainer}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6 }}>
               {PRESET_SCENES.map((p, idx) => (
@@ -466,11 +553,36 @@ export const ScannerScreen: React.FC = () => {
         )}
 
         {/* Background Image / Camera Frame */}
-        <Image
-          source={{ uri: currentImg }}
-          style={StyleSheet.absoluteFill}
-          resizeMode="cover"
-        />
+        {currentImg ? (
+          <Image
+            source={{ uri: currentImg }}
+            style={StyleSheet.absoluteFill}
+            resizeMode="cover"
+          />
+        ) : null}
+
+        {/* Real Camera Launcher Viewfinder Overlay when in Camera mode and no photo taken yet */}
+        {activeStudioTab === 'camera' && !customImageUri && (
+          <View style={styles.cameraPlaceholderOverlay}>
+            <TouchableOpacity
+              style={styles.openCameraCenterBtn}
+              onPress={openDeviceCamera}
+              activeOpacity={0.85}
+            >
+              <View style={styles.cameraIconCircle}>
+                <Ionicons name="camera" size={36} color="#FFFFFF" />
+              </View>
+              <Text style={styles.cameraMainTitle}>Mở Camera điện thoại</Text>
+              <Text style={styles.cameraSubTitle}>
+                Chạm vào đây hoặc bấm nút chụp bên dưới để mở máy ảnh và quét đồ vật thực tế quanh bạn
+              </Text>
+              <View style={styles.openCameraPill}>
+                <Ionicons name="aperture-outline" size={15} color="#FFFFFF" style={{ marginRight: 6 }} />
+                <Text style={styles.openCameraPillText}>Chụp ảnh qua Camera</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        )}
 
         {/* 3x3 Grid Overlay */}
         {isGridActive && (
@@ -566,13 +678,15 @@ export const ScannerScreen: React.FC = () => {
         <View
           style={[
             styles.statusDot,
-            { backgroundColor: customImageUri || activeStudioTab === 'camera' ? T.emerald : T.muted },
+            { backgroundColor: customImageUri || activeStudioTab === 'camera' || activeStudioTab === 'preset' ? T.emerald : T.muted },
           ]}
         />
         <Text style={styles.statusText}>
           {activeStudioTab === 'camera'
-            ? customImageUri ? 'Đã chụp ảnh' : 'Đang hoạt động'
-            : customImageUri ? 'Đã nạp file ảnh' : 'Chờ tải file'}
+            ? customImageUri ? 'Đã chụp ảnh' : 'Sẵn sàng mở camera'
+            : activeStudioTab === 'upload'
+            ? customImageUri ? 'Đã nạp file ảnh' : 'Chờ tải file'
+            : 'Ảnh mẫu có sẵn'}
         </Text>
       </View>
 
@@ -581,10 +695,27 @@ export const ScannerScreen: React.FC = () => {
         {activeStudioTab === 'camera' && !customImageUri && !hasScanned && (
           <TouchableOpacity
             style={styles.shutterOuter}
-            onPress={isScanning ? undefined : captureOrLoadFrame}
+            onPress={isScanning ? undefined : openDeviceCamera}
             activeOpacity={0.7}
           >
             <View style={styles.shutterInner} />
+          </TouchableOpacity>
+        )}
+
+        {activeStudioTab === 'preset' && !hasScanned && (
+          <TouchableOpacity
+            style={styles.scanCtaBtn}
+            onPress={isScanning ? undefined : captureOrLoadFrame}
+            activeOpacity={0.85}
+          >
+            {isScanning ? (
+              <ActivityIndicator size="small" color="#FFFFFF" style={{ marginRight: 6 }} />
+            ) : (
+              <Ionicons name="sparkles" size={15} color={T.goldAccent} style={{ marginRight: 6 }} />
+            )}
+            <Text style={styles.scanCtaText}>
+              {isScanning ? 'Đang bóc tách AI...' : 'Bắt đầu quét AI'}
+            </Text>
           </TouchableOpacity>
         )}
 
@@ -608,11 +739,11 @@ export const ScannerScreen: React.FC = () => {
         {hasScanned && (
           <TouchableOpacity
             style={styles.retakeBtn}
-            onPress={retakePhoto}
+            onPress={activeStudioTab === 'camera' ? openDeviceCamera : retakePhoto}
             activeOpacity={0.8}
           >
             <Ionicons name="camera-outline" size={14} color={T.brand} style={{ marginRight: 4 }} />
-            <Text style={styles.retakeBtnText}>Chụp ảnh mới</Text>
+            <Text style={styles.retakeBtnText}>{activeStudioTab === 'camera' ? 'Chụp ảnh mới' : 'Chọn ảnh khác'}</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -1004,6 +1135,46 @@ const styles = StyleSheet.create({
     shadowRadius: 16,
     elevation: 8,
   },
+
+  // ── Camera Placeholder ─────────────────────────────────────────────────────
+  cameraPlaceholderOverlay: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: T.darkViewport,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  openCameraCenterBtn: { alignItems: 'center', justifyContent: 'center' },
+  cameraIconCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.25)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  cameraMainTitle: { fontSize: 16, fontWeight: 'bold', color: '#FFFFFF', textAlign: 'center' },
+  cameraSubTitle: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.7)',
+    textAlign: 'center',
+    lineHeight: 16,
+    marginTop: 6,
+    maxWidth: 290,
+  },
+  openCameraPill: {
+    marginTop: 16,
+    backgroundColor: T.brand,
+    borderRadius: 6,
+    paddingHorizontal: 18,
+    paddingVertical: 9,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  openCameraPillText: { fontSize: 12, fontWeight: 'bold', color: '#FFFFFF' },
 
   // ── Upload Placeholder ─────────────────────────────────────────────────────
   uploadPlaceholderOverlay: {

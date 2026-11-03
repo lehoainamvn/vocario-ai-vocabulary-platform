@@ -131,7 +131,9 @@ export const HomeScreen: React.FC = () => {
         const cefrThresholds: Record<string, number> = { A1: 500, A2: 1000, B1: 2000, B2: 4000, C1: 8000 };
         const userLvl = (user.targetLevel || 'A2').toUpperCase();
         const threshold = targetProgress?.masteryThreshold || cefrThresholds[userLvl] || 1000;
-        const mastered = targetProgress?.masteredWordsAtLevel ?? 0;
+        const rawMastered = targetProgress?.masteredWordsAtLevel ?? 0;
+        const totalMasteredFromBreakdowns = targetProgress?.levelBreakdowns?.reduce((sum: number, b: any) => sum + (b.masteredCount || 0), 0) ?? 0;
+        const mastered = rawMastered > 0 ? rawMastered : totalMasteredFromBreakdowns;
         const pct = targetProgress?.completionPercentage ?? (threshold > 0 ? Math.min(100, Math.round((mastered / threshold) * 100)) : 0);
 
         setMasteredWords(mastered);
@@ -143,8 +145,8 @@ export const HomeScreen: React.FC = () => {
         setTiers(levels.map((lvl) => {
           const b = breakdowns.find((x: any) => (x.level || '').toUpperCase() === lvl);
           const lvlMastered = b?.masteredCount ?? (lvl === userLvl ? mastered : 0);
-          const lvlTotal = b?.totalCount ?? (cefrThresholds[lvl] || 1000);
-          const lvlPct = b?.completionPercentage ?? Math.min(100, Math.round((lvlMastered / lvlTotal) * 100));
+          const lvlReq = b?.requiredWords ?? (cefrThresholds[lvl] || 1000);
+          const lvlPct = b?.completionPercentage ?? (lvlReq > 0 ? Math.min(100, Math.round((lvlMastered / lvlReq) * 100)) : 0);
           const isComplete = lvlPct >= 100;
           const isActive = lvl === userLvl;
           return {

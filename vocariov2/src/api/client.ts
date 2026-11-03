@@ -52,10 +52,46 @@ export const getStoredToken = async (): Promise<string | null> => {
 
 export const getStoredUserId = async (): Promise<string | null> => {
   try {
+    let id: string | null = null;
     if (Platform.OS === 'web') {
-      return await AsyncStorage.getItem(USER_ID_KEY);
+      id = await AsyncStorage.getItem(USER_ID_KEY);
+    } else {
+      id = await SecureStore.getItemAsync(USER_ID_KEY);
     }
-    return await SecureStore.getItemAsync(USER_ID_KEY);
+    if (id && id.trim()) return id.trim();
+
+    // Fallback 1: Trích xuất từ USER_KEY JSON đã lưu
+    const rawUserStr = await AsyncStorage.getItem(USER_KEY);
+    if (rawUserStr) {
+      try {
+        const u = JSON.parse(rawUserStr);
+        const resolved = u.userId || u.id;
+        if (resolved) {
+          const resStr = String(resolved).trim();
+          if (Platform.OS === 'web') {
+            await AsyncStorage.setItem(USER_ID_KEY, resStr);
+          } else {
+            await SecureStore.setItemAsync(USER_ID_KEY, resStr);
+          }
+          return resStr;
+        }
+      } catch (_) {}
+    }
+
+    // Fallback 2: Trích xuất trực tiếp từ chuỗi Token "jwt_token_<uuid>"
+    const token = await getStoredToken();
+    if (token && token.startsWith('jwt_token_')) {
+      const extracted = token.replace('jwt_token_', '').trim();
+      if (extracted) {
+        if (Platform.OS === 'web') {
+          await AsyncStorage.setItem(USER_ID_KEY, extracted);
+        } else {
+          await SecureStore.setItemAsync(USER_ID_KEY, extracted);
+        }
+        return extracted;
+      }
+    }
+    return null;
   } catch (_) {
     return null;
   }

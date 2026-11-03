@@ -63,8 +63,9 @@ export const authService = {
   },
 
   async getProfile(userId?: string) {
+    const id = userId || (await getStoredUserId());
     const res = await apiClient.get('/api/auth/me', {
-      params: userId ? { userId } : {},
+      params: id ? { userId: id } : {},
     });
     return res.data;
   },
@@ -87,8 +88,9 @@ export const authService = {
   },
 
   async getDashboardData() {
-    const profile = await authService.getProfile().catch(() => null);
-    const userId = profile?.id || profile?.userId || (await getStoredUserId());
+    const storedId = await getStoredUserId();
+    const profile = await authService.getProfile(storedId || undefined).catch(() => null);
+    const userId = storedId || profile?.id || profile?.userId;
     const [dueCards, targetProgress] = await Promise.allSettled([
       srsService.getDueCards(userId).catch(() => []),
       srsService.getTargetProgress(userId).catch(() => null),
