@@ -16,11 +16,11 @@ export const USE_PRODUCTION = false;
 export const API_BASE_URL = USE_PRODUCTION
   ? PRODUCTION_API_URL
   : Platform.select({
-      web: 'http://localhost:8088',
-      ios: `http://${DEV_MACHINE_IP}:8088`,
-      android: `http://${DEV_MACHINE_IP}:8088`,
-      default: `http://${DEV_MACHINE_IP}:8088`,
-    });
+    web: 'http://localhost:8088',
+    ios: `http://${DEV_MACHINE_IP}:8088`,
+    android: `http://${DEV_MACHINE_IP}:8088`,
+    default: `http://${DEV_MACHINE_IP}:8088`,
+  });
 
 // Alias for image URL construction
 export const BASE_URL = API_BASE_URL;
@@ -28,11 +28,11 @@ export const BASE_URL = API_BASE_URL;
 export const AI_VISION_URL = USE_PRODUCTION
   ? PRODUCTION_AI_URL
   : Platform.select({
-      web: 'http://localhost:8001',
-      ios: `http://${DEV_MACHINE_IP}:8001`,
-      android: `http://${DEV_MACHINE_IP}:8001`,
-      default: `http://${DEV_MACHINE_IP}:8001`,
-    });
+    web: 'http://localhost:8001',
+    ios: `http://${DEV_MACHINE_IP}:8001`,
+    android: `http://${DEV_MACHINE_IP}:8001`,
+    default: `http://${DEV_MACHINE_IP}:8001`,
+  });
 
 const TOKEN_KEY = 'vocario_jwt_token';
 const USER_ID_KEY = 'vocario_user_id';
@@ -87,7 +87,7 @@ export const setAuthData = async (token: string, userId?: string, username?: str
       if (username) await SecureStore.setItemAsync(USERNAME_KEY, username);
       if (rawUser) await AsyncStorage.setItem(USER_KEY, JSON.stringify(rawUser));
     }
-  } catch (_) {}
+  } catch (_) { }
 };
 
 export const setStoredToken = async (token: string): Promise<void> => {
@@ -109,7 +109,7 @@ export const removeStoredToken = async (): Promise<void> => {
       await SecureStore.deleteItemAsync(USERNAME_KEY);
       await AsyncStorage.removeItem(USER_KEY);
     }
-  } catch (_) {}
+  } catch (_) { }
 };
 
 export const apiClient = axios.create({

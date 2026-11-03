@@ -5623,5 +5623,15 @@
     "vietnamese": "áo blouse",
     "ipa": "/læb koʊt/",
     "level": "A1"
+  },
+  "scale": {
+    "vietnamese": "cân",
+    "ipa": "/skeɪl/",
+    "level": "A2"
+  },
+  "stadiometer": {
+    "vietnamese": "máy đo chiều cao",
+    "ipa": "/stadiometer/",
+    "level": "C2"
   }
 }

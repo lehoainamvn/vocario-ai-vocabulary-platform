@@ -74,42 +74,42 @@ interface ArenaStage {
   bestRecordHolder: string;
 }
 
-// Default Official Stages matching Flutter & Angular Web
+// Default Official Stages matching CSDL Quản Trị Hệ Thống (2 sàn đấu chính thức)
 const DEFAULT_OFFICIAL_STAGES: ArenaStage[] = [
   {
-    id: 'stage-admin-kitchen',
-    title: 'Gian Bếp Đời Thực',
-    subtitle: 'Bối cảnh thi đấu chính thức tuần này dành cho toàn thể học viên',
+    id: 'stage-admin-desk-nam2',
+    title: 'Tối Ưu Hóa Không Gian Làm Việc Tại Nhà',
+    subtitle: 'Bối cảnh thi đấu tuần · Đóng góp bởi nam2',
     category: 'Đời Sống Gia Đình',
-    badge: 'Đấu trường tuần',
-    imageUrl: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=82',
+    badge: 'Bối cảnh tuần',
+    imageUrl: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=1200&q=82',
     isOfficial: true,
     isWeekly: true,
     bestRecordStr: '00:08.45',
-    bestRecordHolder: 'Nguyễn Văn Nam',
+    bestRecordHolder: 'nam2',
     words: [
-      { id: 'k-1', word: 'refrigerator', ipa: '/rɪˈfrɪdʒəreɪtər/', vietnamese: 'tủ lạnh', level: 'A2', partOfSpeech: 'noun', topPercent: 24, leftPercent: 6, widthPercent: 32, heightPercent: 68 },
-      { id: 'k-2', word: 'gas stove', ipa: '/ˈɡæs stəʊv/', vietnamese: 'bếp ga nấu ăn', level: 'A2', partOfSpeech: 'noun', topPercent: 58, leftPercent: 62, widthPercent: 28, heightPercent: 25 },
-      { id: 'k-3', word: 'water bottle', ipa: '/ˈwɔːtər ˈbɒtl/', vietnamese: 'chai nước uống', level: 'A1', partOfSpeech: 'noun', topPercent: 54, leftPercent: 44, widthPercent: 12, heightPercent: 28 },
-      { id: 'k-4', word: 'cardboard box', ipa: '/ˈkɑːdbɔːd bɒks/', vietnamese: 'thùng các-tông đựng đồ', level: 'B1', partOfSpeech: 'noun', topPercent: 62, leftPercent: 78, widthPercent: 20, heightPercent: 34 },
+      { id: 'desk-1', word: 'bookshelf', ipa: '/ˈbʊk.ʃelf/', vietnamese: 'kệ sách', level: 'A2', partOfSpeech: 'noun', topPercent: 8, leftPercent: 42, widthPercent: 35, heightPercent: 32 },
+      { id: 'desk-2', word: 'laptop', ipa: '/ˈlæp.tɒp/', vietnamese: 'máy tính xách tay', level: 'A1', partOfSpeech: 'noun', topPercent: 38, leftPercent: 38, widthPercent: 22, heightPercent: 20 },
+      { id: 'desk-3', word: 'mousepad', ipa: '/ˈmaʊs.pæd/', vietnamese: 'tấm lót chuột', level: 'A2', partOfSpeech: 'noun', topPercent: 46, leftPercent: 26, widthPercent: 30, heightPercent: 18 },
+      { id: 'desk-4', word: 'chair', ipa: '/tʃeər/', vietnamese: 'ghế tựa làm việc', level: 'A1', partOfSpeech: 'noun', topPercent: 48, leftPercent: 8, widthPercent: 32, heightPercent: 50 },
+      { id: 'desk-5', word: 'wastebasket', ipa: '/ˈweɪstˌbɑː.skɪt/', vietnamese: 'thùng rác cạnh bàn', level: 'A2', partOfSpeech: 'noun', topPercent: 68, leftPercent: 72, widthPercent: 20, heightPercent: 28 },
     ],
   },
   {
-    id: 'stage-admin-study',
-    title: 'Góc Học Tập & Công Việc',
-    subtitle: 'Bối cảnh bàn làm việc sáng tạo với đồ dùng học thuật chuẩn CEFR',
-    category: 'Học Tập & Công Việc',
-    badge: 'Đấu trường hệ thống',
-    imageUrl: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=1200&q=82',
+    id: 'stage-admin-living',
+    title: 'Phòng Khách Ấm Cúng',
+    subtitle: 'Không gian sinh hoạt gia đình và tiếp đón bạn bè thân mật',
+    category: 'Nội Thất & Tiện Nghi',
+    badge: 'Đang phát sóng',
+    imageUrl: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=1200&q=82',
     isOfficial: true,
     isWeekly: false,
-    bestRecordStr: '00:11.20',
-    bestRecordHolder: 'Lê Minh Khôi',
+    bestRecordStr: '00:06.12',
+    bestRecordHolder: 'Phương Thảo',
     words: [
-      { id: 'sd-1', word: 'laptop', ipa: '/ˈlæptɒp/', vietnamese: 'máy tính xách tay', level: 'A1', partOfSpeech: 'noun', topPercent: 14, leftPercent: 54, widthPercent: 32, heightPercent: 44 },
-      { id: 'sd-2', word: 'desk lamp', ipa: '/ˈdesk læmp/', vietnamese: 'đèn học để bàn', level: 'A2', partOfSpeech: 'noun', topPercent: 12, leftPercent: 40, widthPercent: 20, heightPercent: 36 },
-      { id: 'sd-3', word: 'chair', ipa: '/tʃeər/', vietnamese: 'ghế ngồi làm việc', level: 'A1', partOfSpeech: 'noun', topPercent: 34, leftPercent: 0, widthPercent: 42, heightPercent: 62 },
-      { id: 'sd-4', word: 'notebook', ipa: '/ˈnəʊtbʊk/', vietnamese: 'sổ tay ghi chép', level: 'A1', partOfSpeech: 'noun', topPercent: 34, leftPercent: 24, widthPercent: 22, heightPercent: 18 },
+      { id: 'lr-1', word: 'sofa', ipa: '/ˈsəʊ.fə/', vietnamese: 'ghế sô-pha', level: 'A1', partOfSpeech: 'noun', topPercent: 44, leftPercent: 18, widthPercent: 54, heightPercent: 40 },
+      { id: 'lr-2', word: 'coffee table', ipa: '/ˈkɒf.i ˈteɪ.bl/', vietnamese: 'bàn trà phòng khách', level: 'A2', partOfSpeech: 'noun', topPercent: 64, leftPercent: 30, widthPercent: 34, heightPercent: 26 },
+      { id: 'lr-3', word: 'indoor plant', ipa: '/ˌɪn.dɔː ˈplɑːnt/', vietnamese: 'chậu cây cảnh trong nhà', level: 'A2', partOfSpeech: 'noun', topPercent: 36, leftPercent: 78, widthPercent: 18, heightPercent: 42 },
     ],
   },
 ];
@@ -169,10 +169,11 @@ export const ArenaScreen: React.FC = () => {
     toastTimer.current = setTimeout(() => setToastMessage(null), 3000);
   };
 
-  // ── Sync Stage Leaderboards from PostgreSQL ─────────────────────────────────
+  // ── Sync Stage Leaderboards from PostgreSQL (Non-blocking) ──────────────────
   const syncStageLeaderboards = useCallback(async (currentOfficials: ArenaStage[], currentUsers: ArenaStage[]) => {
     // 1. Cập nhật kỷ lục thật cho Official Stages từ CSDL (bảng arena_stage_records)
     const updatedOfficials = [...currentOfficials];
+    let changedOfficials = false;
     for (let i = 0; i < updatedOfficials.length; i++) {
       const st = updatedOfficials[i];
       try {
@@ -186,14 +187,18 @@ export const ArenaScreen: React.FC = () => {
             bestRecordStr: formatTime(ms),
             bestRecordHolder: holder,
           };
+          changedOfficials = true;
         }
       } catch (_) {}
     }
-    setOfficialStages(updatedOfficials);
+    if (changedOfficials) {
+      setOfficialStages(updatedOfficials);
+    }
 
     // 2. Cập nhật kỷ lục thật cho User Stages từ CSDL
     if (currentUsers.length > 0) {
       const updatedUsers = [...currentUsers];
+      let changedUsers = false;
       for (let i = 0; i < updatedUsers.length; i++) {
         const st = updatedUsers[i];
         try {
@@ -207,10 +212,13 @@ export const ArenaScreen: React.FC = () => {
               bestRecordStr: formatTime(ms),
               bestRecordHolder: holder,
             };
+            changedUsers = true;
           }
         } catch (_) {}
       }
-      setUserStages(updatedUsers);
+      if (changedUsers) {
+        setUserStages(updatedUsers);
+      }
     }
   }, []);
 
@@ -262,15 +270,15 @@ export const ArenaScreen: React.FC = () => {
           }
         });
         setUserStages(loaded);
-        syncStageLeaderboards(officialStages, loaded);
+        syncStageLeaderboards(DEFAULT_OFFICIAL_STAGES, loaded);
       } else {
-        syncStageLeaderboards(officialStages, []);
+        syncStageLeaderboards(DEFAULT_OFFICIAL_STAGES, []);
       }
-    } catch (_) {}
-    finally {
+    } catch (_) {
+    } finally {
       setIsLoadingUserStages(false);
     }
-  }, [officialStages, syncStageLeaderboards]);
+  }, [syncStageLeaderboards]);
 
   useEffect(() => {
     loadUserStages();
@@ -854,7 +862,7 @@ export const ArenaScreen: React.FC = () => {
                 ]}
                 activeOpacity={0.7}
                 onPress={(e) => {
-                  e.stopPropagation();
+                  e?.stopPropagation?.();
                   handleDirectWordHit(item);
                 }}
               />

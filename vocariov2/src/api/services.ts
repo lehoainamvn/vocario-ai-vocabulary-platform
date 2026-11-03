@@ -5,20 +5,24 @@ import { TargetProgress, WordItem, LeaderboardEntry, CertificateItem, DetectedBo
 // Helper chuyển đổi DTO UserWordProgress từ backend Spring Boot sang giao diện WordItem
 export const mapProgressToWordItem = (item: any): WordItem => {
   if (!item) return {} as WordItem;
-  if (typeof item.word === 'string') {
+  if (typeof item.word === 'string' && item.vietnameseMeaning && item.ipa) {
     return item as WordItem;
   }
-  const w = item.word || {};
+  const w = item.word && typeof item.word === 'object' ? item.word : {};
+  const wordText = typeof item.word === 'string' ? item.word : (w.word || item.wordText || 'sofa');
+  const ipa = item.ipa || item.phoneticIpa || w.phoneticIpa || w.ipa || '/.../';
+  const meaning = item.vietnameseMeaning || item.vietnamese || w.vietnameseMeaning || w.meaning || 'Từ vựng bối cảnh';
+  const level = item.cefrLevel || item.level || w.cefrLevel || 'A2';
   return {
     id: item.id ? String(item.id) : (w.id ? String(w.id) : String(Math.random())),
-    word: w.word || item.wordText || 'Unknown',
-    ipa: w.ipa || '',
-    vietnameseMeaning: w.vietnameseMeaning || '',
-    cefrLevel: w.cefrLevel || 'A1',
+    word: wordText,
+    ipa: ipa,
+    vietnameseMeaning: meaning,
+    cefrLevel: level,
     repetitionCount: item.repetitionNumber ?? item.repetitionCount ?? 0,
     status: item.status || 'NEW',
-    exampleSentenceEn: w.exampleSentenceEn || '',
-    exampleSentenceVi: w.exampleSentenceVi || '',
+    exampleSentenceEn: item.exampleSentenceEn || item.exampleEn || w.exampleSentenceEn || w.exampleEn || '',
+    exampleSentenceVi: item.exampleSentenceVi || item.exampleVi || w.exampleSentenceVi || w.exampleVi || '',
   };
 };
 
@@ -83,13 +87,14 @@ export const authService = {
   },
 
   async getDashboardData() {
-    const [user, dueCards, targetProgress] = await Promise.allSettled([
-      authService.getProfile().catch(() => null),
-      srsService.getDueCards().catch(() => []),
-      srsService.getTargetProgress().catch(() => null),
+    const profile = await authService.getProfile().catch(() => null);
+    const userId = profile?.id || profile?.userId || (await getStoredUserId());
+    const [dueCards, targetProgress] = await Promise.allSettled([
+      srsService.getDueCards(userId).catch(() => []),
+      srsService.getTargetProgress(userId).catch(() => null),
     ]);
     return {
-      user: user.status === 'fulfilled' ? user.value : null,
+      user: profile,
       dueCards: dueCards.status === 'fulfilled' ? dueCards.value : [],
       targetProgress: targetProgress.status === 'fulfilled' ? targetProgress.value : null,
     };
@@ -98,23 +103,26 @@ export const authService = {
 
 export const srsService = {
   async getTargetProgress(userId?: string): Promise<TargetProgress> {
+    const id = userId || (await getStoredUserId());
     const res = await apiClient.get('/api/srs/target-progress', {
-      params: userId ? { userId } : {},
+      params: id ? { userId: id } : {},
     });
     return res.data;
   },
 
   async getDueCards(userId?: string): Promise<WordItem[]> {
+    const id = userId || (await getStoredUserId());
     const res = await apiClient.get('/api/srs/due-cards', {
-      params: userId ? { userId } : {},
+      params: id ? { userId: id } : {},
     });
     const rawList = res.data || [];
     return rawList.map(mapProgressToWordItem);
   },
 
   async getSavedWords(userId?: string): Promise<WordItem[]> {
+    const id = userId || (await getStoredUserId());
     const res = await apiClient.get('/api/srs/my-words', {
-      params: userId ? { userId } : {},
+      params: id ? { userId: id } : {},
     });
     const rawList = res.data || [];
     return rawList.map(mapProgressToWordItem);
@@ -124,17 +132,23 @@ export const srsService = {
     progressId?: string;
     wordText?: string;
     ratingGrade: number; // 0-5
+    reviewType?: string;
     speechScore?: number;
     responseTimeMs?: number;
     userId?: string;
   }) {
-    const res = await apiClient.post('/api/srs/review', data);
+    const id = data.userId || (await getStoredUserId());
+    const res = await apiClient.post('/api/srs/review', data, {
+      params: id ? { userId: id } : {},
+    });
     return res.data;
   },
 
-  async markWordAsMastered(progressId?: string, wordText?: string) {
+  async markWordAsMastered(progressId?: string, wordText?: string, userId?: string) {
+    const id = userId || (await getStoredUserId());
     const res = await apiClient.post('/api/srs/mark-mastered', null, {
       params: {
+        ...(id ? { userId: id } : {}),
         ...(progressId ? { progressId } : {}),
         ...(wordText ? { wordText } : {}),
       },
@@ -142,8 +156,11 @@ export const srsService = {
     return res.data;
   },
 
-  async deleteWord(progressId: string) {
-    const res = await apiClient.delete(`/api/srs/word/${progressId}`);
+  async deleteWord(progressId: string, userId?: string) {
+    const id = userId || (await getStoredUserId());
+    const res = await apiClient.delete(`/api/srs/progress/${progressId}`, {
+      params: id ? { userId: id } : {},
+    });
     return res.status === 200 || res.status === 204;
   },
 };
@@ -339,7 +356,8 @@ export const arenaService = {
     totalXpEarned?: number;
     userId?: string;
   }) {
-    const res = await apiClient.post('/api/arena/submit-run', data);
+    const id = data.userId || (await getStoredUserId());
+    const res = await apiClient.post('/api/arena/submit-run', { ...data, userId: id });
     return res.data;
   },
 };

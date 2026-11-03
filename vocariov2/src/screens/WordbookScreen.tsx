@@ -320,8 +320,15 @@ export const WordbookScreen: React.FC = () => {
 
   // ── 5. Audio Speech ──────────────────────────────────────────────────────────
   const playWordAudio = (word: string) => {
-    Speech.speak(word, { language: 'en-US', rate: 0.85 });
-    showToast(`Đang phát âm: ${word}`);
+    try {
+      try {
+        Speech.stop();
+      } catch (_) {}
+      Speech.speak(word, { language: 'en-US', rate: 0.85 });
+      showToast(`Đang phát âm: ${word}`);
+    } catch (e) {
+      console.warn('Speech error:', e);
+    }
   };
 
   // ── 6. Mode 1: 3D Flip Card & SM-2 Rating ────────────────────────────────────
@@ -709,7 +716,7 @@ export const WordbookScreen: React.FC = () => {
             {topic.id !== 'all' && (
               <TouchableOpacity
                 onPress={(e) => {
-                  e.stopPropagation();
+                  e?.stopPropagation?.();
                   deleteTopic(topic);
                 }}
                 style={styles.cardTrashBtn}
@@ -750,7 +757,7 @@ export const WordbookScreen: React.FC = () => {
           <TouchableOpacity
             style={styles.actionPillBtn}
             onPress={(e) => {
-              e.stopPropagation();
+              e?.stopPropagation?.();
               openTopicStudy(topic, 'FLASHCARD');
             }}
             activeOpacity={0.8}
@@ -764,7 +771,7 @@ export const WordbookScreen: React.FC = () => {
             <TouchableOpacity
               style={styles.actionOutlineBtn}
               onPress={(e) => {
-                e.stopPropagation();
+                e?.stopPropagation?.();
                 openTopicStudy(topic, 'WRITING');
               }}
               activeOpacity={0.8}
@@ -777,7 +784,7 @@ export const WordbookScreen: React.FC = () => {
             <TouchableOpacity
               style={styles.actionOutlineBtn}
               onPress={(e) => {
-                e.stopPropagation();
+                e?.stopPropagation?.();
                 openTopicStudy(topic, 'AI_QUIZ');
               }}
               activeOpacity={0.8}
@@ -974,7 +981,7 @@ export const WordbookScreen: React.FC = () => {
                 <TouchableOpacity
                   style={styles.cardCircleBtn}
                   onPress={(e) => {
-                    e.stopPropagation();
+                    e?.stopPropagation?.();
                     playWordAudio(activeWord.word);
                   }}
                   activeOpacity={0.7}
@@ -985,7 +992,7 @@ export const WordbookScreen: React.FC = () => {
                 <TouchableOpacity
                   style={styles.cardCircleBtn}
                   onPress={(e) => {
-                    e.stopPropagation();
+                    e?.stopPropagation?.();
                     setScorerWord(activeWord);
                   }}
                   activeOpacity={0.7}
@@ -1011,7 +1018,7 @@ export const WordbookScreen: React.FC = () => {
                 <TouchableOpacity
                   style={styles.cardMiniIconBtn}
                   onPress={(e) => {
-                    e.stopPropagation();
+                    e?.stopPropagation?.();
                     playWordAudio(activeWord.word);
                   }}
                   activeOpacity={0.7}
@@ -1021,7 +1028,7 @@ export const WordbookScreen: React.FC = () => {
                 <TouchableOpacity
                   style={styles.cardMiniIconBtn}
                   onPress={(e) => {
-                    e.stopPropagation();
+                    e?.stopPropagation?.();
                     markWordAsMastered(activeWord.id, activeWord.word);
                   }}
                   activeOpacity={0.7}

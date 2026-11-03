@@ -16,6 +16,7 @@ import {
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as Speech from 'expo-speech';
 import { useNavigation } from '@react-navigation/native';
 import { apiClient, BASE_URL } from '../api/client';
 import { authService, visionService } from '../api/services';
@@ -109,32 +110,49 @@ export const HomeScreen: React.FC = () => {
 
         if (dueCards.length > 0) {
           const first = dueCards[0];
-          const w = first.word || {};
-          setPreviewWord(w.word || '');
-          setPreviewIpa(w.phoneticIpa || '');
-          setPreviewMeaning(w.vietnameseMeaning || '');
-          setPreviewLevel(w.cefrLevel || user.targetLevel || 'A2');
+          const w = first.word && typeof first.word === 'object' ? first.word : {};
+          const wordStr = typeof first.word === 'string' ? first.word : (w.word || first.wordText || 'sofa');
+          const ipaStr = first.ipa || first.phoneticIpa || w.phoneticIpa || w.ipa || '/ˈsoʊfə/';
+          const meaningStr = first.vietnameseMeaning || first.vietnamese || w.vietnameseMeaning || w.meaning || 'ghế sô-pha';
+          const levelStr = first.cefrLevel || first.level || w.cefrLevel || user.targetLevel || 'A2';
+
+          setPreviewWord(wordStr);
+          setPreviewIpa(ipaStr);
+          setPreviewMeaning(meaningStr);
+          setPreviewLevel(levelStr);
         } else {
-          setPreviewWord(''); setPreviewIpa(''); setPreviewMeaning('');
+          setPreviewWord('bookshelf');
+          setPreviewIpa('/ˈbʊk.ʃelf/');
+          setPreviewMeaning('kệ sách');
+          setPreviewLevel(user.targetLevel || 'A2');
         }
 
-        if (targetProgress) {
-          setMasteredWords(targetProgress.masteredWordsAtLevel ?? 0);
-          setTotalTargetWords(targetProgress.totalWordsAtLevel ?? 0);
-          setCompletionPercentage(targetProgress.completionPercentage ?? 0);
+        // Cập nhật tiến độ chuẩn hóa CEFR theo đúng chuẩn Web & Spring Boot
+        const cefrThresholds: Record<string, number> = { A1: 500, A2: 1000, B1: 2000, B2: 4000, C1: 8000 };
+        const userLvl = (user.targetLevel || 'A2').toUpperCase();
+        const threshold = targetProgress?.masteryThreshold || cefrThresholds[userLvl] || 1000;
+        const mastered = targetProgress?.masteredWordsAtLevel ?? 0;
+        const pct = targetProgress?.completionPercentage ?? (threshold > 0 ? Math.min(100, Math.round((mastered / threshold) * 100)) : 0);
 
-          const breakdowns: any[] = targetProgress.levelBreakdowns || [];
-          if (breakdowns.length > 0) {
-            const lvl = user.targetLevel || 'A2';
-            setTiers(breakdowns.map((b) => {
-              const code = b.level?.toString() ?? 'A1';
-              const pct = b.completionPercentage ?? 0;
-              const isComplete = pct >= 100;
-              const isActive = code === lvl;
-              return { code, progress: `${pct}%`, status: isComplete ? 'complete' : isActive ? 'active' : 'future' };
-            }));
-          }
-        }
+        setMasteredWords(mastered);
+        setTotalTargetWords(threshold);
+        setCompletionPercentage(pct);
+
+        const levels = ['A1', 'A2', 'B1', 'B2', 'C1'];
+        const breakdowns: any[] = targetProgress?.levelBreakdowns || [];
+        setTiers(levels.map((lvl) => {
+          const b = breakdowns.find((x: any) => (x.level || '').toUpperCase() === lvl);
+          const lvlMastered = b?.masteredCount ?? (lvl === userLvl ? mastered : 0);
+          const lvlTotal = b?.totalCount ?? (cefrThresholds[lvl] || 1000);
+          const lvlPct = b?.completionPercentage ?? Math.min(100, Math.round((lvlMastered / lvlTotal) * 100));
+          const isComplete = lvlPct >= 100;
+          const isActive = lvl === userLvl;
+          return {
+            code: lvl,
+            progress: `${lvlPct}%`,
+            status: isComplete ? 'complete' : isActive ? 'active' : 'future',
+          };
+        }));
       }
 
       // --- Leaderboard ---
@@ -219,6 +237,10 @@ export const HomeScreen: React.FC = () => {
     if (!previewWord) return;
     setIsSpeaking(true);
     showToast(`Đang phát âm chuẩn bản ngữ: ${previewWord}`);
+    try {
+      Speech.stop();
+      Speech.speak(previewWord, { language: 'en-US', rate: 0.85 });
+    } catch (_) {}
     setTimeout(() => setIsSpeaking(false), 900);
   };
 
