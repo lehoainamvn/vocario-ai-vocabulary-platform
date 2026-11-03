@@ -9,7 +9,13 @@
     "owner": "naml75803-2",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.naml758032.vocariov2"
+      "bundleIdentifier": "com.naml758032.vocariov2",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "Ứng dụng cần quyền Camera để chụp và quét nhận diện đồ vật bằng AI.",
+        "NSMicrophoneUsageDescription": "Ứng dụng cần quyền Micro để chấm điểm phát âm tiếng Anh.",
+        "NSPhotoLibraryUsageDescription": "Ứng dụng cần quyền truy cập thư viện ảnh để tải lên ảnh bối cảnh học từ vựng."
+      }
     },
     "android": {
       "package": "com.naml758032.vocariov2",
