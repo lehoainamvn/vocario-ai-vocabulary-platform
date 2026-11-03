@@ -91,15 +91,15 @@ vocariov2/web-build/
 *.keystore
 
 # -------------------------------------------------------------------------
-# 7. FLUTTER & DART (vocario_mobile)
+
 # -------------------------------------------------------------------------
-vocario_mobile/.dart_tool/
-vocario_mobile/build/
-vocario_mobile/.flutter-plugins
-vocario_mobile/.flutter-plugins-dependencies
-.dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
+
+
+
+
+
+
+
 
 # 8. HỆ ĐIỀU HÀNH & TRÌNH SOẠN THẢO (OS & IDEs)
 # -------------------------------------------------------------------------

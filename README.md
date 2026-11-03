@@ -151,12 +151,12 @@ DoAnTotNghiep/
 │   ├── package.json          # Dependencies React Native, Expo, Axios, Navigation
 │   └── README.md             # Hướng dẫn chi tiết phân hệ di động
 │
-├── vocario_mobile/           # Mobile Prototype & Research App (Flutter Cross-Platform)
-│   ├── lib/                  # Mã nguồn Dart (Clean Architecture, Tokens, Screens)
-│   │   ├── core/             # Constants (Tokens), Services (ApiService), Utils (Image/Speech)
-│   │   ├── screens/          # Scanner, Wordbook (SM-2), Arena, Extractor, Profile, Home
-│   │   └── widgets/          # SpeechScorerModal, Custom UI Components
-│   └── pubspec.yaml          # Cấu hình dependencies Flutter (Dio, Google Fonts, SharedPrefs)
+
+
+
+
+
+
 │
 ├── docs/                     # Tài liệu kiến trúc & Thiết kế giao diện
 │   ├── figures/              # Biểu đồ đánh giá độ chính xác mAP, Loss, Confusion Matrix
@@ -206,7 +206,7 @@ docker compose down
 | **Node.js & npm** | Node.js v18+ hoặc v20+ LTS | `node -v` && `npm -v` |
 | **PostgreSQL** | PostgreSQL 15, 16 hoặc 17 | `psql -V` |
 | **Python** | Python 3.10+ (64-bit) | `py --version` |
-| **Flutter SDK** | Flutter 3.29+ / Dart 3.7+ | `flutter --version` |
+| **React Native / Expo** | Expo 58+ / Node.js 18+ | `npx expo -v` |
 
 ---
 
@@ -259,7 +259,7 @@ npm start
 
 ---
 
-### Bước 5: Khởi Chạy Mobile App Flagship Expo React Native (`vocariov2`)
+### Bước 5: Khởi Chạy Mobile App (React Native Expo - `vocariov2`)
 
 Ứng dụng di động chính thức của hệ thống xây dựng trên **React Native 0.88 + Expo 58**:
 
@@ -278,7 +278,7 @@ npx expo start
 
 ---
 
-### Bước 6: Khởi Chạy Mobile Prototype Flutter (`vocario_mobile`)
+
 
 Bên cạnh ứng dụng React Native, dự án cung cấp thêm bản thử nghiệm **Flutter Cross-Platform**:
 
