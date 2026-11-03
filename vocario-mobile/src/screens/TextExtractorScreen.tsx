@@ -16,7 +16,7 @@ import {
   Alert,
   Platform,
 } from 'react-native';
-import { MaterialIcons, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Speech from 'expo-speech';
@@ -268,7 +268,7 @@ export const TextExtractorScreen: React.FC = () => {
             onPress={() => (navigation.canGoBack?.() ? navigation.goBack() : navigation.navigate('Home'))}
             style={styles.backBtn}
           >
-            <MaterialIcons name="arrow-back" size={20} color={T.ink} />
+            <Ionicons name="arrow-back" size={20} color={T.ink} />
           </TouchableOpacity>
           <View style={{ marginLeft: 12 }}>
             <Text style={styles.topBarMono}>DOCUMENT INTELLIGENCE & VOCABULARY MINING</Text>
@@ -291,7 +291,7 @@ export const TextExtractorScreen: React.FC = () => {
           {/* Header & Tools */}
           <View style={styles.workspaceHeader}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <MaterialIcons name="edit-note" size={18} color={T.brand} />
+              <Ionicons name="document-text-outline" size={18} color={T.brand} />
               <Text style={styles.workspaceTitle}>NỘI DUNG VĂN BẢN TIẾNG ANH</Text>
             </View>
 
@@ -305,20 +305,20 @@ export const TextExtractorScreen: React.FC = () => {
                   <ActivityIndicator size="small" color={T.brand} />
                 ) : (
                   <>
-                    <MaterialIcons name="upload-file" size={13} color={T.brand} />
+                    <Ionicons name="cloud-upload-outline" size={14} color={T.brand} />
                     <Text style={styles.toolBtnText}>Tải tệp</Text>
                   </>
                 )}
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.toolBtn} onPress={handlePasteFromClipboard}>
-                <MaterialIcons name="content-paste" size={13} color={T.brand} />
+                <Ionicons name="clipboard-outline" size={14} color={T.brand} />
                 <Text style={styles.toolBtnText}>Dán</Text>
               </TouchableOpacity>
 
               {text.length > 0 && (
                 <TouchableOpacity style={styles.toolBtnDanger} onPress={() => setText('')}>
-                  <MaterialIcons name="clear" size={13} color="#B91C1C" />
+                  <Ionicons name="trash-outline" size={14} color="#B91C1C" />
                   <Text style={styles.toolBtnDangerText}>Xóa trắng</Text>
                 </TouchableOpacity>
               )}
@@ -507,7 +507,7 @@ export const TextExtractorScreen: React.FC = () => {
                   <ActivityIndicator color="#FFFFFF" size="small" />
                 ) : (
                   <>
-                    <MaterialIcons name="bookmark-border" size={15} color="#FFFFFF" />
+                    <Ionicons name="bookmark-outline" size={15} color="#FFFFFF" />
                     <Text style={styles.saveAllBtnText}>Lưu vào Sổ SM-2</Text>
                   </>
                 )}
@@ -528,7 +528,7 @@ export const TextExtractorScreen: React.FC = () => {
                   </View>
 
                   <TouchableOpacity onPress={() => speak(w.word)} style={styles.audioBtn}>
-                    <MaterialIcons name="volume-up" size={16} color={T.brand} />
+                    <Ionicons name="volume-medium-outline" size={18} color={T.brand} />
                   </TouchableOpacity>
                 </View>
 

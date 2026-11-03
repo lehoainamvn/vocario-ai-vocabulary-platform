@@ -21,7 +21,7 @@ import * as Speech from 'expo-speech';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { apiClient, BASE_URL } from '../api/client';
-import { authService, visionService } from '../api/services';
+import { authService, visionService, srsService } from '../api/services';
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const T = {
@@ -69,6 +69,11 @@ export const HomeScreen: React.FC = () => {
   const [targetLevel, setTargetLevel] = useState('A2');
   const [streakCount, setStreakCount] = useState(0);
   const [dueWordsCount, setDueWordsCount] = useState(0);
+  const [dueCardsList, setDueCardsList] = useState<any[]>([]);
+  const [isReviewModalVisible, setIsReviewModalVisible] = useState(false);
+  const [reviewCardIndex, setReviewCardIndex] = useState(0);
+  const [isReviewFlipped, setIsReviewFlipped] = useState(false);
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   // Word preview
   const [previewWord, setPreviewWord] = useState('');
@@ -133,6 +138,7 @@ export const HomeScreen: React.FC = () => {
         setTargetLevel(user.targetLevel || 'A2');
         setStreakCount(user.streakCount ?? 0);
         setDueWordsCount(dueCards.length);
+        setDueCardsList(dueCards);
 
         if (dueCards.length > 0) {
           const first = dueCards[0];
@@ -309,6 +315,65 @@ export const HomeScreen: React.FC = () => {
     setTimeout(() => setIsSpeaking(false), 900);
   };
 
+  // ── SRS Spaced Repetition Review Handlers ──────────────────────────────────
+  const startReviewSession = () => {
+    if (dueCardsList.length === 0) {
+      showToast('Tuyệt vời! Bạn đã hoàn thành tất cả thẻ cần ôn hôm nay.');
+      return;
+    }
+    setReviewCardIndex(0);
+    setIsReviewFlipped(false);
+    setIsReviewModalVisible(true);
+  };
+
+  const closeReviewSession = () => {
+    setIsReviewModalVisible(false);
+    setIsReviewFlipped(false);
+  };
+
+  const handleSpeakReviewWord = (wordText: string) => {
+    if (!wordText) return;
+    try {
+      Speech.stop();
+      Speech.speak(wordText, { language: 'en-US', rate: 0.9 });
+    } catch (_) {}
+  };
+
+  const submitReviewGrade = async (grade: number) => {
+    if (isSubmittingReview) return;
+    const currentCard = dueCardsList[reviewCardIndex];
+    if (!currentCard) return;
+
+    setIsSubmittingReview(true);
+    try {
+      const cardId = currentCard.id || currentCard.progressId;
+      const cardText = typeof currentCard.word === 'string'
+        ? currentCard.word
+        : (currentCard.word?.word || currentCard.wordText || previewWord);
+
+      await srsService.submitReview({
+        progressId: cardId ? String(cardId) : undefined,
+        wordText: cardText,
+        ratingGrade: grade,
+        reviewType: 'FLASHCARD',
+      });
+    } catch (err) {
+      console.warn('SRS review submit error:', err);
+    } finally {
+      setIsSubmittingReview(false);
+    }
+
+    if (reviewCardIndex < dueCardsList.length - 1) {
+      setReviewCardIndex((prev) => prev + 1);
+      setIsReviewFlipped(false);
+    } else {
+      setIsReviewModalVisible(false);
+      setIsReviewFlipped(false);
+      showToast('Chúc mừng! Bạn đã hoàn thành tất cả thẻ cần ôn hôm nay.');
+      fetchDatabaseData();
+    }
+  };
+
   // ── Avatar initials ─────────────────────────────────────────────────────────
   const initials = userFullName.trim()
     ? userFullName.trim().split(' ').map((w) => w[0] || '').slice(0, 2).join('').toUpperCase()
@@ -392,7 +457,7 @@ export const HomeScreen: React.FC = () => {
         {/* CTA */}
         <TouchableOpacity
           style={styles.heroCta}
-          onPress={() => navigation.navigate(dueWordsCount > 0 ? 'Wordbook' : 'Scanner')}
+          onPress={() => (dueWordsCount > 0 ? startReviewSession() : navigation.navigate('Scanner'))}
           activeOpacity={0.85}
         >
           <Text style={styles.heroCtaText}>
@@ -417,10 +482,14 @@ export const HomeScreen: React.FC = () => {
   );
 
   const renderWordPreviewCard = () => (
-    <View style={styles.wordPreviewBox}>
+    <TouchableOpacity
+      style={styles.wordPreviewBox}
+      onPress={startReviewSession}
+      activeOpacity={0.88}
+    >
       {/* Top row */}
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-        <Text style={styles.wordPreviewTag}>TỪ XEM TRƯỚC</Text>
+        <Text style={styles.wordPreviewTag}>TỪ XEM TRƯỚC · CHẠM ĐỂ ÔN TẬP</Text>
         <TouchableOpacity onPress={playWordAudio}>
           <Ionicons
             name="volume-high"
@@ -443,7 +512,7 @@ export const HomeScreen: React.FC = () => {
         <View style={styles.wordPreviewDivider} />
         <Text style={styles.wordPreviewMeaning}>{previewMeaning}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   // ── Quick Actions Grid ──────────────────────────────────────────────────────
@@ -894,6 +963,153 @@ export const HomeScreen: React.FC = () => {
     );
   };
 
+  // ── Flashcard Review Modal (SM-2 Spaced Repetition) ──────────────────────────
+  const renderReviewModal = () => {
+    if (!isReviewModalVisible) return null;
+    const currentCard = dueCardsList[reviewCardIndex] || null;
+    const totalDue = dueCardsList.length;
+
+    if (!currentCard) return null;
+
+    const cardWord = typeof currentCard.word === 'string'
+      ? currentCard.word
+      : (currentCard.word?.word || currentCard.wordText || previewWord || 'Vocab');
+    const cardIpa = currentCard.ipa || currentCard.phoneticIpa || currentCard.word?.ipa || previewIpa || '/.../';
+    const cardMeaning = currentCard.vietnameseMeaning || currentCard.vietnamese || currentCard.word?.vietnameseMeaning || previewMeaning || '';
+    const cardLevel = (currentCard.cefrLevel || currentCard.level || currentCard.word?.cefrLevel || targetLevel || 'A2').toUpperCase();
+    const cardExampleEn = currentCard.exampleSentenceEn || currentCard.exampleEn || currentCard.word?.exampleSentenceEn || '';
+    const cardExampleVi = currentCard.exampleSentenceVi || currentCard.exampleVi || currentCard.word?.exampleSentenceVi || '';
+
+    return (
+      <Modal
+        visible={isReviewModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={closeReviewSession}
+      >
+        <View style={styles.reviewModalOverlay}>
+          <View style={styles.reviewModalContainer}>
+            {/* Modal Header */}
+            <View style={styles.reviewModalHeader}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <View style={styles.reviewCounterChip}>
+                  <Text style={styles.reviewCounterChipText}>
+                    THẺ {reviewCardIndex + 1} / {totalDue}
+                  </Text>
+                </View>
+                <View style={[styles.reviewLevelChip, { backgroundColor: '#FAF8F5' }]}>
+                  <Text style={styles.reviewLevelChipText}>{cardLevel}</Text>
+                </View>
+              </View>
+
+              <TouchableOpacity
+                onPress={closeReviewSession}
+                style={styles.reviewCloseBtn}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Ionicons name="close" size={18} color={T.ink} />
+              </TouchableOpacity>
+            </View>
+
+            {/* Flashcard Body */}
+            <TouchableOpacity
+              activeOpacity={0.95}
+              onPress={() => !isReviewFlipped && setIsReviewFlipped(true)}
+              style={styles.reviewCardBody}
+            >
+              <Text style={styles.reviewCardWord}>{cardWord}</Text>
+              <Text style={styles.reviewCardIpa}>{cardIpa}</Text>
+
+              {/* Pronunciation Audio Button */}
+              <TouchableOpacity
+                style={styles.reviewAudioBtn}
+                onPress={() => handleSpeakReviewWord(cardWord)}
+                activeOpacity={0.75}
+              >
+                <Ionicons name="volume-medium-outline" size={16} color={T.brand} />
+                <Text style={styles.reviewAudioBtnText}>Nghe phát âm</Text>
+              </TouchableOpacity>
+
+              {/* Flipped Section: Meaning & Context */}
+              {isReviewFlipped ? (
+                <View style={styles.reviewFlippedBox}>
+                  <View style={styles.reviewDivider} />
+                  <Text style={styles.reviewMeaningText}>{cardMeaning}</Text>
+
+                  {Boolean(cardExampleEn) && (
+                    <View style={styles.reviewExampleBox}>
+                      <Text style={styles.reviewExampleEn}>“{cardExampleEn}”</Text>
+                      {Boolean(cardExampleVi) && (
+                        <Text style={styles.reviewExampleVi}>{cardExampleVi}</Text>
+                      )}
+                    </View>
+                  )}
+                </View>
+              ) : (
+                <View style={styles.reviewTapPrompt}>
+                  <Ionicons name="hand-left-outline" size={14} color={T.faint} />
+                  <Text style={styles.reviewTapPromptText}>Chạm để lật xem dịch nghĩa & ví dụ</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+
+            {/* Bottom Actions */}
+            {!isReviewFlipped ? (
+              <TouchableOpacity
+                style={styles.reviewFlipCta}
+                onPress={() => setIsReviewFlipped(true)}
+                activeOpacity={0.85}
+              >
+                <Ionicons name="eye-outline" size={16} color="#FFFFFF" />
+                <Text style={styles.reviewFlipCtaText}>Xem Dịch Nghĩa & Đánh Giá</Text>
+              </TouchableOpacity>
+            ) : (
+              <View style={styles.reviewRatingsContainer}>
+                <Text style={styles.reviewRatingTitle}>ĐÁNH GIÁ MỨC ĐỘ GHI NHỚ (SM-2)</Text>
+                <View style={styles.reviewRatingButtonsRow}>
+                  {/* Rating 1: Chưa nhớ */}
+                  <TouchableOpacity
+                    style={[styles.reviewRatingBtn, styles.reviewRatingBtnHard]}
+                    onPress={() => submitReviewGrade(1)}
+                    disabled={isSubmittingReview}
+                  >
+                    <Text style={[styles.reviewRatingBtnText, { color: '#DC2626' }]}>Chưa nhớ</Text>
+                    <Text style={styles.reviewRatingBtnSub}>Lặp lại sớm</Text>
+                  </TouchableOpacity>
+
+                  {/* Rating 3: Nhớ tốt */}
+                  <TouchableOpacity
+                    style={[styles.reviewRatingBtn, styles.reviewRatingBtnGood]}
+                    onPress={() => submitReviewGrade(3)}
+                    disabled={isSubmittingReview}
+                  >
+                    <Text style={[styles.reviewRatingBtnText, { color: T.brand }]}>Nhớ tốt</Text>
+                    <Text style={styles.reviewRatingBtnSub}>Đúng chu kỳ</Text>
+                  </TouchableOpacity>
+
+                  {/* Rating 5: Rất dễ */}
+                  <TouchableOpacity
+                    style={[styles.reviewRatingBtn, styles.reviewRatingBtnEasy]}
+                    onPress={() => submitReviewGrade(5)}
+                    disabled={isSubmittingReview}
+                  >
+                    <Text style={[styles.reviewRatingBtnText, { color: '#16A34A' }]}>Rất dễ</Text>
+                    <Text style={styles.reviewRatingBtnSub}>Giãn cách dài</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+
+            {/* Footer SM-2 notice */}
+            <Text style={styles.reviewFooterNotice}>
+              Thuật toán ngắt quãng SuperMemo SM-2 tự động đồng bộ tiến độ vào CSDL Cổng Học Tập.
+            </Text>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
   // ── Toast ────────────────────────────────────────────────────────────────────
   const renderToast = () => {
     if (!toastMessage) return null;
@@ -943,6 +1159,7 @@ export const HomeScreen: React.FC = () => {
         {renderFooter()}
       </ScrollView>
 
+      {renderReviewModal()}
       {renderCertPreviewModal()}
       {renderToast()}
     </View>
@@ -1556,5 +1773,230 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     color: T.ink,
+  },
+
+  // ── Flashcard Review Modal Styles ───────────────────────────────────────────
+  reviewModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.58)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  reviewModalContainer: {
+    width: '100%',
+    maxWidth: 420,
+    backgroundColor: T.surface,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: T.border,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  reviewModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingBottom: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: T.border,
+  },
+  reviewCounterChip: {
+    backgroundColor: T.field,
+    borderWidth: 1,
+    borderColor: T.border,
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  reviewCounterChipText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: T.brand,
+    letterSpacing: 0.5,
+  },
+  reviewLevelChip: {
+    borderWidth: 1,
+    borderColor: T.border,
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  reviewLevelChipText: {
+    fontSize: 10,
+    fontWeight: '700',
+    fontFamily: 'monospace',
+    color: T.muted,
+  },
+  reviewCloseBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 6,
+    backgroundColor: T.field,
+    borderWidth: 1,
+    borderColor: T.border,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  reviewCardBody: {
+    backgroundColor: T.field,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: T.border,
+    padding: 20,
+    alignItems: 'center',
+    marginVertical: 14,
+  },
+  reviewCardWord: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: T.ink,
+    letterSpacing: -0.5,
+    textAlign: 'center',
+  },
+  reviewCardIpa: {
+    fontSize: 13,
+    color: T.muted,
+    fontFamily: 'monospace',
+    marginTop: 4,
+  },
+  reviewAudioBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: T.surface,
+    borderWidth: 1,
+    borderColor: T.border,
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    marginTop: 12,
+  },
+  reviewAudioBtnText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: T.brand,
+  },
+  reviewTapPrompt: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 18,
+    paddingTop: 10,
+  },
+  reviewTapPromptText: {
+    fontSize: 11,
+    color: T.faint,
+    fontStyle: 'italic',
+  },
+  reviewFlippedBox: {
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  reviewDivider: {
+    width: '100%',
+    height: 1,
+    backgroundColor: T.border,
+    marginBottom: 12,
+  },
+  reviewMeaningText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: T.brand,
+    textAlign: 'center',
+  },
+  reviewExampleBox: {
+    backgroundColor: T.surface,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: T.border,
+    padding: 12,
+    marginTop: 10,
+    width: '100%',
+  },
+  reviewExampleEn: {
+    fontSize: 12.5,
+    fontStyle: 'italic',
+    color: T.ink,
+    lineHeight: 18,
+  },
+  reviewExampleVi: {
+    fontSize: 11.5,
+    color: T.muted,
+    marginTop: 4,
+    lineHeight: 16,
+  },
+  reviewFlipCta: {
+    backgroundColor: T.brand,
+    borderRadius: 8,
+    paddingVertical: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  reviewFlipCtaText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  reviewRatingsContainer: {
+    width: '100%',
+  },
+  reviewRatingTitle: {
+    fontSize: 9.5,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    color: T.muted,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  reviewRatingButtonsRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  reviewRatingBtn: {
+    flex: 1,
+    paddingVertical: 9,
+    paddingHorizontal: 6,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  reviewRatingBtnHard: {
+    backgroundColor: '#FEF2F2',
+    borderWidth: 1,
+    borderColor: '#FECACA',
+  },
+  reviewRatingBtnGood: {
+    backgroundColor: T.field,
+    borderWidth: 1,
+    borderColor: T.border,
+  },
+  reviewRatingBtnEasy: {
+    backgroundColor: '#F0FDF4',
+    borderWidth: 1,
+    borderColor: '#BBF7D0',
+  },
+  reviewRatingBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  reviewRatingBtnSub: {
+    fontSize: 9,
+    color: T.muted,
+    marginTop: 2,
+  },
+  reviewFooterNotice: {
+    fontSize: 9,
+    color: T.faint,
+    textAlign: 'center',
+    marginTop: 12,
+    lineHeight: 13,
   },
 });
