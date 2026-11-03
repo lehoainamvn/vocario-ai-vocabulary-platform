@@ -117,7 +117,24 @@ Mô hình AI Vision và Soft-Gating tự động nhận diện và bóc tách t�
   <i>Trái: Bóc tách vật thể không gian phòng khách Scandinavian (sofa, coffee table, houseplant). Phải: Nhận diện không gian thư viện tri thức học thuật (bookshelf, book, chair).</i>
 </p>
 
-### 4. Trải Nghiệm Ứng Dụng Di Động Thông Minh (React Native & Expo 58 Mobile Experience)
+### 4. Giao Diện Cổng Web Học Tập Trực Tuyến (Angular 19 Scandinavian Editorial Web Experience)
+Toàn bộ các phân hệ của `vocario-angular` được thiết kế chuẩn mực theo phong cách **Scandinavian Editorial**, tối ưu hóa không gian hiển thị rộng rãi trên máy tính để bàn (Desktop), bố cục tinh tế, tối giản nhưng chứa đựng chiều sâu nghiệp vụ:
+
+<p align="center">
+  <img src="docs/figures/web/01_web_home_dashboard.jpg" width="49%" alt="Web Home Dashboard" style="border-radius: 6px; border: 1px solid #E5DED3;" />
+  <img src="docs/figures/web/02_web_scanner_camera.jpg" width="49%" alt="Web Camera Scanner Studio" style="border-radius: 6px; border: 1px solid #E5DED3;" />
+</p>
+<p align="center">
+  <img src="docs/figures/web/04_web_wordbook_topics.jpg" width="49%" alt="Web Wordbook Topics" style="border-radius: 6px; border: 1px solid #E5DED3;" />
+  <img src="docs/figures/web/05_web_arena_speedrun.jpg" width="49%" alt="Web Visual Arena" style="border-radius: 6px; border: 1px solid #E5DED3;" />
+</p>
+<p align="center">
+  <img src="docs/figures/web/03_web_text_extractor.jpg" width="99%" alt="Web Document Intelligence Text Extractor" style="border-radius: 6px; border: 1px solid #E5DED3;" />
+  <br/>
+  <i>Từ trên xuống: (1) Bảng điều khiển trung tâm & Thẻ ôn tập SM-2 · (2) Smart Aperture Studio nhận diện camera trực tiếp · (3) Sổ từ vựng & 3 chế độ luyện tập (Thẻ ghi nhớ, Viết chính tả, Trắc nghiệm) · (4) Đấu trường thị giác AI 60s Blitz · (5) Phân hệ trích xuất từ vựng từ văn bản học thuật (Document Intelligence)</i>
+</p>
+
+### 5. Trải Nghiệm Ứng Dụng Di Động Thông Minh (React Native & Expo 58 Mobile Experience)
 Toàn bộ các màn hình chức năng của `vocario-mobile` được thiết kế tỉ mỉ theo triết lý **Scandinavian Editorial**, xử lý triệt để Dynamic Safe Area Inset cho iOS (Dynamic Island / Notch) và Android, trang bị thanh điều hướng thanh thoát cùng nút FAB Quét AI viền vàng Gold:
 
 <p align="center">
