@@ -15,9 +15,11 @@ import {
   Alert,
   Modal,
   Animated,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { authService, certificateService } from '../api/services';
 import { removeStoredToken } from '../api/client';
 
@@ -76,6 +78,8 @@ interface ProfileScreenProps {
 
 export const ProfileScreen: React.FC<ProfileScreenProps> = ({ onLogout }) => {
   const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
+  const topInset = Math.max(insets.top, Platform.OS === 'ios' ? 44 : 24) + 6;
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isClaimingCert, setIsClaimingCert] = useState(false);
@@ -337,7 +341,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ onLogout }) => {
   // ──────────────────────────────────────────────────────────────────────────
 
   const renderTopAppBar = () => (
-    <View style={styles.topBar}>
+    <View style={[styles.topBar, { paddingTop: topInset, paddingBottom: 10 }]}>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <View style={styles.topBarLabel}>
           <Text style={styles.topBarMono}>SCHOLAR'S DESK</Text>

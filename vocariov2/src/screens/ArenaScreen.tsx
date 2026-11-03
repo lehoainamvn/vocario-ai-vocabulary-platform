@@ -21,6 +21,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import * as Speech from 'expo-speech';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { apiClient, BASE_URL } from '../api/client';
 import { arenaService, leaderboardService, visionService } from '../api/services';
 
@@ -117,6 +118,8 @@ const DEFAULT_OFFICIAL_STAGES: ArenaStage[] = [
 export const ArenaScreen: React.FC = () => {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
+  const insets = useSafeAreaInsets();
+  const topInset = Math.max(insets.top, Platform.OS === 'ios' ? 44 : 24) + 6;
 
   // Modes: 'SELECT_STAGE' | 'PLAYING' | 'VICTORY'
   const [gameMode, setGameMode] = useState<'SELECT_STAGE' | 'PLAYING' | 'VICTORY'>('SELECT_STAGE');
@@ -562,7 +565,7 @@ export const ArenaScreen: React.FC = () => {
       showsVerticalScrollIndicator={false}
     >
       {/* Top Header */}
-      <View style={styles.topHeaderRow}>
+      <View style={[styles.topHeaderRow, { paddingTop: topInset }]}>
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={16} color={T.ink} />
         </TouchableOpacity>
@@ -732,7 +735,7 @@ export const ArenaScreen: React.FC = () => {
     return (
       <View style={{ flex: 1, backgroundColor: '#1F1C18' }}>
         {/* Top HUD Bar */}
-        <View style={styles.hudBar}>
+        <View style={[styles.hudBar, { paddingTop: topInset, paddingBottom: 8 }]}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <TouchableOpacity onPress={() => setGameMode('SELECT_STAGE')} style={{ padding: 4 }}>
               <Ionicons name="arrow-back" size={18} color={T.ink} />

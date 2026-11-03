@@ -18,6 +18,7 @@ import {
 } from 'react-native';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Speech from 'expo-speech';
 import { nlpService, classroomService } from '../api/services';
 
@@ -70,6 +71,8 @@ const QUICK_COUNTS = [5, 8, 10, 15, 20];
 
 export const TextExtractorScreen: React.FC = () => {
   const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
+  const topInset = Math.max(insets.top, Platform.OS === 'ios' ? 44 : 24) + 6;
 
   // Open workspace: starts empty for free user input
   const [text, setText] = useState<string>('');
@@ -259,7 +262,7 @@ export const TextExtractorScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       {/* Top App Bar */}
-      <View style={styles.topBar}>
+      <View style={[styles.topBar, { paddingTop: topInset, paddingBottom: 12 }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity
             onPress={() => (navigation.canGoBack?.() ? navigation.goBack() : navigation.navigate('Home'))}

@@ -13,9 +13,11 @@ import {
   RefreshControl,
   ActivityIndicator,
   Modal,
+  Platform,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { leaderboardService, authService } from '../api/services';
 
 // ——— Tokens (Matching VocarioTokens from tokens.dart) ————————————————————————
@@ -66,6 +68,7 @@ const CEFR_LEVELS = [
 
 export const LeaderboardScreen: React.FC = () => {
   const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
 
   const [activeTab, setActiveTab] = useState<'SM2' | 'ARENA'>('SM2');
   const [selectedPeriod, setSelectedPeriod] = useState<'weekly' | 'all-time'>('weekly');
@@ -246,7 +249,7 @@ export const LeaderboardScreen: React.FC = () => {
   // ——— Render Sub-components ————————————————————————————————————————————————
 
   const renderTopAppBar = () => (
-    <View style={styles.topBar}>
+    <View style={[styles.topBar, { paddingTop: Math.max(insets.top, Platform.OS === 'ios' ? 44 : 24) + 6 }]}>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <TouchableOpacity
           onPress={() => navigation.goBack?.() || navigation.navigate('Home')}
@@ -413,13 +416,13 @@ export const LeaderboardScreen: React.FC = () => {
         <View style={{ flexDirection: 'row', marginTop: 12 }}>
           <TouchableOpacity
             style={styles.actionBtnPrimary}
-            onPress={() => navigation.navigate('Wordbook', { initialTabIndex: 1 })}
+            onPress={() => navigation.navigate('MainTabs', { screen: 'Wordbook', params: { initialTabIndex: 1 } })}
           >
             <Text style={styles.actionBtnPrimaryText}>Ôn Flashcard ngay</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.actionBtnSecondary}
-            onPress={() => navigation.navigate('Arena')}
+            onPress={() => navigation.navigate('MainTabs', { screen: 'Arena' })}
           >
             <Text style={styles.actionBtnSecondaryText}>Vào Đấu trường</Text>
           </TouchableOpacity>
@@ -860,7 +863,10 @@ export const LeaderboardScreen: React.FC = () => {
       <TouchableOpacity
         style={styles.arenaActionBtn}
         onPress={() =>
-          navigation.navigate('Arena', { initialStageId: selectedArenaStageId })
+          navigation.navigate('MainTabs', {
+            screen: 'Arena',
+            params: { initialStageId: selectedArenaStageId },
+          })
         }
       >
         <MaterialIcons name="bolt" size={14} color="#FFFFFF" />

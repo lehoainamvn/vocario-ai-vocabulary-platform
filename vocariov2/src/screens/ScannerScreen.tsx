@@ -15,12 +15,14 @@ import {
   ActivityIndicator,
   Alert,
   Dimensions,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as Speech from 'expo-speech';
 import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { visionService } from '../api/services';
 import { SpeechScorerModal } from '../components/SpeechScorerModal';
 
@@ -68,6 +70,8 @@ interface DialogueTurn {
 
 export const ScannerScreen: React.FC = () => {
   const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
+  const topInset = Math.max(insets.top, Platform.OS === 'ios' ? 44 : 24) + 6;
 
   // Studio Mode: 'camera' | 'upload'
   const [activeStudioTab, setActiveStudioTab] = useState<'camera' | 'upload'>('camera');
@@ -404,7 +408,7 @@ export const ScannerScreen: React.FC = () => {
   // 1. STUDIO HEADER
   // ──────────────────────────────────────────────────────────────────────────
   const renderStudioHeader = () => (
-    <View style={styles.header}>
+    <View style={[styles.header, { paddingTop: topInset }]}>
       <View style={styles.headerTopRow}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity

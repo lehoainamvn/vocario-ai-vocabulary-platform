@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Platform, View, ActivityIndicator } from 'react-native';
+import { Platform, View, ActivityIndicator, Image, Text, TouchableOpacity } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -25,6 +25,8 @@ const T = {
   border: '#E5DED3',
   brand: '#7D6853',
   muted: '#746B60',
+  gold: '#F7D147',
+  ink: '#2D2823',
 };
 
 const MainTabNavigator: React.FC = () => {
@@ -36,14 +38,15 @@ const MainTabNavigator: React.FC = () => {
           backgroundColor: T.surface,
           borderTopColor: T.border,
           borderTopWidth: 1,
-          height: Platform.OS === 'ios' ? 84 : 64,
+          height: Platform.OS === 'ios' ? 86 : 66,
           paddingBottom: Platform.OS === 'ios' ? 24 : 6,
           paddingTop: 6,
           elevation: 8,
           shadowColor: '#000',
           shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.05,
-          shadowRadius: 4,
+          shadowOpacity: 0.06,
+          shadowRadius: 5,
+          overflow: 'visible',
         },
         tabBarActiveTintColor: T.brand,
         tabBarInactiveTintColor: T.muted,
@@ -66,16 +69,6 @@ const MainTabNavigator: React.FC = () => {
         }}
       />
       <Tab.Screen
-        name="Scanner"
-        component={ScannerScreen}
-        options={{
-          tabBarLabel: 'Thu nạp AI',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="camera-alt" size={size || 22} color={color} />
-          ),
-        }}
-      />
-      <Tab.Screen
         name="Wordbook"
         component={WordbookScreen}
         options={{
@@ -83,6 +76,68 @@ const MainTabNavigator: React.FC = () => {
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="menu-book" size={size || 22} color={color} />
           ),
+        }}
+      />
+      <Tab.Screen
+        name="Scanner"
+        component={ScannerScreen}
+        options={{
+          tabBarLabel: 'Quét AI',
+          tabBarButton: (props: any) => {
+            const isFocused = props.accessibilityState?.selected;
+            return (
+              <TouchableOpacity
+                {...props}
+                activeOpacity={0.85}
+                style={[
+                  props.style,
+                  {
+                    top: -16,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  },
+                ]}
+              >
+                <View
+                  style={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: 28,
+                    backgroundColor: '#FAF8F5',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    borderWidth: isFocused ? 2.5 : 2,
+                    borderColor: isFocused ? T.gold : '#E5DED3',
+                    shadowColor: T.ink,
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.18,
+                    shadowRadius: 6,
+                    elevation: 8,
+                  }}
+                >
+                  <Image
+                    source={require('../../assets/logo.png')}
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 12,
+                    }}
+                    resizeMode="contain"
+                  />
+                </View>
+                <Text
+                  style={{
+                    fontSize: 10,
+                    fontWeight: isFocused ? '700' : '600',
+                    color: isFocused ? T.brand : T.muted,
+                    marginTop: 3,
+                  }}
+                >
+                  Quét AI
+                </Text>
+              </TouchableOpacity>
+            );
+          },
         }}
       />
       <Tab.Screen

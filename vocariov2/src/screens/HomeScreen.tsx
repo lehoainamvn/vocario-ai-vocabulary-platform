@@ -19,6 +19,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import * as Speech from 'expo-speech';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { apiClient, BASE_URL } from '../api/client';
 import { authService, visionService } from '../api/services';
 
@@ -58,6 +59,7 @@ interface HeroStage {
 // ─── Main Screen ──────────────────────────────────────────────────────────────
 export const HomeScreen: React.FC = () => {
   const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -317,7 +319,7 @@ export const HomeScreen: React.FC = () => {
   // ──────────────────────────────────────────────────────────────────────────
 
   const renderTopBar = () => (
-    <View style={styles.topBar}>
+    <View style={[styles.topBar, { paddingTop: Math.max(insets.top, Platform.OS === 'ios' ? 44 : 24) + 6 }]}>
       <TouchableOpacity
         style={styles.topBarUser}
         onPress={() => navigation.navigate('Profile')}

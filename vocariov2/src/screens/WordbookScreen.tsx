@@ -22,6 +22,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import * as Speech from 'expo-speech';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { apiClient } from '../api/client';
 import { srsService, nlpService } from '../api/services';
 import { SpeechScorerModal } from '../components/SpeechScorerModal';
@@ -94,6 +95,8 @@ export interface QuizQuestionData {
 export const WordbookScreen: React.FC = () => {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
+  const insets = useSafeAreaInsets();
+  const topInset = Math.max(insets.top, Platform.OS === 'ios' ? 44 : 24) + 6;
   const { width } = useWindowDimensions();
   const isTabletOrDesktop = width > 768;
 
@@ -588,7 +591,7 @@ export const WordbookScreen: React.FC = () => {
   const renderTopicIndexView = () => (
     <ScrollView
       style={{ flex: 1 }}
-      contentContainerStyle={styles.topicIndexContent}
+      contentContainerStyle={[styles.topicIndexContent, { paddingTop: topInset }]}
       showsVerticalScrollIndicator={false}
       refreshControl={
         <RefreshControl
@@ -820,7 +823,7 @@ export const WordbookScreen: React.FC = () => {
     return (
       <View style={{ flex: 1, backgroundColor: T.canvas }}>
         {/* Top Studio Bar */}
-        <View style={styles.studioTopBar}>
+        <View style={[styles.studioTopBar, { paddingTop: topInset, paddingBottom: 10 }]}>
           <TouchableOpacity
             style={styles.studioBackBtn}
             onPress={backToTopicsList}

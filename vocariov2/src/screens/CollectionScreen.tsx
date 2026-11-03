@@ -15,9 +15,11 @@ import {
   ActivityIndicator,
   Alert,
   Modal,
+  Platform,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Speech from 'expo-speech';
 import { visionService, srsService } from '../api/services';
 import { SpeechScorerModal } from '../components/SpeechScorerModal';
@@ -44,11 +46,11 @@ export const CollectionScreen: React.FC = () => {
   const route = useRoute<any>();
   const initialSceneId = route.params?.initialSceneId;
 
+  const insets = useSafeAreaInsets();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [allAlbums, setAllAlbums] = useState<any[]>([]);
   const [selectedAlbum, setSelectedAlbum] = useState<any | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [activeFilter, setActiveFilter] = useState<'Tất cả' | 'Gần đây' | 'Chưa thành thạo'>('Tất cả');
 
   const [isSavingAll, setIsSavingAll] = useState<boolean>(false);
   const [savingWords, setSavingWords] = useState<Record<string, boolean>>({});
@@ -185,16 +187,13 @@ export const CollectionScreen: React.FC = () => {
       );
       if (!matchTitle && !matchWord) return false;
     }
-    if (activeFilter === 'Chưa thành thạo') {
-      return (a.words || []).some((w: any) => !w.isMastered);
-    }
     return true;
   });
 
   return (
     <View style={styles.container}>
-      {/* Top App Bar */}
-      <View style={styles.topBar}>
+      {/* Top App Bar with Safe Area Inset */}
+      <View style={[styles.topBar, { paddingTop: Math.max(insets.top, Platform.OS === 'ios' ? 44 : 24) + 6 }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity
             onPress={() => {
@@ -359,25 +358,7 @@ export const CollectionScreen: React.FC = () => {
             )}
           </View>
 
-          {/* Filter Pills */}
-          <View style={styles.filterRow}>
-            {(['Tất cả', 'Gần đây', 'Chưa thành thạo'] as const).map((f) => {
-              const isSelected = activeFilter === f;
-              return (
-                <TouchableOpacity
-                  key={f}
-                  style={[styles.filterPill, isSelected && styles.filterPillActive]}
-                  onPress={() => setActiveFilter(f)}
-                >
-                  <Text style={[styles.filterPillText, isSelected && styles.filterPillTextActive]}>
-                    {f}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-
-          <View style={{ height: 16 }} />
+          <View style={{ height: 12 }} />
 
           {isLoading ? (
             <View style={{ paddingVertical: 40, alignItems: 'center' }}>
@@ -481,7 +462,7 @@ const styles = StyleSheet.create({
   topBar: {
     backgroundColor: T.surface,
     paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingBottom: 10,
     borderBottomWidth: 1,
     borderBottomColor: T.border,
     flexDirection: 'row',

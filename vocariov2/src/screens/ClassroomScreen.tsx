@@ -13,9 +13,11 @@ import {
   TextInput,
   ActivityIndicator,
   Alert,
+  Platform,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { classroomService } from '../api/services';
 
 const T = {
@@ -35,6 +37,8 @@ const T = {
 export const ClassroomScreen: React.FC = () => {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
+  const insets = useSafeAreaInsets();
+  const topInset = Math.max(insets.top, Platform.OS === 'ios' ? 44 : 24) + 6;
   const initialCode = route.params?.initialCode;
 
   const [joinCode, setJoinCode] = useState<string>(initialCode || '');
@@ -141,7 +145,7 @@ export const ClassroomScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       {/* Top App Bar */}
-      <View style={styles.topBar}>
+      <View style={[styles.topBar, { paddingTop: topInset, paddingBottom: 10 }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity
             onPress={() => {
