@@ -225,7 +225,7 @@ cd d:\GitHub\DoAnTotNghiep
 pip install -r backend/requirements.txt
 
 # 2. Khởi chạy AI Vision FastAPI Server
-py -m uvicorn backend.services.ai_vision_server:app --host 127.0.0.1 --port 8001 --reload
+py -m uvicorn backend.services.ai_vision_server:app --host 0.0.0.0 --port 8001 --reload
 ```
 *(Hoặc click đúp chuột vào file tiện ích **`scripts\start_ai_service.bat`**).*
 * **Kiểm tra trạng thái:** `http://127.0.0.1:8001/health`

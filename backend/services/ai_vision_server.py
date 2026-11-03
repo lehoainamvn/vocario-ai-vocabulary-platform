@@ -843,5 +843,5 @@ async def handle_parse_document(file: UploadFile = File(...)):
 
 if __name__ == "__main__":
     import uvicorn
-    print("⚡ Khởi chạy Vocario AI Vision Server trên cổng 8001 (http://127.0.0.1:8001)...")
+    print("⚡ Khởi chạy Vocario AI Vision Server trên cổng 8001 (http://0.0.0.0:8001)...")
     uvicorn.run(app, host="127.0.0.1", port=8001)

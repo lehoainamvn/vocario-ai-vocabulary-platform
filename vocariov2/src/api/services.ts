@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Platform } from 'react-native';
 import { apiClient, AI_VISION_URL, removeStoredToken, setAuthData, getStoredUserId } from './client';
 import { TargetProgress, WordItem, LeaderboardEntry, CertificateItem, DetectedBox } from '../types';
 
@@ -187,26 +188,29 @@ export const visionService = {
       const formData = new FormData();
       const filename = 'capture.jpg';
 
-      if (options.base64DataUrl) {
-        if (typeof window !== 'undefined' && typeof window.fetch === 'function') {
+      if (Platform.OS === 'web') {
+        if (options.base64DataUrl) {
           const blobRes = await fetch(options.base64DataUrl);
           const blob = await blobRes.blob();
           formData.append('file', blob, filename);
-        } else {
-          formData.append('file', {
-            uri: options.imageUri || options.base64DataUrl,
-            name: filename,
-            type: 'image/jpeg',
-          } as any);
-        }
-      } else if (options.imageUri) {
-        if (typeof window !== 'undefined' && options.imageUri.startsWith('http')) {
+        } else if (options.imageUri) {
           const blobRes = await fetch(options.imageUri);
           const blob = await blobRes.blob();
           formData.append('file', blob, filename);
-        } else {
+        }
+      } else {
+        // Native Mobile (iOS & Android):
+        // React Native FormData đòi hỏi object { uri, name, type } và uri phải là file path thực tế
+        const fileUri = options.imageUri || (options.base64DataUrl?.startsWith('file:') ? options.base64DataUrl : null);
+        if (fileUri) {
           formData.append('file', {
-            uri: options.imageUri,
+            uri: fileUri,
+            name: filename,
+            type: 'image/jpeg',
+          } as any);
+        } else if (options.base64DataUrl) {
+          formData.append('file', {
+            uri: options.base64DataUrl,
             name: filename,
             type: 'image/jpeg',
           } as any);
@@ -220,7 +224,7 @@ export const visionService = {
           target_level: options.targetLevel || 'A2',
           skip_dialogue: options.skipDialogue ?? false,
         },
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: Platform.OS === 'web' ? { 'Content-Type': 'multipart/form-data' } : undefined,
         timeout: 45000,
       });
 
@@ -253,7 +257,7 @@ export const visionService = {
           target_level: params?.targetLevel || 'A2',
           skip_dialogue: params?.skipDialogue ?? true,
         },
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: Platform.OS === 'web' ? { 'Content-Type': 'multipart/form-data' } : undefined,
         timeout: 45000,
       });
       return res.data;
@@ -285,7 +289,7 @@ export const visionService = {
         } as any);
       }
       const res = await apiClient.post('/api/vision/save-capture', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: Platform.OS === 'web' ? { 'Content-Type': 'multipart/form-data' } : undefined,
       });
       return res.data;
     } catch (err: any) {
