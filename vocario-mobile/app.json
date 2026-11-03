@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Vocario — Smart Vision English",
-    "slug": "vocariov2",
+    "slug": "vocario-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -9,7 +9,7 @@
     "owner": "naml75803-2",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.naml758032.vocariov2",
+      "bundleIdentifier": "com.naml758032.vocariomobile",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSCameraUsageDescription": "Ứng dụng cần quyền Camera để chụp và quét nhận diện đồ vật bằng AI.",
@@ -18,7 +18,7 @@
       }
     },
     "android": {
-      "package": "com.naml758032.vocariov2",
+      "package": "com.naml758032.vocariomobile",
       "adaptiveIcon": {
         "backgroundColor": "#FAF8F5",
         "foregroundImage": "./assets/android-icon-foreground.png",

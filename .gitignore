@@ -21,8 +21,8 @@ MSSV_*
 # -------------------------------------------------------------------------
 .env
 *.env
-backend/.env
-vocario-backend/.env
+vocario-ai/.env
+vocario-vocario-ai/.env
 *.pem
 *.key
 
@@ -74,17 +74,17 @@ test_output/
 .coverage
 htmlcov/
 cache/
-!backend/services/cache/
-!backend/services/cache/**
+!vocario-ai/services/cache/
+!vocario-ai/services/cache/**
 
 # -------------------------------------------------------------------------
 # 6. REACT NATIVE & EXPO (vocariov2)
 # -------------------------------------------------------------------------
-vocariov2/node_modules/
-vocariov2/.expo/
+vocario-mobile/node_modules/
+vocario-mobile/.expo/
 .expo/
-vocariov2/dist/
-vocariov2/web-build/
+vocario-mobile/dist/
+vocario-mobile/web-build/
 *.jks
 *.p8
 *.p12

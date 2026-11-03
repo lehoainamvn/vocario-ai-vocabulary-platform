@@ -111,7 +111,7 @@ graph TD
 
 ```text
 DoAnTotNghiep/
-├── backend/                  # AI Vision Microservice (FastAPI + YOLO-World v2)
+├── vocario-ai/               # AI Vision Microservice (FastAPI + YOLO-World v2)
 │   ├── database/             # File schema và migration SQL
 │   ├── evaluation/           # Script đo lường mAP, Precision, Recall và FPS
 │   ├── services/             # AI Vision Server, Groq Generator, Lexicon Service
@@ -138,7 +138,7 @@ DoAnTotNghiep/
 │   ├── nginx.conf            # Nginx reverse proxy & HTML5 SPA rewrite rules
 │   └── package.json
 │
-├── vocariov2/                # Flagship Mobile Application (React Native 0.88 + Expo 58)
+├── vocario-mobile/           # Mobile Client Application (React Native 0.88 + Expo 58)
 │   ├── assets/               # Biểu tượng, logo thương hiệu và tài nguyên hình ảnh
 │   ├── src/
 │   │   ├── api/              # Axios REST Client, dynamic baseURL, Token Storage
@@ -218,7 +218,7 @@ docker compose down
    ```sql
    CREATE DATABASE vocario_db;
    ```
-3. Chạy file cấu trúc dữ liệu tại: `backend/database/schema.sql`.
+3. Chạy file cấu trúc dữ liệu tại: `vocario-ai/database/schema.sql`.
 
 ---
 
@@ -237,10 +237,11 @@ mvn spring-boot:run
 cd d:\GitHub\DoAnTotNghiep
 
 # 1. Cài đặt các thư viện Python (chỉ cần chạy lần đầu)
-pip install -r backend/requirements.txt
+pip install -r vocario-ai/requirements.txt
 
 # 2. Khởi chạy AI Vision FastAPI Server
-py -m uvicorn backend.services.ai_vision_server:app --host 0.0.0.0 --port 8001 --reload
+cd vocario-ai
+py -m uvicorn services.ai_vision_server:app --host 0.0.0.0 --port 8001 --reload
 ```
 *(Hoặc click đúp chuột vào file tiện ích **`scripts\start_ai_service.bat`**).*
 * **Kiểm tra trạng thái:** `http://127.0.0.1:8001/health`
@@ -259,12 +260,12 @@ npm start
 
 ---
 
-### Bước 5: Khởi Chạy Mobile App (React Native Expo - `vocariov2`)
+### Bước 5: Khởi Chạy Mobile App (React Native Expo - `vocario-mobile`)
 
 Ứng dụng di động chính thức của hệ thống xây dựng trên **React Native 0.88 + Expo 58**:
 
 ```powershell
-cd d:\GitHub\DoAnTotNghiep\vocariov2
+cd d:\GitHub\DoAnTotNghiep\vocario-mobile
 
 # 1. Cài đặt các gói phụ thuộc (chỉ cần chạy lần đầu)
 npm install

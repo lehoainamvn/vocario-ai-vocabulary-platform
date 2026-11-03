@@ -10,12 +10,36 @@ from collections import defaultdict
 from fastapi.middleware.cors import CORSMiddleware
 from ultralytics import YOLOWorld
 
-from backend.services.lexicon_service import lexicon_service
-from backend.services.context_generator import generate_context
-from backend.services.scene_service import scene_service
-from backend.services.verifier_service import verifier_service
-from backend.services.quiz_generator import generate_quiz
-from backend.services.text_extractor import extract_vocabulary_from_text, generate_context_story_from_words
+# Đảm bảo đường dẫn thư mục vocario-ai luôn có trong sys.path
+_CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+_AI_ROOT = os.path.dirname(_CURRENT_DIR)
+if _AI_ROOT not in sys.path:
+    sys.path.insert(0, _AI_ROOT)
+
+try:
+    from services.lexicon_service import lexicon_service
+except ImportError:
+    from backend.services.lexicon_service import lexicon_service
+try:
+    from services.context_generator import generate_context
+except ImportError:
+    from backend.services.context_generator import generate_context
+try:
+    from services.scene_service import scene_service
+except ImportError:
+    from backend.services.scene_service import scene_service
+try:
+    from services.verifier_service import verifier_service
+except ImportError:
+    from backend.services.verifier_service import verifier_service
+try:
+    from services.quiz_generator import generate_quiz
+except ImportError:
+    from backend.services.quiz_generator import generate_quiz
+try:
+    from services.text_extractor import extract_vocabulary_from_text, generate_context_story_from_words
+except ImportError:
+    from backend.services.text_extractor import extract_vocabulary_from_text, generate_context_story_from_words
 
 Image.MAX_IMAGE_PIXELS = 16_000_000
 
@@ -311,7 +335,7 @@ def health_check():
         "model_loaded": model is not None,
         "current_theme": current_active_theme or "all",
         "classes_count": classes_count,
-        "classes_file": "backend/services/target_classes.txt",
+        "classes_file": "vocario-ai/services/target_classes.txt",
         "supported_themes": list(themes_map.keys())
     }
 

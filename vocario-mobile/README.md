@@ -41,7 +41,7 @@
 ## 🏗️ Cấu Trúc Mã Nguồn
 
 ```text
-vocariov2/
+vocario-mobile/
 ├── assets/                   # Biểu tượng, logo thương hiệu và tài nguyên hình ảnh
 ├── src/
 │   ├── api/                  # Axios HTTP client, token storage & REST API services
@@ -76,7 +76,7 @@ vocariov2/
 ### Khởi Chạy Ứng Dụng
 ```bash
 # 1. Di chuyển vào thư mục ứng dụng
-cd vocariov2
+cd vocario-mobile
 
 # 2. Cài đặt các gói phụ thuộc
 npm install
