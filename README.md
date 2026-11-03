@@ -102,19 +102,19 @@ Hệ thống được thử nghiệm và đánh giá độ chính xác thực ng
 <p align="center">
   <img src="docs/figures/test_10_online_benchmark/01_study_desk_detected.jpg" width="31%" alt="Study Desk" style="border-radius: 4px;" />
   <img src="docs/figures/test_10_online_benchmark/02_living_room_detected.jpg" width="31%" alt="Living Room" style="border-radius: 4px;" />
-  <img src="docs/figures/test_10_online_benchmark/03_kitchen_detected.jpg" width="31%" alt="Kitchen" style="border-radius: 4px;" />
+  <img src="docs/figures/test_10_online_benchmark/08_coffee_shop_detected.jpg" width="31%" alt="Coffee Shop" style="border-radius: 4px;" />
   <br/>
-  <i>Từ trái qua phải: Không gian Góc học tập (Study Desk) · Phòng khách (Living Room) · Gian bếp gia đình (Kitchen)</i>
+  <i>Từ trái qua phải: Không gian Góc học tập (Study Desk) · Phòng khách (Living Room) · Quán cà phê (Coffee Shop)</i>
 </p>
 
-### 3. Thẻ Học Từ Vựng Ngữ Cảnh & Nghe Phát Âm Chuẩn Bản Ngữ
-Mỗi từ vựng được sinh kèm phiên âm quốc tế IPA, cấp độ năng lực CEFR (A1 - C2), định nghĩa và câu ví dụ hội thoại tự nhiên sinh bởi Groq LLM:
+### 3. Nhận Diện Không Gian Sinh Hoạt & Tri Thức Học Thuật Đa Tầng
+Mô hình AI Vision và Soft-Gating tự động nhận diện và bóc tách từ vựng chính xác trên các không gian thực tế:
 
 <p align="center">
-  <img src="vocario-angular/public/kitchen_word.png" width="48%" alt="Kitchen Word Meaning" style="border-radius: 6px; border: 1px solid #E5DED3;" />
-  <img src="vocario-angular/public/kitchen_translation.png" width="48%" alt="Kitchen Context Translation" style="border-radius: 6px; border: 1px solid #E5DED3;" />
+  <img src="docs/figures/test_output_living_room.jpg" width="48%" alt="Living Room Detected" style="border-radius: 6px; border: 1px solid #E5DED3;" />
+  <img src="docs/figures/test_20_realworld_benchmark/17_dense_library_bookshelves_detected.jpg" width="48%" alt="Library Bookshelves Detected" style="border-radius: 6px; border: 1px solid #E5DED3;" />
   <br/>
-  <i>Giao diện thẻ từ vựng thiết kế theo phong cách Scandinavian Editorial — Trọng tâm chữ in, thẩm mỹ tối giản, không gây mỏi mắt</i>
+  <i>Trái: Bóc tách vật thể không gian phòng khách Scandinavian (sofa, coffee table, houseplant). Phải: Nhận diện không gian thư viện tri thức học thuật (bookshelf, book, chair).</i>
 </p>
 
 ### 4. Trải Nghiệm Ứng Dụng Di Động Thông Minh (React Native & Expo 58 Mobile Experience)
