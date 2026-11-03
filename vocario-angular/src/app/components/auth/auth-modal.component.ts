@@ -35,9 +35,11 @@ import { LoginRequest, RegisterRequest } from '../../models/vocario.models';
         <!-- Brand Icon & Header -->
         <div class="flex flex-col items-center text-center">
           <!-- Logo Badge [V] -->
-          <div class="w-8 h-8 rounded-xl bg-[#7D6853] text-white flex items-center justify-center font-serif font-bold text-base shadow-2xs select-none">
-            V
-          </div>
+          <img 
+            src="favicon.svg" 
+            alt="Vocario Logo" 
+            class="w-10 h-10 rounded-xl shadow-2xs select-none object-contain mb-1"
+          />
           <span class="text-[9px] font-sans font-semibold tracking-wider uppercase text-[#746B60] mt-1">
             Vocario
           </span>

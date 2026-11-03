@@ -35,9 +35,11 @@ import { environment } from '../../../environments/environment';
           
           <!-- Brand Logo Header -->
           <div class="flex items-center gap-2.5 pb-4 mb-2 border-b border-[#E5DED3]">
-            <div class="w-7 h-7 rounded-[4px] bg-[#2D2823] text-white flex items-center justify-center font-serif font-semibold text-xs shadow-xs shrink-0">
-              V
-            </div>
+            <img 
+              src="favicon.svg" 
+              alt="Vocario Logo" 
+              class="w-7 h-7 rounded-[6px] shadow-2xs select-none object-contain shrink-0"
+            />
             <div>
               <span class="font-serif font-semibold text-sm text-[#2D2823] tracking-tight block leading-tight">
                 Vocario

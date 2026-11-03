@@ -14,6 +14,7 @@ import {
   ActivityIndicator,
   Animated,
   Platform,
+  Image,
 } from 'react-native';
 import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -189,9 +190,11 @@ export const AuthScreen: React.FC = () => {
       >
         {/* Brand Hero */}
         <View style={styles.brandHero}>
-          <View style={styles.logoBadge}>
-            <Text style={styles.logoBadgeText}>V</Text>
-          </View>
+          <Image
+            source={require('../../assets/logo.png')}
+            style={styles.brandLogoImage}
+            resizeMode="contain"
+          />
           <Text style={styles.brandSub}>VOCARIO</Text>
           <Text style={styles.brandHeadline}>
             {mode === 'signin' ? 'Chào mừng bạn trở lại' : 'Khởi đầu hành trình mới'}
@@ -607,24 +610,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 8,
   },
-  logoBadge: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    backgroundColor: T.brand,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: T.ink,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.22,
-    shadowRadius: 16,
-    elevation: 4,
-  },
-  logoBadgeText: {
-    color: '#FFFFFF',
-    fontSize: 22,
-    fontFamily: 'serif',
-    fontWeight: 'bold',
+  brandLogoImage: {
+    width: 64,
+    height: 64,
+    borderRadius: 16,
+    marginBottom: 8,
   },
   brandSub: {
     fontSize: 9.5,

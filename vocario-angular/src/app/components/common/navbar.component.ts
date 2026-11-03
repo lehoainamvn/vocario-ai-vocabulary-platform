@@ -29,9 +29,11 @@ import { IconComponent } from './icon.component';
             href="#"
             class="flex items-center gap-2.5 no-underline select-none group shrink-0"
           >
-            <div class="w-8 h-8 rounded-[6px] bg-[#7D6853] text-white flex items-center justify-center font-serif font-bold text-base shadow-2xs select-none">
-              V
-            </div>
+            <img 
+              src="favicon.svg" 
+              alt="Vocario Logo" 
+              class="w-8 h-8 rounded-[8px] shadow-2xs select-none object-contain transition-transform duration-200 group-hover:scale-105"
+            />
             <span class="text-xl font-serif font-bold tracking-tight leading-none text-[#2D2823]">
               Vocario
             </span>
