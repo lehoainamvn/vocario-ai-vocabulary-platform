@@ -273,26 +273,50 @@ export const visionService = {
     imageUri?: string;
   }) {
     try {
+      const userId = await getStoredUserId();
       const formData = new FormData();
       formData.append('sceneTheme', data.sceneTheme);
       formData.append('detectedObjectsJson', JSON.stringify(data.detectedObjects));
-      const filename = 'capture.jpg';
-      if (data.base64DataUrl && typeof window !== 'undefined' && typeof window.fetch === 'function') {
-        const blobRes = await fetch(data.base64DataUrl);
-        const blob = await blobRes.blob();
-        formData.append('image', blob, filename);
-      } else if (data.imageUri) {
-        formData.append('image', {
-          uri: data.imageUri,
-          name: filename,
-          type: 'image/jpeg',
-        } as any);
+      if (userId) {
+        formData.append('userId', userId);
       }
+
+      const filename = 'capture.jpg';
+      if (Platform.OS === 'web') {
+        if (data.base64DataUrl) {
+          const blobRes = await fetch(data.base64DataUrl);
+          const blob = await blobRes.blob();
+          formData.append('image', blob, filename);
+        } else if (data.imageUri) {
+          const blobRes = await fetch(data.imageUri);
+          const blob = await blobRes.blob();
+          formData.append('image', blob, filename);
+        }
+      } else {
+        // Native Mobile (iOS & Android)
+        const fileUri = data.imageUri || (data.base64DataUrl?.startsWith('file:') ? data.base64DataUrl : null);
+        if (fileUri) {
+          formData.append('image', {
+            uri: fileUri,
+            name: filename,
+            type: 'image/jpeg',
+          } as any);
+        } else if (data.base64DataUrl) {
+          formData.append('image', {
+            uri: data.base64DataUrl,
+            name: filename,
+            type: 'image/jpeg',
+          } as any);
+        }
+      }
+
       const res = await apiClient.post('/api/vision/save-capture', formData, {
+        params: userId ? { userId } : undefined,
         headers: Platform.OS === 'web' ? { 'Content-Type': 'multipart/form-data' } : undefined,
       });
       return res.data;
     } catch (err: any) {
+      console.warn('[saveRealCapture] error:', err?.message || err);
       return { success: false, error: err.message };
     }
   },
@@ -316,8 +340,16 @@ export const visionService = {
   },
 
   async getUserCaptures() {
-    const res = await apiClient.get('/api/vision/captures');
-    return res.data || [];
+    try {
+      const userId = await getStoredUserId();
+      const res = await apiClient.get('/api/vision/captures', {
+        params: userId ? { userId } : undefined,
+      });
+      return res.data || [];
+    } catch (err) {
+      console.warn('[getUserCaptures] error:', err);
+      return [];
+    }
   },
 };
 

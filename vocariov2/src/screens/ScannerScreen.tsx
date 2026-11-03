@@ -305,7 +305,13 @@ export const ScannerScreen: React.FC = () => {
           detectedObjects: mapped,
           base64DataUrl: base64Data || undefined,
           imageUri: customImageUri || localUri,
-        }).catch(() => {});
+        }).then((saveRes: any) => {
+          if (saveRes && saveRes.id) {
+            console.log('✅ Đã lưu capture vào Bộ sưu tập:', saveRes.id);
+          }
+        }).catch((err: any) => {
+          console.warn('⚠️ Lỗi lưu capture:', err);
+        });
 
         showToast(`Two-Stage AI đã bóc tách ${mapped.length} vật thể thực tế!`);
       } else {

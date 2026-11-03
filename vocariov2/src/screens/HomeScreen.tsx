@@ -18,7 +18,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Speech from 'expo-speech';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { apiClient, BASE_URL } from '../api/client';
 import { authService, visionService } from '../api/services';
 
@@ -279,7 +279,11 @@ export const HomeScreen: React.FC = () => {
     }
   }, []);
 
-  useEffect(() => { fetchDatabaseData(); }, [fetchDatabaseData]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchDatabaseData();
+    }, [fetchDatabaseData])
+  );
 
   // ── Toast ──────────────────────────────────────────────────────────────────
   const showToast = (msg: string) => {

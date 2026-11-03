@@ -17,7 +17,7 @@ import {
   Modal,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import * as Speech from 'expo-speech';
 import { visionService, srsService } from '../api/services';
 import { SpeechScorerModal } from '../components/SpeechScorerModal';
@@ -116,9 +116,11 @@ export const CollectionScreen: React.FC = () => {
     }
   }, [initialSceneId]);
 
-  useEffect(() => {
-    fetchCaptures();
-  }, [fetchCaptures]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchCaptures();
+    }, [fetchCaptures])
+  );
 
   const speakWord = (text: string) => {
     Speech.speak(text, { language: 'en-US', rate: 0.9 });
