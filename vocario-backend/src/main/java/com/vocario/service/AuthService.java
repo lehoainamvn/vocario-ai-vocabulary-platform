@@ -11,12 +11,25 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class AuthService {
 
     private static final Logger log = LoggerFactory.getLogger(AuthService.class);
+
+    // Cấu hình phòng thủ Brute-force mật khẩu
+    private static final int MAX_FAILED_ATTEMPTS = 5;
+    private static final long LOCKOUT_DURATION_MILLIS = 15 * 60 * 1000L; // Tạm khóa 15 phút
+
+    private static class LoginAttemptTracker {
+        int failedCount = 0;
+        long lockedUntil = 0;
+    }
+
+    private final Map<String, LoginAttemptTracker> loginAttempts = new ConcurrentHashMap<>();
 
     private final UserRepository userRepository;
     private final JwtService jwtService;
@@ -82,12 +95,35 @@ public class AuthService {
         String cleanIdentifier = request.usernameOrEmail != null ? request.usernameOrEmail.trim() : "";
         log.info("🔑 [LOGIN REQUEST] Yêu cầu đăng nhập cho tài khoản: '{}'", cleanIdentifier);
 
+        // Chốt chặn Brute-Force: Kiểm tra số lần đăng nhập sai và thời gian khóa
+        String trackerKey = cleanIdentifier.toLowerCase();
+        LoginAttemptTracker tracker = loginAttempts.computeIfAbsent(trackerKey, k -> new LoginAttemptTracker());
+        long now = System.currentTimeMillis();
+
+        if (tracker.lockedUntil > now) {
+            long remainingMins = Math.max(1, (tracker.lockedUntil - now) / (60 * 1000L));
+            log.warn("🚨 [ACCOUNT LOCKED] Tài khoản '{}' đang bị khóa tạm thời do nhập sai mật khẩu quá 5 lần!", cleanIdentifier);
+            throw new RuntimeException("Tài khoản đang bị tạm khóa " + remainingMins + " phút do nhập sai mật khẩu quá 5 lần liên tiếp. Vui lòng thử lại sau.");
+        }
+
+        // Hết thời gian khóa, tự động hoàn trả trạng thái đếm
+        if (tracker.lockedUntil > 0 && tracker.lockedUntil <= now) {
+            tracker.failedCount = 0;
+            tracker.lockedUntil = 0;
+        }
+
         User user = userRepository.findByUsername(cleanIdentifier)
                 .or(() -> userRepository.findByEmail(cleanIdentifier.toLowerCase()))
                 .orElse(null);
 
         if (user == null) {
-            log.warn("❌ [LOGIN FAILED] Không tìm thấy tài khoản '{}' trong database!", cleanIdentifier);
+            tracker.failedCount++;
+            log.warn("❌ [LOGIN FAILED] Không tìm thấy tài khoản '{}' trong database! (Lần {}/{})", 
+                    cleanIdentifier, tracker.failedCount, MAX_FAILED_ATTEMPTS);
+            if (tracker.failedCount >= MAX_FAILED_ATTEMPTS) {
+                tracker.lockedUntil = now + LOCKOUT_DURATION_MILLIS;
+                throw new RuntimeException("Bạn đã nhập sai thông tin 5 lần liên tiếp. Tài khoản tạm thời bị khóa 15 phút.");
+            }
             throw new RuntimeException("Tài khoản hoặc mật khẩu không chính xác");
         }
 
@@ -109,9 +145,19 @@ public class AuthService {
         }
 
         if (!isMatched) {
-            log.warn("❌ [LOGIN FAILED] Mật khẩu không chính xác cho tài khoản '{}' (User ID: {})!", cleanIdentifier, user.getId());
+            tracker.failedCount++;
+            log.warn("❌ [LOGIN FAILED] Mật khẩu không chính xác cho tài khoản '{}' (Lần {}/{})!", 
+                    cleanIdentifier, tracker.failedCount, MAX_FAILED_ATTEMPTS);
+            if (tracker.failedCount >= MAX_FAILED_ATTEMPTS) {
+                tracker.lockedUntil = now + LOCKOUT_DURATION_MILLIS;
+                log.error("🚨 [LOCKOUT TRIGGERED] Đã kích hoạt khóa 15 phút cho tài khoản '{}'", cleanIdentifier);
+                throw new RuntimeException("Bạn đã nhập sai mật khẩu 5 lần liên tiếp. Tài khoản tạm thời bị khóa 15 phút để bảo vệ an toàn.");
+            }
             throw new RuntimeException("Tài khoản hoặc mật khẩu không chính xác");
         }
+
+        // Đăng nhập thành công -> Xóa bộ đếm thất bại
+        loginAttempts.remove(trackerKey);
 
         // Cập nhật thời điểm hoạt động
         user.setLastActiveAt(OffsetDateTime.now());

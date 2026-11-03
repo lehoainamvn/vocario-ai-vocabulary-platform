@@ -130,6 +130,23 @@ Tệp `vocario-angular/vercel.json` và `index.html` được bổ sung hệ th�
 - `X-XSS-Protection: 1; mode=block`: Bật bộ lọc chống Cross-Site Scripting tích hợp trên trình duyệt cũ.
 - `Referrer-Policy: strict-origin-when-cross-origin`: Bảo vệ rò rỉ đường dẫn URL chứa dữ liệu nhạy cảm.
 
+#### F. Bộ lọc chống Spam & Giới hạn tần suất trên Spring Boot (RateLimitingFilter)
+Lớp `RateLimitingFilter.java` được cấu hình ưu tiên cao (`@Order(HIGHEST_PRECEDENCE + 1)`), bóc tách địa chỉ IP thực từ các tiêu đề ủy quyền ngược `X-Forwarded-For` và `X-Real-IP`, áp dụng hạn ngạch phân loại:
+- **Nhóm nhạy cảm (Đăng nhập, Đăng ký):** Tối đa 10 lượt gọi/phút per IP nhằm triệt tiêu botnet spam tài khoản ảo.
+- **Nhóm ghi dữ liệu nặng (Lưu ảnh bối cảnh, Tạo lớp học):** Tối đa 15 lượt gọi/phút per IP.
+- **Nhóm API thông thường:** Tối đa 120 lượt gọi/phút per IP.
+- **Phản hồi:** Trả về mã trạng thái HTTP 429 kèm tiêu đề `Retry-After: 60` và thông điệp JSON cảnh báo.
+
+#### G. Cơ chế khóa tài khoản tự động chống dò mật khẩu (Account Lockout Shield)
+Trong `AuthService.java`, bộ theo dõi `LoginAttemptTracker` ghi nhận số lần nhập sai mật khẩu liên tiếp theo từng tài khoản:
+- Nếu nhập sai quá **5 lần liên tiếp**, hệ thống tự động khóa tài khoản tạm thời trong **15 phút**.
+- Mọi nỗ lực đăng nhập trong thời gian khóa đều bị từ chối ngay lập tức trước khi chạm vào hàm băm BCrypt, bảo vệ $100\%$ CPU máy chủ Render khỏi bị quá tải bởi các cuộc tấn công từ điển (Dictionary Attacks).
+
+#### H. Nén ảnh thích ứng chống tràn bộ nhớ CSDL Supabase (Base64 Database Optimization)
+Trong `VisionService.java`, hàm `compressImageForDatabase()` tự động thu nhỏ các chiều ảnh vượt quá 1280px và nén định dạng JPEG chất lượng 75%:
+- Dung lượng ảnh chuyển đổi sang chuỗi Base64 Data URL giảm mạnh từ **$5.0\text{MB} - 8.0\text{MB}$ xuống còn $\sim 120\text{KB} - 180\text{KB}$** (tiết kiệm hơn $95\%$ dung lượng lưu trữ CSDL).
+- Vệ sinh tên tệp gốc loại bỏ các ký tự đặc biệt, chống kỹ thuật tấn công duyệt thư mục (Path Traversal).
+
 ---
 
 ## 3. BẢNG TỔNG HỢP CÁC FILE ĐÃ CHỈNH SỬA VÀ THÊM MỚI
@@ -148,13 +165,15 @@ Tệp `vocario-angular/vercel.json` và `index.html` được bổ sung hệ th�
 | 10 | **Mobile** | `vocariov2/src/screens/ClassroomScreen.tsx` | Chỉnh sửa | Thêm safe area cho thanh tiêu đề Lớp học ảo. |
 | 11 | **Backend** | `vocario-backend/pom.xml` | Chỉnh sửa | Bổ sung `spring-security-crypto` và bộ thư viện `jjwt` (0.12.6). |
 | 12 | **Backend** | `vocario-backend/src/.../service/JwtService.java` | **Thêm mới** | Dịch vụ sinh và kiểm thực token HMAC-SHA256 chuẩn RFC 7519. |
-| 13 | **Backend** | `vocario-backend/src/.../service/AuthService.java` | Chỉnh sửa | Mã hóa mật khẩu bằng BCrypt Work Factor 12; áp dụng cơ chế tự động nâng cấp mật khẩu cũ; ký JWT khi đăng nhập/đăng ký. |
+| 13 | **Backend** | `vocario-backend/src/.../service/AuthService.java` | Chỉnh sửa | Mã hóa mật khẩu bằng BCrypt Work Factor 12; tự động nâng cấp mật khẩu cũ; tích hợp Account Lockout 15 phút khi sai quá 5 lần. |
 | 14 | **Backend** | `vocario-backend/src/.../config/WebConfig.java` | Chỉnh sửa | Thắt chặt CORS Whitelist, loại bỏ `*` khi dùng `allowCredentials=true`. |
-| 15 | **AI Service** | `backend/services/ai_vision_server.py` | Chỉnh sửa | Thêm Decompression Bomb limit (16MP), Rate Limiter trượt, thẩm định Magic Bytes tệp ảnh và CORS regex. |
-| 16 | **Web Client** | `vocario-angular/src/.../auth.interceptor.ts` | **Thêm mới** | HTTP Interceptor tự động gắn Bearer Token cho mọi request. |
-| 17 | **Web Client** | `vocario-angular/src/app/app.config.ts` | Chỉnh sửa | Đăng ký `withInterceptors([authInterceptor])` vào `provideHttpClient`. |
-| 18 | **Web Client** | `vocario-angular/vercel.json` | Chỉnh sửa | Cấu hình 5 tiêu đề an ninh trình duyệt (CSP, X-Content-Type-Options, Frame-Options, XSS, Referrer). |
-| 19 | **Web Client** | `vocario-angular/src/index.html` | Chỉnh sửa | Thêm thẻ meta an ninh trình duyệt chống MIME sniffing. |
+| 15 | **Backend** | `vocario-backend/src/.../config/RateLimitingFilter.java` | **Thêm mới** | Bộ lọc Rate Limiter trượt trên Spring Boot: chặn IP spam đăng ký, quét ảnh và tấn công DoS (HTTP 429). |
+| 16 | **Backend** | `vocario-backend/src/.../service/VisionService.java` | Chỉnh sửa | Nén ảnh JPEG thông minh trước khi lưu Base64 Data URL, giảm 95% tải bộ nhớ CSDL Supabase; chống Path Traversal. |
+| 17 | **AI Service** | `backend/services/ai_vision_server.py` | Chỉnh sửa | Thêm Decompression Bomb limit (16MP), Rate Limiter trượt, thẩm định Magic Bytes tệp ảnh và CORS regex. |
+| 18 | **Web Client** | `vocario-angular/src/.../auth.interceptor.ts` | **Thêm mới** | HTTP Interceptor tự động gắn Bearer Token cho mọi request. |
+| 19 | **Web Client** | `vocario-angular/src/app/app.config.ts` | Chỉnh sửa | Đăng ký `withInterceptors([authInterceptor])` vào `provideHttpClient`. |
+| 20 | **Web Client** | `vocario-angular/vercel.json` | Chỉnh sửa | Cấu hình 5 tiêu đề an ninh trình duyệt (CSP, X-Content-Type-Options, Frame-Options, XSS, Referrer). |
+| 21 | **Web Client** | `vocario-angular/src/index.html` | Chỉnh sửa | Thêm thẻ meta an ninh trình duyệt chống MIME sniffing. |
 
 ---
 

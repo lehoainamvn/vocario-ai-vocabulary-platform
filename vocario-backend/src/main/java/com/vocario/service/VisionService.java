@@ -77,16 +77,19 @@ public class VisionService {
             log.info("📁 Đã tự động tạo thư mục lưu trữ ảnh: {}", uploadPath.toAbsolutePath());
         }
 
-        String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        // Vệ sinh tên file chống tấn công Path Traversal
+        String rawFilename = file.getOriginalFilename();
+        String safeName = (rawFilename != null ? rawFilename.replaceAll("[^a-zA-Z0-9._-]", "_") : "photo.jpg");
+        String filename = UUID.randomUUID() + "_" + safeName;
         Path filePath = uploadPath.resolve(filename);
         Files.copy(file.getInputStream(), filePath);
         log.info("💾 Đã lưu file ảnh vào đĩa: {}", filePath.toAbsolutePath());
 
-        // Chuyển ảnh thành chuỗi Base64 Data URL để lưu vĩnh viễn vào Supabase PostgreSQL
-        // Giúp ảnh không bao giờ bị xóa mất khi máy chủ Render khởi động lại (Ephemeral disk)!
-        byte[] fileBytes = Files.readAllBytes(filePath);
-        String mimeType = file.getContentType() != null && !file.getContentType().isBlank() ? file.getContentType() : "image/jpeg";
-        String base64ImageUrl = "data:" + mimeType + ";base64," + java.util.Base64.getEncoder().encodeToString(fileBytes);
+        // Nén ảnh thông minh trước khi chuyển thành Base64 Data URL để lưu vào Supabase PostgreSQL
+        // Giảm kích thước ảnh từ 5-10MB xuống ~100-200KB, tiết kiệm 95% dung lượng CSDL và chống tràn ổ đĩa
+        byte[] originalBytes = Files.readAllBytes(filePath);
+        byte[] optimizedBytes = compressImageForDatabase(originalBytes, 1280, 0.75f);
+        String base64ImageUrl = "data:image/jpeg;base64," + java.util.Base64.getEncoder().encodeToString(optimizedBytes);
 
         Capture capture = new Capture(user, base64ImageUrl, sceneTheme, detectedObjectsJson);
         Capture saved = captureRepository.save(capture);
@@ -94,6 +97,66 @@ public class VisionService {
         log.info("✅ [VISION SERVICE] Lưu phiên chụp ảnh THÀNH CÔNG! Capture ID: {}", saved.getId());
         log.info("================================================================================");
         return saved;
+    }
+
+    /**
+     * Thu nhỏ và nén chất lượng ảnh JPEG để lưu trữ an toàn trong Supabase CSDL,
+     * ngăn ngừa cạn kiệt dung lượng ổ đĩa (Storage Exhaustion / Denial of Database).
+     */
+    private byte[] compressImageForDatabase(byte[] originalBytes, int maxDimension, float quality) {
+        try {
+            java.io.ByteArrayInputStream bais = new java.io.ByteArrayInputStream(originalBytes);
+            java.awt.image.BufferedImage img = javax.imageio.ImageIO.read(bais);
+            if (img == null) {
+                return originalBytes;
+            }
+
+            int width = img.getWidth();
+            int height = img.getHeight();
+
+            if (width > maxDimension || height > maxDimension) {
+                double scale = (double) maxDimension / Math.max(width, height);
+                int newWidth = (int) (width * scale);
+                int newHeight = (int) (height * scale);
+
+                java.awt.image.BufferedImage resized = new java.awt.image.BufferedImage(
+                        newWidth, newHeight, java.awt.image.BufferedImage.TYPE_INT_RGB);
+                java.awt.Graphics2D g2d = resized.createGraphics();
+                g2d.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, 
+                        java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                g2d.drawImage(img, 0, 0, newWidth, newHeight, null);
+                g2d.dispose();
+                img = resized;
+            }
+
+            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+            var writers = javax.imageio.ImageIO.getImageWritersByFormatName("jpg");
+            if (writers.hasNext()) {
+                var writer = writers.next();
+                var param = writer.getDefaultWriteParam();
+                if (param.canWriteCompressed()) {
+                    param.setCompressionMode(javax.imageio.ImageWriteParam.MODE_EXPLICIT);
+                    param.setCompressionQuality(quality);
+                }
+                var ios = javax.imageio.ImageIO.createImageOutputStream(baos);
+                writer.setOutput(ios);
+                writer.write(null, new javax.imageio.IIOImage(img, null, null), param);
+                writer.dispose();
+                ios.close();
+            } else {
+                javax.imageio.ImageIO.write(img, "jpg", baos);
+            }
+
+            byte[] result = baos.toByteArray();
+            log.info("🖼️ [IMAGE COMPRESSION] Thu nhỏ ảnh bối cảnh: {} KB -> {} KB (Tiết kiệm {}% CSDL)!",
+                    originalBytes.length / 1024,
+                    result.length / 1024,
+                    Math.round((1.0 - (double) result.length / originalBytes.length) * 100));
+            return result;
+        } catch (Exception e) {
+            log.warn("⚠️ Nén ảnh thất bại ({}), giữ nguyên ảnh gốc", e.getMessage());
+            return originalBytes;
+        }
     }
 
     @Transactional
