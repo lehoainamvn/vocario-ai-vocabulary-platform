@@ -45,30 +45,6 @@ const T = {
   emeraldDark: '#15803D',
 };
 
-// Preset scenes (Unsplash high quality)
-const PRESET_SCENES = [
-  {
-    title: 'Bàn học & Làm việc',
-    theme: 'Bàn Học & Góc Làm Việc',
-    url: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=1200&q=82',
-  },
-  {
-    title: 'Gian bếp gia đình',
-    theme: 'Nhà Bếp & Nấu Ăn',
-    url: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=82',
-  },
-  {
-    title: 'Phòng khách ấm cúng',
-    theme: 'Phòng Khách Gia Đình',
-    url: 'https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&w=1200&q=82',
-  },
-  {
-    title: 'Quán cà phê sáng',
-    theme: 'Quán Cà Phê & Đồ Uống',
-    url: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1200&q=82',
-  },
-];
-
 interface DetectedItem {
   word: string;
   ipa: string;
@@ -93,8 +69,8 @@ interface DialogueTurn {
 export const ScannerScreen: React.FC = () => {
   const navigation = useNavigation<any>();
 
-  // Studio Mode: 'camera' | 'upload' | 'preset'
-  const [activeStudioTab, setActiveStudioTab] = useState<'camera' | 'upload' | 'preset'>('camera');
+  // Studio Mode: 'camera' | 'upload'
+  const [activeStudioTab, setActiveStudioTab] = useState<'camera' | 'upload'>('camera');
   const [isGridActive, setIsGridActive] = useState(true);
   const [isScanning, setIsScanning] = useState(false);
   const [hasScanned, setHasScanned] = useState(false);
@@ -103,8 +79,7 @@ export const ScannerScreen: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isSavingAll, setIsSavingAll] = useState(false);
 
-  // Image State
-  const [activePresetIndex, setActivePresetIndex] = useState(0);
+  // Image State (Chỉ dùng ảnh thật từ Camera điện thoại hoặc Thư viện ảnh thiết bị)
   const [customImageUri, setCustomImageUri] = useState<string | null>(null);
   const [customImageDataUrl, setCustomImageDataUrl] = useState<string | null>(null);
 
@@ -150,15 +125,13 @@ export const ScannerScreen: React.FC = () => {
   };
 
   // ── Mode Switcher ──────────────────────────────────────────────────────────
-  const switchStudioTab = (tab: 'camera' | 'upload' | 'preset') => {
+  const switchStudioTab = (tab: 'camera' | 'upload') => {
     if (activeStudioTab === tab) return;
     setActiveStudioTab(tab);
     setHasScanned(false);
     setDetectedItems([]);
-    if (tab === 'camera' || tab === 'upload') {
-      setCustomImageUri(null);
-      setCustomImageDataUrl(null);
-    }
+    setCustomImageUri(null);
+    setCustomImageDataUrl(null);
   };
 
   // ── Real Phone Camera ───────────────────────────────────────────────────────
@@ -252,15 +225,12 @@ export const ScannerScreen: React.FC = () => {
         return;
       }
       await executeAiScan(customImageUri, customImageDataUrl || undefined);
-    } else if (activeStudioTab === 'upload') {
+    } else {
       if (!customImageUri) {
         await pickImageFromDevice();
         return;
       }
       await executeAiScan(customImageUri, customImageDataUrl || undefined);
-    } else {
-      const currentImg = PRESET_SCENES[activePresetIndex].url;
-      await executeAiScan(currentImg);
     }
   };
 
@@ -287,11 +257,10 @@ export const ScannerScreen: React.FC = () => {
         localUri = manip.uri;
       }
 
-      const theme = customImageUri ? 'auto' : (activeStudioTab === 'preset' ? PRESET_SCENES[activePresetIndex].theme : 'auto');
       const res = await visionService.detectObjectsFromImage({
         imageUri: localUri,
         base64DataUrl: base64Data || undefined,
-        sceneTheme: theme,
+        sceneTheme: 'auto',
         targetLevel: 'A2',
         confidenceThreshold: 0.12,
         skipDialogue: false,
@@ -326,13 +295,13 @@ export const ScannerScreen: React.FC = () => {
 
         setDetectedItems(mapped);
         setSelectedWordIndex(0);
-        setSceneTitle(res.sceneTitle || res.scene_theme || theme);
+        setSceneTitle(res.sceneTitle || res.scene_theme || 'Không gian thực tế');
         setDialogueTurns(mappedDialogue);
         setHasScanned(true);
 
         // Lưu capture vào Spring Boot PostgreSQL (bảng captures)
         visionService.saveRealCapture({
-          sceneTheme: res.sceneTitle || res.scene_theme || theme,
+          sceneTheme: res.sceneTitle || res.scene_theme || 'Bối cảnh thực tế đời thường',
           detectedObjects: mapped,
           base64DataUrl: base64Data || undefined,
           imageUri: customImageUri || localUri,
@@ -489,21 +458,6 @@ export const ScannerScreen: React.FC = () => {
             Tải ảnh lên
           </Text>
         </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.tabBtn, activeStudioTab === 'preset' && styles.tabBtnActive]}
-          onPress={() => switchStudioTab('preset')}
-          activeOpacity={0.8}
-        >
-          <Ionicons
-            name="sparkles-outline"
-            size={14}
-            color={activeStudioTab === 'preset' ? T.brand : T.muted}
-          />
-          <Text style={[styles.tabText, activeStudioTab === 'preset' && styles.tabTextActive]}>
-            Ảnh mẫu AI
-          </Text>
-        </TouchableOpacity>
       </View>
     </View>
   );
@@ -512,7 +466,7 @@ export const ScannerScreen: React.FC = () => {
   // 2. DARK CINEMATIC VIEWPORT
   // ──────────────────────────────────────────────────────────────────────────
   const renderCinematicViewport = () => {
-    const currentImg = customImageUri || (activeStudioTab === 'preset' ? PRESET_SCENES[activePresetIndex].url : null);
+    const currentImg = customImageUri;
 
     // Laser translate Y
     const laserTop = laserAnim.interpolate({
@@ -527,30 +481,9 @@ export const ScannerScreen: React.FC = () => {
           <Text style={styles.floatingTopText}>
             {activeStudioTab === 'camera'
               ? 'Hướng camera về vật thể bạn muốn học'
-              : activeStudioTab === 'upload'
-              ? 'Chọn ảnh chụp từ thiết bị'
-              : 'Chọn ảnh bối cảnh mẫu có sẵn'}
+              : 'Chọn ảnh chụp từ thiết bị'}
           </Text>
         </View>
-
-        {/* Preset Scenes Horizontal Carousel (when in preset tab) */}
-        {activeStudioTab === 'preset' && !customImageUri && !hasScanned && (
-          <View style={styles.presetCarouselContainer}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6 }}>
-              {PRESET_SCENES.map((p, idx) => (
-                <TouchableOpacity
-                  key={idx}
-                  style={[styles.presetChip, activePresetIndex === idx && styles.presetChipActive]}
-                  onPress={() => setActivePresetIndex(idx)}
-                >
-                  <Text style={[styles.presetChipText, activePresetIndex === idx && styles.presetChipTextActive]}>
-                    {p.title}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-        )}
 
         {/* Background Image / Camera Frame */}
         {currentImg ? (
@@ -678,15 +611,13 @@ export const ScannerScreen: React.FC = () => {
         <View
           style={[
             styles.statusDot,
-            { backgroundColor: customImageUri || activeStudioTab === 'camera' || activeStudioTab === 'preset' ? T.emerald : T.muted },
+            { backgroundColor: customImageUri || activeStudioTab === 'camera' ? T.emerald : T.muted },
           ]}
         />
         <Text style={styles.statusText}>
           {activeStudioTab === 'camera'
             ? customImageUri ? 'Đã chụp ảnh' : 'Sẵn sàng mở camera'
-            : activeStudioTab === 'upload'
-            ? customImageUri ? 'Đã nạp file ảnh' : 'Chờ tải file'
-            : 'Ảnh mẫu có sẵn'}
+            : customImageUri ? 'Đã nạp file ảnh' : 'Chờ tải file'}
         </Text>
       </View>
 
@@ -699,23 +630,6 @@ export const ScannerScreen: React.FC = () => {
             activeOpacity={0.7}
           >
             <View style={styles.shutterInner} />
-          </TouchableOpacity>
-        )}
-
-        {activeStudioTab === 'preset' && !hasScanned && (
-          <TouchableOpacity
-            style={styles.scanCtaBtn}
-            onPress={isScanning ? undefined : captureOrLoadFrame}
-            activeOpacity={0.85}
-          >
-            {isScanning ? (
-              <ActivityIndicator size="small" color="#FFFFFF" style={{ marginRight: 6 }} />
-            ) : (
-              <Ionicons name="sparkles" size={15} color={T.goldAccent} style={{ marginRight: 6 }} />
-            )}
-            <Text style={styles.scanCtaText}>
-              {isScanning ? 'Đang bóc tách AI...' : 'Bắt đầu quét AI'}
-            </Text>
           </TouchableOpacity>
         )}
 

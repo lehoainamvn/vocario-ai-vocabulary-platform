@@ -14,6 +14,7 @@ import {
   Animated,
   Image,
   Platform,
+  Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Speech from 'expo-speech';
@@ -97,6 +98,18 @@ export const HomeScreen: React.FC = () => {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const toastAnim = useRef(new Animated.Value(0)).current;
+
+  // Certificate Preview Modal
+  const [previewCertData, setPreviewCertData] = useState<{
+    code: string;
+    label: string;
+    mastered: number;
+    required: number;
+    pctNumber: number;
+    isComplete: boolean;
+    color: string;
+  } | null>(null);
+  const [showCertPreviewModal, setShowCertPreviewModal] = useState(false);
 
   // ── Fetch data ────────────────────────────────────────────────────────────
   const fetchDatabaseData = useCallback(async () => {
@@ -574,11 +587,16 @@ export const HomeScreen: React.FC = () => {
                 ]}
                 activeOpacity={0.7}
                 onPress={() => {
-                  if (isComplete) {
-                    navigation.navigate('Profile');
-                  } else {
-                    showToast(`Bản nháp chứng chỉ CEFR ${tier.code}: Đã thành thạo ${tier.mastered}/${tier.required} từ.`);
-                  }
+                  setPreviewCertData({
+                    code: tier.code,
+                    label: tier.label,
+                    mastered: tier.mastered,
+                    required: tier.required,
+                    pctNumber: tier.pctNumber,
+                    isComplete: tier.pctNumber >= 100,
+                    color: tier.color,
+                  });
+                  setShowCertPreviewModal(true);
                 }}
               >
                 <Ionicons
@@ -740,6 +758,136 @@ export const HomeScreen: React.FC = () => {
     </View>
   );
 
+  // ── Certificate Preview Modal ──────────────────────────────────────────────
+  const renderCertPreviewModal = () => {
+    if (!previewCertData) return null;
+    const isOfficial = previewCertData.isComplete;
+    const studentName = userFullName || 'Học viên Vocario';
+    const certCode = `VOC-2026-${previewCertData.code}-${isOfficial ? 'OFFICIAL' : 'DRAFT'}`;
+    const todayStr = new Date().toLocaleDateString('vi-VN');
+
+    return (
+      <Modal
+        transparent
+        visible={showCertPreviewModal}
+        animationType="fade"
+        onRequestClose={() => setShowCertPreviewModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.certModalBox}>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {/* Top Ribbon */}
+              <View style={styles.certModalTopRow}>
+                <View
+                  style={[
+                    styles.certModalRibbon,
+                    !isOfficial && { backgroundColor: '#FEF3C7', borderColor: '#FDE68A' },
+                  ]}
+                >
+                  <Ionicons
+                    name={isOfficial ? 'checkmark-circle' : 'time-outline'}
+                    size={14}
+                    color={isOfficial ? '#15803D' : '#B45309'}
+                  />
+                  <Text
+                    style={[
+                      styles.certModalRibbonText,
+                      !isOfficial && { color: '#B45309' },
+                    ]}
+                  >
+                    {isOfficial ? 'CHỨNG CHỈ CEFR CHÍNH THỨC' : `BẢN NHÁP CHỨNG CHỈ (${previewCertData.pctNumber}%)`}
+                  </Text>
+                </View>
+                <TouchableOpacity onPress={() => setShowCertPreviewModal(false)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                  <Ionicons name="close" size={20} color={T.ink} />
+                </TouchableOpacity>
+              </View>
+
+              {/* Gold Seal */}
+              <View style={styles.certModalSealWrap}>
+                <View style={[styles.certModalSeal, !isOfficial && { borderColor: '#D97706', backgroundColor: '#FFFBEB' }]}>
+                  <Ionicons
+                    name={isOfficial ? 'ribbon' : 'medal-outline'}
+                    size={32}
+                    color={isOfficial ? '#059669' : '#D97706'}
+                  />
+                </View>
+              </View>
+
+              <Text style={styles.certModalOrg}>HỘI ĐỒNG HỌC THUẬT VOCARIO</Text>
+              <Text style={styles.certModalTitle}>
+                {isOfficial ? 'CHỨNG NHẬN NĂNG LỰC TỪ VỰNG' : 'BẢN NHÁP XÁC NHẬN NĂNG LỰC'}
+              </Text>
+
+              <Text style={styles.certModalItalic}>Chứng nhận dành cho học viên:</Text>
+              <Text style={styles.certModalName}>{studentName}</Text>
+
+              <View style={[styles.certModalLevelBadge, { borderColor: previewCertData.color }]}>
+                <Text style={[styles.certModalLevelText, { color: previewCertData.color }]}>
+                  TRÌNH ĐỘ CEFR {previewCertData.code} — {previewCertData.label.toUpperCase()}
+                </Text>
+              </View>
+
+              <Text style={styles.certModalDesc}>
+                {isOfficial
+                  ? `Học viên đã xuất sắc làm chủ toàn diện ${previewCertData.mastered}/${previewCertData.required} từ vựng tiêu chuẩn CEFR ${previewCertData.code} qua hệ thống nhận diện AI Vision và chu kỳ lặp lại ngắt quãng SuperMemo SM-2.`
+                  : `Hồ sơ tiến độ tích lũy: Hiện đã làm chủ ${previewCertData.mastered}/${previewCertData.required} từ vựng chuẩn CEFR ${previewCertData.code} (${previewCertData.pctNumber}%). Cần tiếp tục ôn tập thêm ${Math.max(0, previewCertData.required - previewCertData.mastered)} từ để kích hoạt cấp chứng chỉ chính thức.`}
+              </Text>
+
+              {/* Progress Summary Box */}
+              <View style={styles.certModalProgressBox}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Text style={{ fontSize: 11, fontWeight: '600', color: T.ink }}>Tiến độ tích lũy:</Text>
+                  <Text style={{ fontSize: 11, fontFamily: 'monospace', fontWeight: 'bold', color: previewCertData.color }}>
+                    {previewCertData.mastered} / {previewCertData.required} từ ({previewCertData.pctNumber}%)
+                  </Text>
+                </View>
+                <View style={{ height: 6, backgroundColor: '#E5DFD4', borderRadius: 3, marginTop: 6, overflow: 'hidden' }}>
+                  <View
+                    style={{
+                      height: '100%',
+                      backgroundColor: previewCertData.color,
+                      width: `${Math.min(previewCertData.pctNumber, 100)}%` as any,
+                    }}
+                  />
+                </View>
+              </View>
+
+              <View style={styles.certModalDivider} />
+
+              <View style={styles.certModalMetaRow}>
+                <View>
+                  <Text style={styles.certModalMetaLabel}>MÃ TRA CỨU:</Text>
+                  <Text style={styles.certModalMetaValue}>{certCode}</Text>
+                </View>
+                <View style={{ alignItems: 'flex-end' }}>
+                  <Text style={styles.certModalMetaLabel}>{isOfficial ? 'NGÀY CẤP:' : 'NGÀY XEM TRƯỚC:'}</Text>
+                  <Text style={styles.certModalMetaValueDark}>{todayStr}</Text>
+                </View>
+              </View>
+
+              {isOfficial ? (
+                <TouchableOpacity
+                  style={[styles.certModalCloseBtn, { backgroundColor: '#059669', borderColor: '#059669', marginBottom: 8 }]}
+                  onPress={() => {
+                    setShowCertPreviewModal(false);
+                    navigation.navigate('Profile');
+                  }}
+                >
+                  <Text style={[styles.certModalCloseBtnText, { color: '#FFFFFF' }]}>Xem trong Hồ sơ & Tải về</Text>
+                </TouchableOpacity>
+              ) : null}
+
+              <TouchableOpacity style={styles.certModalCloseBtn} onPress={() => setShowCertPreviewModal(false)}>
+                <Text style={styles.certModalCloseBtnText}>Đóng cửa sổ xem trước</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
   // ── Toast ────────────────────────────────────────────────────────────────────
   const renderToast = () => {
     if (!toastMessage) return null;
@@ -789,6 +937,7 @@ export const HomeScreen: React.FC = () => {
         {renderFooter()}
       </ScrollView>
 
+      {renderCertPreviewModal()}
       {renderToast()}
     </View>
   );
@@ -1234,4 +1383,172 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   toastText: { flex: 1, fontSize: 10, color: T.ink, lineHeight: 14 },
+
+  // ── Certificate Preview Modal ─────────────────────────────────────────────
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(45,40,35,0.65)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 18,
+  },
+  certModalBox: {
+    width: '100%',
+    maxHeight: '88%',
+    backgroundColor: '#FCFAF6',
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: T.amber,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.25,
+    shadowRadius: 18,
+    elevation: 10,
+  },
+  certModalTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  certModalRibbon: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: 'rgba(200,131,50,0.12)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(200,131,50,0.3)',
+  },
+  certModalRibbonText: {
+    fontSize: 9.5,
+    fontWeight: 'bold',
+    fontFamily: 'monospace',
+    color: T.amber,
+    letterSpacing: 0.5,
+  },
+  certModalSealWrap: {
+    alignItems: 'center',
+    marginVertical: 6,
+  },
+  certModalSeal: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#FFFBEB',
+    borderWidth: 2,
+    borderColor: T.amber,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  certModalOrg: {
+    textAlign: 'center',
+    fontSize: 9.5,
+    fontFamily: 'monospace',
+    letterSpacing: 1.5,
+    color: T.brand,
+    fontWeight: 'bold',
+    marginTop: 6,
+  },
+  certModalTitle: {
+    textAlign: 'center',
+    fontSize: 16,
+    fontFamily: 'serif',
+    fontWeight: 'bold',
+    color: T.ink,
+    marginTop: 2,
+  },
+  certModalItalic: {
+    textAlign: 'center',
+    fontStyle: 'italic',
+    fontSize: 11,
+    color: T.muted,
+    marginTop: 10,
+  },
+  certModalName: {
+    textAlign: 'center',
+    fontSize: 19,
+    fontFamily: 'serif',
+    fontWeight: 'bold',
+    color: T.ink,
+    marginTop: 2,
+  },
+  certModalLevelBadge: {
+    alignSelf: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 6,
+    borderWidth: 1.5,
+    borderColor: T.brand,
+    backgroundColor: '#FFFFFF',
+    marginTop: 10,
+  },
+  certModalLevelText: {
+    fontSize: 12,
+    fontFamily: 'monospace',
+    fontWeight: 'bold',
+    letterSpacing: 0.8,
+  },
+  certModalDesc: {
+    textAlign: 'center',
+    fontSize: 11,
+    color: '#5C5249',
+    lineHeight: 16,
+    marginTop: 10,
+    paddingHorizontal: 8,
+  },
+  certModalProgressBox: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: T.border,
+    borderRadius: 8,
+    padding: 10,
+    marginTop: 12,
+  },
+  certModalDivider: {
+    height: 1,
+    backgroundColor: T.border,
+    marginVertical: 14,
+  },
+  certModalMetaRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  certModalMetaLabel: {
+    fontSize: 8.5,
+    fontFamily: 'monospace',
+    color: T.muted,
+    letterSpacing: 0.5,
+  },
+  certModalMetaValue: {
+    fontSize: 10,
+    fontFamily: 'monospace',
+    fontWeight: 'bold',
+    color: T.brand,
+    marginTop: 2,
+  },
+  certModalMetaValueDark: {
+    fontSize: 10,
+    fontFamily: 'monospace',
+    fontWeight: 'bold',
+    color: T.ink,
+    marginTop: 2,
+  },
+  certModalCloseBtn: {
+    backgroundColor: '#FAF8F5',
+    borderWidth: 1,
+    borderColor: T.border,
+    borderRadius: 8,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  certModalCloseBtnText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: T.ink,
+  },
 });
