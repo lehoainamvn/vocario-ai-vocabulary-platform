@@ -4,7 +4,9 @@ import io
 from typing import List, Optional, Dict, Any
 from PIL import Image
 from pydantic import BaseModel
-from fastapi import FastAPI, File, UploadFile, Query
+from fastapi import FastAPI, File, UploadFile, Query, Request, HTTPException
+import time
+from collections import defaultdict
 from fastapi.middleware.cors import CORSMiddleware
 from ultralytics import YOLOWorld
 
@@ -14,6 +16,8 @@ from backend.services.scene_service import scene_service
 from backend.services.verifier_service import verifier_service
 from backend.services.quiz_generator import generate_quiz
 from backend.services.text_extractor import extract_vocabulary_from_text, generate_context_story_from_words
+
+Image.MAX_IMAGE_PIXELS = 16_000_000
 
 # Khởi tạo ứng dụng FastAPI
 app = FastAPI(
@@ -25,11 +29,46 @@ app = FastAPI(
 # Cho phép CORS từ mọi nguồn (Angular 4200, React 5173, Spring Boot 8088)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1|.*\.vercel\.app)(:[0-9]+)?$",
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
+
+# ── In-Memory Sliding Window Rate Limiter ───
+_RATE_LIMIT_BUCKET = defaultdict(list)
+
+def enforce_rate_limit(request: Request, max_requests: int = 35, window_secs: int = 60) -> None:
+    client_ip = request.client.host if request.client else "unknown"
+    now = time.time()
+    timestamps = _RATE_LIMIT_BUCKET[client_ip]
+    _RATE_LIMIT_BUCKET[client_ip] = [t for t in timestamps if now - t < window_secs]
+    if len(_RATE_LIMIT_BUCKET[client_ip]) >= max_requests:
+        raise HTTPException(
+            status_code=429,
+            detail=f"Tần suất yêu cầu vượt quá giới hạn an toàn ({max_requests} req/{window_secs}s). Vui lòng thử lại sau giây lát."
+        )
+    _RATE_LIMIT_BUCKET[client_ip].append(now)
+
+# ── Thẩm định tệp ảnh tải lên (Magic Bytes & File Size Defense) ───
+def validate_uploaded_image(image_bytes: bytes, max_size_mb: int = 8) -> None:
+    if len(image_bytes) > max_size_mb * 1024 * 1024:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Kích thước tệp vượt quá giới hạn cho phép ({max_size_mb}MB)."
+        )
+    if len(image_bytes) < 12:
+        raise HTTPException(status_code=400, detail="Tệp dữ liệu không hợp lệ hoặc bị hỏng.")
+    is_jpeg = image_bytes.startswith(b'\xff\xd8\xff')
+    is_png = image_bytes.startswith(b'\x89PNG\r\n\x1a\n')
+    is_webp = image_bytes.startswith(b'RIFF') and image_bytes[8:12] == b'WEBP'
+    is_bmp = image_bytes.startswith(b'BM')
+    if not (is_jpeg or is_png or is_webp or is_bmp):
+        raise HTTPException(
+            status_code=400,
+            detail="Định dạng tệp không được hỗ trợ. Chỉ chấp nhận các định dạng ảnh hợp lệ: JPEG, PNG, WEBP, BMP."
+        )
+
 
 # Ưu tiên sử dụng trọng số mô hình đã qua Fine-Tuning (best.pt)
 FINETUNED_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "runs", "train", "vocario_yolo_world_finetune", "weights", "best.pt")
@@ -333,6 +372,7 @@ def reload_target_classes():
 
 @app.post("/detect")
 async def detect_objects(
+    request: Request,
     file: UploadFile = File(...),
     conf: float = Query(0.15, description="Ngưỡng tin cậy nhận diện (Confidence Threshold)"),
     theme: Optional[str] = Query("general", description="Chủ đề bối cảnh"),
@@ -347,8 +387,10 @@ async def detect_objects(
         return {"error": "Mô hình YOLO-World chưa được khởi tạo", "detectedObjects": []}
 
     try:
-        # Đọc dữ liệu ảnh từ request upload
+        # Kiểm tra Rate Limit & Thẩm định tệp ảnh
+        enforce_rate_limit(request, max_requests=25, window_secs=60)
         image_bytes = await file.read()
+        validate_uploaded_image(image_bytes, max_size_mb=8)
         pil_image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
         width, height = pil_image.size
 

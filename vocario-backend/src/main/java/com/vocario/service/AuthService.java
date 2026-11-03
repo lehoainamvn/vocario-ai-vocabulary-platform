@@ -5,6 +5,8 @@ import com.vocario.entity.User;
 import com.vocario.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,9 +19,13 @@ public class AuthService {
     private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
     private final UserRepository userRepository;
+    private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthService(UserRepository userRepository) {
+    public AuthService(UserRepository userRepository, JwtService jwtService) {
         this.userRepository = userRepository;
+        this.jwtService = jwtService;
+        this.passwordEncoder = new BCryptPasswordEncoder(12);
     }
 
     @Transactional
@@ -37,38 +43,35 @@ public class AuthService {
         // 1. Kiểm tra Email đã tồn tại chưa
         if (userRepository.existsByEmail(cleanEmail)) {
             log.warn("❌ [REGISTER FAILED] Đăng ký KHÔNG THÀNH CÔNG: Email '{}' ĐÃ TỒN TẠI trong hệ thống!", cleanEmail);
-            log.warn("   Lý do: Mỗi người dùng chỉ được sử dụng một địa chỉ email duy nhất.");
             throw new RuntimeException("Email '" + cleanEmail + "' đã được đăng ký trước đó. Vui lòng sử dụng email khác hoặc đăng nhập!");
         }
 
         // 2. Kiểm tra Username đã tồn tại chưa
         if (userRepository.existsByUsername(cleanUsername)) {
             log.warn("❌ [REGISTER FAILED] Đăng ký KHÔNG THÀNH CÔNG: Tên đăng nhập (username) '{}' ĐÃ ĐƯỢC SỬ DỤNG!", cleanUsername);
-            log.warn("   Lý do: Tên đăng nhập đã có người khác chọn.");
             throw new RuntimeException("Tên đăng nhập '" + cleanUsername + "' đã tồn tại. Vui lòng chọn một tên đăng nhập khác!");
         }
 
-        // 3. Tạo và lưu người dùng mới
-        log.info("💾 [REGISTER DB] Đang lưu thông tin tài khoản '{}' vào cơ sở dữ liệu PostgreSQL (vocario_db)...", cleanUsername);
-        User user = new User(cleanEmail, cleanUsername, request.password, request.fullName);
+        // 3. Băm mật khẩu một chiều bằng BCrypt Work Factor 12
+        String hashedPassword = passwordEncoder.encode(request.password);
+
+        // 4. Tạo và lưu người dùng mới vào CSDL
+        log.info("💾 [REGISTER DB] Đang lưu thông tin tài khoản '{}' với mật khẩu đã mã hóa BCrypt...", cleanUsername);
+        User user = new User(cleanEmail, cleanUsername, hashedPassword, request.fullName);
         User savedUser = userRepository.save(user);
 
-        log.info("✅ [REGISTER SUCCESS] Đăng ký THÀNH CÔNG tài khoản mới!");
-        log.info("   - User ID   : {}", savedUser.getId());
-        log.info("   - Username  : {}", savedUser.getUsername());
-        log.info("   - Email     : {}", savedUser.getEmail());
-        log.info("   - Full Name : {}", savedUser.getFullName());
-        log.info("   - Target Lvl: {}", savedUser.getTargetLevel());
+        log.info("✅ [REGISTER SUCCESS] Đăng ký THÀNH CÔNG tài khoản mới: ID={}", savedUser.getId());
         log.info("================================================================================");
 
-        String dummyToken = "jwt_token_" + savedUser.getId();
+        // Phát hành JSON Web Token có chữ ký mật mã HMAC-SHA256
+        String token = jwtService.generateToken(savedUser);
 
         return new AuthDto.AuthResponse(
                 savedUser.getId(),
                 savedUser.getEmail(),
                 savedUser.getUsername(),
                 savedUser.getFullName(),
-                dummyToken,
+                token,
                 savedUser.getStreakCount(),
                 savedUser.getRole()
         );
@@ -84,11 +87,28 @@ public class AuthService {
                 .orElse(null);
 
         if (user == null) {
-            log.warn("❌ [LOGIN FAILED] Không tìm thấy tài khoản '{}' (kiểm tra cả username lẫn email) trong database!", cleanIdentifier);
+            log.warn("❌ [LOGIN FAILED] Không tìm thấy tài khoản '{}' trong database!", cleanIdentifier);
             throw new RuntimeException("Tài khoản hoặc mật khẩu không chính xác");
         }
 
-        if (!user.getPassword().equals(request.password)) {
+        String storedPassword = user.getPassword();
+        boolean isMatched = false;
+
+        // Cơ chế Adaptive Password Hashing: Hỗ trợ tự động nâng cấp mật khẩu cũ sang BCrypt
+        if (storedPassword != null && (storedPassword.startsWith("$2a$") || storedPassword.startsWith("$2b$") || storedPassword.startsWith("$2y$"))) {
+            isMatched = passwordEncoder.matches(request.password, storedPassword);
+        } else {
+            // Mật khẩu legacy dạng plaintext (từ dữ liệu thử nghiệm ban đầu)
+            isMatched = storedPassword != null && storedPassword.equals(request.password);
+            if (isMatched) {
+                // Tự động nâng cấp sang mã băm BCrypt an toàn ngay trong lần đăng nhập này
+                user.setPassword(passwordEncoder.encode(request.password));
+                userRepository.save(user);
+                log.info("🔒 [SECURITY UPGRADE] Đã tự động nâng cấp mật khẩu của '{}' sang chuẩn mã băm BCrypt!", user.getUsername());
+            }
+        }
+
+        if (!isMatched) {
             log.warn("❌ [LOGIN FAILED] Mật khẩu không chính xác cho tài khoản '{}' (User ID: {})!", cleanIdentifier, user.getId());
             throw new RuntimeException("Tài khoản hoặc mật khẩu không chính xác");
         }
@@ -100,14 +120,15 @@ public class AuthService {
         log.info("✅ [LOGIN SUCCESS] Đăng nhập THÀNH CÔNG cho user: id={}, username='{}', role='{}'", 
                 user.getId(), user.getUsername(), user.getRole());
 
-        String dummyToken = "jwt_token_" + user.getId();
+        // Phát hành JSON Web Token có chữ ký mật mã HMAC-SHA256
+        String token = jwtService.generateToken(user);
 
         return new AuthDto.AuthResponse(
                 user.getId(),
                 user.getEmail(),
                 user.getUsername(),
                 user.getFullName(),
-                dummyToken,
+                token,
                 user.getStreakCount(),
                 user.getRole()
         );
