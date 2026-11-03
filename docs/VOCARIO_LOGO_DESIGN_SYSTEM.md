@@ -61,6 +61,10 @@ Tên gọi **Vocario** là sự giao thoa hài hòa giữa 4 trụ cột công n
 ## 3. Ý TƯỞNG SÁNG TẠO & CẤU TRÚC BIỂU TRƯNG
 
 ### 🎯 Biểu Tượng Chính Thức: "The Optical Aperture 'V'" (Khẩu Độ Tri Thức)
+
+![Vocario Primary Logo](figures/logo/vocario-logo-primary.jpg)
+*Hình 1: Bản thiết kế chính thức của Logo Vocario — Tỷ lệ vàng hình học, phong cách Scandinavian Editorial.*
+
 Biểu trưng Vocario là sự hợp nhất có chủ đích của 3 biểu tượng thị giác:
 
 ```
@@ -79,6 +83,9 @@ Biểu trưng Vocario là sự hợp nhất có chủ đích của 3 biểu tư�
 2. **Khung ngắm quang học L-Brackets (`[   ]`)**: Lấy cảm hứng trực tiếp từ giao diện nhận diện vật thể AI Camera Studio của Vocario. Hai góc ngoặc L-bracket ôm lấy chữ V tượng trưng cho khả năng bóc tách thế giới thực thành ngôn ngữ.
 3. **Cánh sách học thuật (Open Editorial Book)**: Phần lòng chữ V tạo góc mở $45^\circ$, gợi nhắc đến cuốn từ điển bách khoa cổ điển đang mở ra trước mắt người học.
 4. **Điểm vàng tiêu cự (The Amber Iris)**: Điểm nhấn màu vàng hổ phách (`#F7D147`) đặt tại góc hội tụ, tượng trưng cho tia sáng thông tuệ và sự tập trung cao độ của người học.
+
+![Vocario Alternative Crosshair Concept](figures/logo/vocario-logo-alternative.jpg)
+*Hình 2: Phiên bản biến thể góc ngắm quang học đối xứng (Alternative Crosshair Concept).*
 
 ---
 
@@ -260,3 +267,4 @@ Mọi biến thể logo Vocario trước khi đưa vào phát hành chính thứ
 
 ---
 *Tài liệu được thiết lập và phê duyệt bởi: Đội ngũ Nghiên cứu & Thiết kế Sản phẩm Vocario.*
+

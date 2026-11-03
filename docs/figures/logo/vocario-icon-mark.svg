@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none">
+  <defs>
+    <!-- Scandinavian Wood Gradient (Organic, Not Cyberpunk) -->
+    <linearGradient id="woodGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8C755E"/>
+      <stop offset="50%" stop-color="#7D6853"/>
+      <stop offset="100%" stop-color="#685542"/>
+    </linearGradient>
+
+    <!-- Baltic Amber Iris Gradient -->
+    <radialGradient id="amberGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FCE38A"/>
+      <stop offset="60%" stop-color="#F7D147"/>
+      <stop offset="100%" stop-color="#E8BA20"/>
+    </radialGradient>
+
+    <!-- Subtle Drop Shadow for Paper Texture -->
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#2D2823" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- Canvas Washi Paper Background -->
+  <rect x="16" y="16" width="480" height="480" rx="120" fill="#F8F6F1" filter="url(#softShadow)"/>
+  <rect x="16" y="16" width="480" height="480" rx="120" stroke="#E5DED3" stroke-width="3"/>
+
+  <!-- Optical Camera Viewfinder L-Brackets (Computer Vision) -->
+  <!-- Top-Left Bracket -->
+  <path d="M100 160 V 100 H 160" stroke="#7D6853" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Top-Right Bracket -->
+  <path d="M352 100 H 412 V 160" stroke="#7D6853" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" opacity="0.45"/>
+  <!-- Bottom-Left Bracket -->
+  <path d="M100 352 V 412 H 160" stroke="#7D6853" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" opacity="0.45"/>
+  <!-- Bottom-Right Bracket -->
+  <path d="M412 352 V 412 H 352" stroke="#7D6853" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Golden Aperture Grid Marks (Subtle Camera Crosshairs) -->
+  <circle cx="256" cy="100" r="3" fill="#A8A199"/>
+  <circle cx="256" cy="412" r="3" fill="#A8A199"/>
+  <circle cx="100" cy="256" r="3" fill="#A8A199"/>
+  <circle cx="412" cy="256" r="3" fill="#A8A199"/>
+
+  <!-- Main "V" Monogram & Open Academic Book Fold -->
+  <g id="main-emblem">
+    <!-- Left Wing (Vocabulary Foundation - Solid & Architectural) -->
+    <path d="M152 168 L 244 380 C 248 388 254 392 256 392 C 258 392 264 388 268 380 L 360 168" 
+          stroke="url(#woodGrad)" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Inner Book Leaf Fold (Knowledge Opening - $45 Degree Academic V) -->
+    <path d="M198 196 L 256 328 L 314 196" 
+          stroke="#5C4D3E" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" opacity="0.75"/>
+
+    <!-- Center Line of Spine -->
+    <line x1="256" y1="210" x2="256" y2="320" stroke="#FAF8F5" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
+
+    <!-- Baltic Amber Iris Convergence (The Focus Point of Vision) -->
+    <circle cx="256" cy="386" r="28" fill="#F7D147" opacity="0.18"/>
+    <circle cx="256" cy="386" r="18" fill="url(#amberGlow)"/>
+    <circle cx="256" cy="386" r="18" stroke="#FFFFFF" stroke-width="3" stroke-opacity="0.85"/>
+  </g>
+</svg>
