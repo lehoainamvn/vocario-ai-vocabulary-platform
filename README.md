@@ -117,6 +117,19 @@ Mỗi từ vựng được sinh kèm phiên âm quốc tế IPA, cấp độ nă
   <i>Giao diện thẻ từ vựng thiết kế theo phong cách Scandinavian Editorial — Trọng tâm chữ in, thẩm mỹ tối giản, không gây mỏi mắt</i>
 </p>
 
+### 4. Trải Nghiệm Ứng Dụng Di Động Thông Minh (React Native & Expo 58 Mobile Experience)
+Toàn bộ các màn hình chức năng của `vocario-mobile` được thiết kế tỉ mỉ theo triết lý **Scandinavian Editorial**, xử lý triệt để Dynamic Safe Area Inset cho iOS (Dynamic Island / Notch) và Android, trang bị thanh điều hướng thanh thoát cùng nút FAB Quét AI viền vàng Gold:
+
+<p align="center">
+  <img src="docs/figures/mobile/01_mobile_home_dashboard.jpg" width="19%" alt="Home Dashboard" style="border-radius: 8px; border: 1px solid #E5DED3;" />
+  <img src="docs/figures/mobile/03_mobile_scanner_camera.jpg" width="19%" alt="Camera Scanner" style="border-radius: 8px; border: 1px solid #E5DED3;" />
+  <img src="docs/figures/mobile/04_mobile_wordbook_topics.jpg" width="19%" alt="Wordbook Topics" style="border-radius: 8px; border: 1px solid #E5DED3;" />
+  <img src="docs/figures/mobile/02_mobile_arena_blitz.jpg" width="19%" alt="Arena Blitz" style="border-radius: 8px; border: 1px solid #E5DED3;" />
+  <img src="docs/figures/mobile/05_mobile_profile_cefr.jpg" width="19%" alt="Profile CEFR" style="border-radius: 8px; border: 1px solid #E5DED3;" />
+  <br/>
+  <i>Từ trái sang: (1) Trang chủ Dashboard SM-2 · (2) Smart Aperture Scanner · (3) Sổ từ vựng theo chủ đề · (4) Đấu trường Blitz 60s · (5) Hồ sơ & Mục tiêu CEFR</i>
+</p>
+
 ---
 
 ## 💡 GIỚI THIỆU TỔNG QUAN & VẤN ĐỀ GIẢI QUYẾT
