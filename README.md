@@ -3,6 +3,8 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Spring%20Boot-3.3.4-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring Boot" />
   <img src="https://img.shields.io/badge/Angular-19.0-DD0031?style=for-the-badge&logo=angular&logoColor=white" alt="Angular" />
+  <img src="https://img.shields.io/badge/React%20Native-0.88-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React Native" />
+  <img src="https://img.shields.io/badge/Expo-v58-000020?style=for-the-badge&logo=expo&logoColor=white" alt="Expo" />
   <img src="https://img.shields.io/badge/FastAPI-0.110-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" />
   <img src="https://img.shields.io/badge/PostgreSQL-17-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
   <img src="https://img.shields.io/badge/AI%20Vision-YOLO--World%20v2-FF6F00?style=for-the-badge&logo=openai&logoColor=white" alt="YOLO-World v2" />
@@ -136,7 +138,20 @@ DoAnTotNghiep/
 │   ├── nginx.conf            # Nginx reverse proxy & HTML5 SPA rewrite rules
 │   └── package.json
 │
-├── vocario_mobile/           # Mobile Application (Flutter Cross-Platform)
+├── vocariov2/                # Flagship Mobile Application (React Native 0.88 + Expo 58)
+│   ├── assets/               # Biểu tượng, logo thương hiệu và tài nguyên hình ảnh
+│   ├── src/
+│   │   ├── api/              # Axios REST Client, dynamic baseURL, Token Storage
+│   │   ├── components/       # Reusable UI components & Safe Area Headers
+│   │   ├── constants/        # Three-Tier Design Tokens & Scandinavian Color Palette
+│   │   ├── navigation/       # RootNavigator, 5 Bottom Tabs & Center Scanner FAB
+│   │   ├── screens/          # Scanner, Collection, Wordbook, Arena, Leaderboard
+│   │   └── types/            # TypeScript Interface & Navigation definitions
+│   ├── app.json              # Cấu hình Expo, quyền Camera/Micro và bundle ID
+│   ├── package.json          # Dependencies React Native, Expo, Axios, Navigation
+│   └── README.md             # Hướng dẫn chi tiết phân hệ di động
+│
+├── vocario_mobile/           # Mobile Prototype & Research App (Flutter Cross-Platform)
 │   ├── lib/                  # Mã nguồn Dart (Clean Architecture, Tokens, Screens)
 │   │   ├── core/             # Constants (Tokens), Services (ApiService), Utils (Image/Speech)
 │   │   ├── screens/          # Scanner, Wordbook (SM-2), Arena, Extractor, Profile, Home
@@ -244,9 +259,28 @@ npm start
 
 ---
 
-### Bước 5: Khởi Chạy Mobile App Flutter (`vocario_mobile`)
+### Bước 5: Khởi Chạy Mobile App Flagship Expo React Native (`vocariov2`)
 
-Ứng dụng di động Vocario hỗ trợ đa nền tảng (**Flutter Web**, **Android Emulator**, **Thiết bị thật**):
+Ứng dụng di động chính thức của hệ thống xây dựng trên **React Native 0.88 + Expo 58**:
+
+```powershell
+cd d:\GitHub\DoAnTotNghiep\vocariov2
+
+# 1. Cài đặt các gói phụ thuộc (chỉ cần chạy lần đầu)
+npm install
+
+# 2. Khởi chạy Expo Metro Bundler
+npx expo start
+```
+* **Mở trên điện thoại thật:** Quét mã QR hiển thị trong terminal bằng ứng dụng **Expo Go** (Android / iOS).
+* **Mở Web Preview:** Bấm phím `w` trong terminal.
+* **Mở Giả lập:** Bấm phím `a` (Android Emulator) hoặc `i` (iOS Simulator).
+
+---
+
+### Bước 6: Khởi Chạy Mobile Prototype Flutter (`vocario_mobile`)
+
+Bên cạnh ứng dụng React Native, dự án cung cấp thêm bản thử nghiệm **Flutter Cross-Platform**:
 
 ```powershell
 cd d:\GitHub\DoAnTotNghiep\vocario_mobile

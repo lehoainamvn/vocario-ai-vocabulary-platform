@@ -29,7 +29,7 @@ load_dotenv(ENV_PATH)
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 GROQ_MODEL = os.getenv("GROQ_MODEL", "qwen/qwen3.8-27b")
 
-DEFAULT_PG_URL = "postgresql://postgres.ltviznwjqsfszbjbjjqj:Vocario2026Pass@aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres?sslmode=require"
+DEFAULT_PG_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/vocario_db")
 PG_URL = os.getenv("DATABASE_URL", DEFAULT_PG_URL)
 
 try:

@@ -78,7 +78,31 @@ cache/
 !backend/services/cache/**
 
 # -------------------------------------------------------------------------
-# 6. HỆ ĐIỀU HÀNH & TRÌNH SOẠN THẢO (OS & IDEs)
+# 6. REACT NATIVE & EXPO (vocariov2)
+# -------------------------------------------------------------------------
+vocariov2/node_modules/
+vocariov2/.expo/
+.expo/
+vocariov2/dist/
+vocariov2/web-build/
+*.jks
+*.p8
+*.p12
+*.keystore
+
+# -------------------------------------------------------------------------
+# 7. FLUTTER & DART (vocario_mobile)
+# -------------------------------------------------------------------------
+vocario_mobile/.dart_tool/
+vocario_mobile/build/
+vocario_mobile/.flutter-plugins
+vocario_mobile/.flutter-plugins-dependencies
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# 8. HỆ ĐIỀU HÀNH & TRÌNH SOẠN THẢO (OS & IDEs)
+# -------------------------------------------------------------------------
 # -------------------------------------------------------------------------
 .DS_Store
 .DS_Store?

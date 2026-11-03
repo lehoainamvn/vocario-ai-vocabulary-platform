@@ -25,7 +25,7 @@ from dotenv import load_dotenv
 ENV_PATH = os.path.join(ROOT_DIR, "backend", ".env")
 load_dotenv(ENV_PATH)
 
-DEFAULT_PG_URL = "postgresql://postgres.ltviznwjqsfszbjbjjqj:Vocario2026Pass@aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres?sslmode=require"
+DEFAULT_PG_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/vocario_db")
 PG_URL = os.getenv("DATABASE_URL", DEFAULT_PG_URL)
 
 CACHE_FILE = os.path.join(ROOT_DIR, "backend", "services", "cache", "lexicon_cache.json")
