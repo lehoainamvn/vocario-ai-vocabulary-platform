@@ -58,7 +58,7 @@ vocario-mobile/
 │   │   ├── ArenaScreen.tsx          # Đấu trường tốc độ từ vựng 60s Blitz
 │   │   ├── LeaderboardScreen.tsx    # Bảng xếp hạng thành tích học viên
 │   │   ├── TextExtractorScreen.tsx  # Document Intelligence bóc tách văn bản
-│   │   ├── ClassroomScreen.tsx      # Lớp học ảo tương tác
+│   │   ├── ClassroomScreen.tsx      # Không gian lớp học & nhóm học tập
 │   │   └── ProfileScreen.tsx        # Hồ sơ cá nhân & chỉ số thành thạo CEFR
 │   └── types/                # TypeScript interface definitions
 ├── app.json                  # Cấu hình Expo, app permissions và định danh bundle

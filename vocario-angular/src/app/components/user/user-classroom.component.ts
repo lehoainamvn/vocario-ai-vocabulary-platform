@@ -44,7 +44,7 @@ interface ClassroomQuizQuestion {
         <section class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-[#E5DED3]">
           <div class="max-w-[720px]">
             <span class="text-[10px] font-bold uppercase tracking-[0.11em] text-[#7D6853] block mb-2">
-              Virtual Classroom & Deck Exchange · Lớp học ảo & Chia sẻ bộ từ vựng
+              Community Classroom & Deck Exchange · Không gian Lớp học & Chia sẻ bộ từ vựng
             </span>
             <h1 class="font-serif text-3xl sm:text-4xl lg:text-[36px] font-normal text-[#29251F] tracking-[-0.035em] leading-[1.12]">
               Lớp học & Chia sẻ bộ từ

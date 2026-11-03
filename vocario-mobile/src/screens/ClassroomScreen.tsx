@@ -160,9 +160,9 @@ export const ClassroomScreen: React.FC = () => {
             <MaterialIcons name="arrow-back" size={20} color={T.ink} />
           </TouchableOpacity>
           <View style={{ marginLeft: 12 }}>
-            <Text style={styles.topBarMono}>VIRTUAL ACADEMY</Text>
+            <Text style={styles.topBarMono}>COMMUNITY CLASSROOM</Text>
             <Text style={styles.topBarTitle}>
-              {activeClassroom ? activeClassroom.name : 'Lớp học ảo & Chia sẻ'}
+              {activeClassroom ? activeClassroom.name : 'Không Gian Lớp Học'}
             </Text>
           </View>
         </View>
