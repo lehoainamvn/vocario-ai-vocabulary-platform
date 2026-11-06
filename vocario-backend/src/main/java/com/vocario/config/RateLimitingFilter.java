@@ -43,8 +43,11 @@ public class RateLimitingFilter extends OncePerRequestFilter {
 
         String uri = request.getRequestURI();
 
-        // Bỏ qua các endpoint tĩnh hoặc tài liệu Swagger/OpenAPI
-        if (!uri.startsWith("/api") || uri.startsWith("/v3/api-docs") || uri.startsWith("/swagger-ui")) {
+        // Bỏ qua preflight CORS (OPTIONS) và các endpoint tĩnh hoặc tài liệu Swagger/OpenAPI
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())
+                || !uri.startsWith("/api") 
+                || uri.startsWith("/v3/api-docs") 
+                || uri.startsWith("/swagger-ui")) {
             filterChain.doFilter(request, response);
             return;
         }

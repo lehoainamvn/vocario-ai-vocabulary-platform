@@ -3,9 +3,9 @@
 # =========================================================================
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/vocario_db}
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: "${SPRING_DATASOURCE_PASSWORD:}"
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres?sslmode=require}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres.ltviznwjqsfszbjbjjqj}
+    password: "${SPRING_DATASOURCE_PASSWORD:Vocario2026Pass}"
     driver-class-name: org.postgresql.Driver
 
   jpa:
