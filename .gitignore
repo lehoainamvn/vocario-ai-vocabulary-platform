@@ -76,6 +76,8 @@ htmlcov/
 cache/
 !vocario-ai/services/cache/
 !vocario-ai/services/cache/**
+!backend/services/cache/
+!backend/services/cache/**
 
 # -------------------------------------------------------------------------
 # 6. REACT NATIVE & EXPO (vocariov2)

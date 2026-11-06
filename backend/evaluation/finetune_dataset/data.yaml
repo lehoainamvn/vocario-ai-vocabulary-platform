@@ -1,0 +1,32 @@
+# Vocario Fine-Tuning Dataset Configuration
+# Phục vụ huấn luyện thích nghi (Transfer Learning / Domain Adaptation) cho mô hình YOLO-World v2
+# Nguồn: Trích xuất từ Google Open Images V7 + Tập ảnh bối cảnh đời sống thực tế (Domestic Contexts)
+
+path: d:/GitHub/DoAnTotNghiep/backend/evaluation/finetune_dataset
+train: images/train
+val: images/val
+
+# Số lượng phân lớp từ vựng cốt lõi học tập (Key English Vocabulary Classes)
+nc: 20
+
+names:
+  0: desk
+  1: chair
+  2: laptop
+  3: book
+  4: potted plant
+  5: cup
+  6: bookshelf
+  7: table
+  8: sofa
+  9: coffee table
+  10: pillow
+  11: bus
+  12: car
+  13: person
+  14: road
+  15: street lamp
+  16: refrigerator
+  17: bottle
+  18: kitchen counter
+  19: sink

@@ -1,0 +1,93 @@
+[
+  {
+    "filename": "study_desk_01.png",
+    "theme": "study_office",
+    "description": "Bàn học sinh bằng gỗ công nghiệp, kèm giá sách và laptop",
+    "expected_objects": [
+      "desk",
+      "chair",
+      "laptop",
+      "book",
+      "potted plant",
+      "cup",
+      "bookshelf",
+      "table"
+    ]
+  },
+  {
+    "filename": "study_desk_02.png",
+    "theme": "study_office",
+    "description": "Góc bàn học tập với laptop, ghế tựa và sách vở",
+    "expected_objects": [
+      "desk",
+      "chair",
+      "laptop",
+      "book",
+      "potted plant",
+      "cup",
+      "bookshelf"
+    ]
+  },
+  {
+    "filename": "living_room_01.jpg",
+    "theme": "living_room_decor",
+    "description": "Phòng khách hiện đại có ghế sofa, bàn trà, chậu cây và sách",
+    "expected_objects": [
+      "sofa",
+      "couch",
+      "coffee table",
+      "table",
+      "potted plant",
+      "book",
+      "pillow",
+      "cushion",
+      "carpet"
+    ]
+  },
+  {
+    "filename": "traffic_bus_01.jpg",
+    "theme": "outdoor_vehicles_street",
+    "description": "Xe bus công cộng đang di chuyển trên đường phố có hành khách",
+    "expected_objects": [
+      "bus",
+      "person",
+      "car",
+      "road",
+      "street lamp"
+    ]
+  },
+  {
+    "filename": "kitchen_01.png",
+    "theme": "kitchen_appliances",
+    "description": "Khu vực bếp gia đình có tủ lạnh lớn và chai nước",
+    "expected_objects": [
+      "refrigerator",
+      "bottle",
+      "kitchen counter",
+      "sink"
+    ]
+  },
+  {
+    "filename": "camera_desk_01.jpg",
+    "theme": "study_office",
+    "description": "Ảnh chụp thực tế từ camera người dùng: người ngồi bàn, ghế và bình nước",
+    "expected_objects": [
+      "person",
+      "chair",
+      "bottle",
+      "desk",
+      "laptop"
+    ]
+  },
+  {
+    "filename": "camera_desk_02.jpg",
+    "theme": "study_office",
+    "description": "Ảnh chụp thực tế góc học tập qua webcam",
+    "expected_objects": [
+      "person",
+      "chair",
+      "bottle",
+      "desk"
+    ]
+  }
+]
